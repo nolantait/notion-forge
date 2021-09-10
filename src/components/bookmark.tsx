@@ -1,5 +1,5 @@
 import React from "react";
-import { BookmarkBlock } from "notion-types";
+import { Decoration, BaseBlock } from "notion-types";
 import { cs } from "../utils";
 import { useNotionContext } from "../context";
 import { GracefulImage } from "../components/graceful-image";
@@ -11,16 +11,37 @@ interface BookmarkProps {
   block: BookmarkBlock;
 }
 
+interface BookmarkBlock extends BaseBlock {
+  type: "bookmark";
+  properties: {
+    link: Decoration[];
+    title: Decoration[];
+    description: Decoration[];
+    caption?: Decoration[];
+  };
+
+  format: {
+    block_color?: string;
+    bookmark_icon: string;
+    bookmark_cover: string;
+  };
+}
+
 export const Bookmark = (props: BookmarkProps) => {
   const { block, blockId } = props;
   const { components } = useNotionContext();
+  const { properties } = block;
 
-  if (!block.properties) return null;
+  if (!properties) return null;
 
-  let title = getTextContent(block.properties?.title);
+  let title = getTextContent(properties.title);
   if (!title) {
-    title = getTextContent(block.properties?.link);
+    title = getTextContent(properties.link);
   }
+
+  const caption = properties.caption ? (
+    <components.text value={properties.caption} block={block} />
+  ) : null;
 
   if (title) {
     if (title.startsWith("http")) {
@@ -34,7 +55,7 @@ export const Bookmark = (props: BookmarkProps) => {
   }
 
   return (
-    <div className="notion-row">
+    <>
       <components.link
         target="_blank"
         rel="noopener noreferrer"
@@ -86,6 +107,8 @@ export const Bookmark = (props: BookmarkProps) => {
           </div>
         )}
       </components.link>
-    </div>
+
+      {caption && <div className="notion-bookmark-caption">{caption}</div>}
+    </>
   );
 };

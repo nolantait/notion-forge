@@ -7,7 +7,7 @@ import {
   uuidToId,
 } from "notion-utils";
 
-import useScrollSpy from "../hooks/use-scroll-spy";
+// import useScrollSpy from "../hooks/use-scroll-spy";
 import { useNotionContext } from "../context";
 
 interface AsideTableOfContentsParams {
@@ -58,10 +58,10 @@ export const TableOfContents = (props: TableOfContentsParams) => {
 };
 
 export const AsideTableOfContents = (props: AsideTableOfContentsParams) => {
-  const throttleMs = 100;
+  // const throttleMs = 100;
   const { darkMode, recordMap } = useNotionContext();
   const { block } = props;
-  const [activeSection, _setActiveSection] = useScrollSpy(throttleMs);
+  // const [activeSection, _setActiveSection] = useScrollSpy(throttleMs);
   const toc = getPageTableOfContents(block, recordMap);
 
   return (
@@ -82,8 +82,8 @@ export const AsideTableOfContents = (props: AsideTableOfContentsParams) => {
               href={`#${id}`}
               className={cs(
                 "notion-table-of-contents-item",
-                `notion-table-of-contents-item-indent-level-${tocItem.indentLevel}`,
-                activeSection === id && "notion-table-of-contents-active-item"
+                `notion-table-of-contents-item-indent-level-${tocItem.indentLevel}`
+                // activeSection === id && "notion-table-of-contents-active-item"
               )}
             >
               <span

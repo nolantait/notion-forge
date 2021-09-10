@@ -73,10 +73,6 @@ export const Collection: React.FC<{
   }
 
   const style: React.CSSProperties = {};
-  if (collectionView.type === "table" || collectionView.type === "board") {
-    style.paddingLeft = padding;
-    style.paddingRight = padding;
-  }
 
   const title = getTextContent(collection.name).trim();
   if (collection.icon) {
