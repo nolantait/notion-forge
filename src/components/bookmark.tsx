@@ -52,7 +52,7 @@ export const Bookmark = (props: BookmarkProps) => {
   }
 
   return (
-    <div className="notion-row">
+    <>
       <components.link
         target="_blank"
         rel="noopener noreferrer"
@@ -105,7 +105,7 @@ export const Bookmark = (props: BookmarkProps) => {
         )}
       </components.link>
 
-      {caption && <div className="notion-caption">{caption}</div>}
-    </div>
+      {caption && <div className="notion-bookmark-caption">{caption}</div>}
+    </>
   );
 };
