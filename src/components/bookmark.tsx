@@ -30,15 +30,18 @@ interface BookmarkBlock extends BaseBlock {
 export const Bookmark = (props: BookmarkProps) => {
   const { block, blockId } = props;
   const { components } = useNotionContext();
+  const { properties } = block;
 
-  if (!block.properties) return null;
+  if (!properties) return null;
 
-  let title = getTextContent(block.properties?.title);
+  let title = getTextContent(properties.title);
   if (!title) {
-    title = getTextContent(block.properties?.link);
+    title = getTextContent(properties.link);
   }
 
-  const caption = getTextContent(block.properties?.caption);
+  const caption = properties.caption ? (
+    <components.text value={properties.caption} block={block} />
+  ) : null;
 
   if (title) {
     if (title.startsWith("http")) {
