@@ -1,6 +1,6 @@
 {
   "name": "notion-forge",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Customizable React renderer for Notion based on react-notion-x.",
   "repository": "nolantait/notion-forge",
   "author": "Nolan J Tait <nolanjtait@gmail.com>",
