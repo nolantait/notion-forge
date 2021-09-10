@@ -10,8 +10,6 @@ export const CollectionViewTable: React.FC<CollectionViewProps> = ({
   collection,
   collectionView,
   collectionData,
-  padding,
-  width,
 }) => {
   const { recordMap } = useNotionContext();
   // console.log('table', { collection, collectionView, collectionData })
@@ -33,20 +31,8 @@ export const CollectionViewTable: React.FC<CollectionViewProps> = ({
   // const hasFullWidths = properties.every((p) => p.width >= 0)
 
   return (
-    <div
-      className="notion-table"
-      style={{
-        width,
-        maxWidth: width,
-      }}
-    >
-      <div
-        className="notion-table-view"
-        style={{
-          paddingLeft: padding,
-          paddingRight: padding,
-        }}
-      >
+    <div className="notion-table">
+      <div className="notion-table-view">
         {!!properties.length && (
           <>
             <div className="notion-table-header">
