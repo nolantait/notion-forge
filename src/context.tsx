@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import { ExtendedRecordMap } from "notion-types";
 
 import {
@@ -214,5 +214,5 @@ export const NotionContextProvider: React.FC<PartialNotionContext> = ({
 export const NotionContextConsumer = ctx.Consumer;
 
 export const useNotionContext = (): NotionContext => {
-  return React.useContext(ctx);
+  return useContext(ctx);
 };

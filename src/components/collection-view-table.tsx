@@ -1,104 +1,104 @@
-import React from 'react'
+import React from "react";
 
-import { CollectionViewProps } from '../types'
-import { cs } from '../utils'
-import { Property } from './property'
-import { CollectionColumnTitle } from './collection-column-title'
-import { useNotionContext } from '../context'
+import { CollectionViewProps } from "../types";
+import { cs } from "../utils";
+import { Property } from "./property";
+import { CollectionColumnTitle } from "./collection-column-title";
+import { useNotionContext } from "../context";
 
 export const CollectionViewTable: React.FC<CollectionViewProps> = ({
   collection,
   collectionView,
   collectionData,
   padding,
-  width
+  width,
 }) => {
-  const { recordMap } = useNotionContext()
+  const { recordMap } = useNotionContext();
   // console.log('table', { collection, collectionView, collectionData })
 
-  let properties = []
+  let properties = [];
 
   if (collectionView.format?.table_properties) {
     properties = collectionView.format?.table_properties.filter(
       (p) => p.visible && collection.schema[p.property]
-    )
+    );
   } else {
-    properties = [{ property: 'title' }].concat(
+    properties = [{ property: "title" }].concat(
       Object.keys(collection.schema)
-        .filter((p) => p !== 'title')
+        .filter((p) => p !== "title")
         .map((property) => ({ property }))
-    )
+    );
   }
 
   // const hasFullWidths = properties.every((p) => p.width >= 0)
 
   return (
     <div
-      className='notion-table'
+      className="notion-table"
       style={{
         width,
-        maxWidth: width
+        maxWidth: width,
       }}
     >
       <div
-        className='notion-table-view'
+        className="notion-table-view"
         style={{
           paddingLeft: padding,
-          paddingRight: padding
+          paddingRight: padding,
         }}
       >
         {!!properties.length && (
           <>
-            <div className='notion-table-header'>
-              <div className='notion-table-header-inner'>
+            <div className="notion-table-header">
+              <div className="notion-table-header-inner">
                 {properties.map((p) => {
-                  const schema = collection.schema?.[p.property]
-                  const isTitle = p.property === 'title'
-                  const style: React.CSSProperties = {}
+                  const schema = collection.schema?.[p.property];
+                  const isTitle = p.property === "title";
+                  const style: React.CSSProperties = {};
 
                   if (p.width) {
-                    style.width = p.width
+                    style.width = p.width;
                   } else if (isTitle) {
-                    style.width = 280
+                    style.width = 280;
                   } else {
-                    style.width = 200
+                    style.width = 200;
                     // style.width = `${100.0 / properties.length}%`
                   }
 
                   return (
-                    <div className='notion-table-th' key={p.property}>
+                    <div className="notion-table-th" key={p.property}>
                       <div
-                        className='notion-table-view-header-cell'
+                        className="notion-table-view-header-cell"
                         style={style}
                       >
-                        <div className='notion-table-view-header-cell-inner'>
+                        <div className="notion-table-view-header-cell-inner">
                           <CollectionColumnTitle schema={schema} />
                         </div>
                       </div>
                     </div>
-                  )
+                  );
                 })}
               </div>
             </div>
 
-            <div className='notion-table-header-placeholder'></div>
+            <div className="notion-table-header-placeholder"></div>
 
-            <div className='notion-table-body'>
+            <div className="notion-table-body">
               {collectionData.blockIds.map((blockId) => (
-                <div className='notion-table-row' key={blockId}>
+                <div className="notion-table-row" key={blockId}>
                   {properties.map((p) => {
-                    const schema = collection.schema?.[p.property]
-                    const block = recordMap.block[blockId]?.value
-                    const data = block?.properties?.[p.property]
-                    const isTitle = p.property === 'title'
-                    const style: React.CSSProperties = {}
+                    const schema = collection.schema?.[p.property];
+                    const block = recordMap.block[blockId]?.value;
+                    const data = block?.properties?.[p.property];
+                    const isTitle = p.property === "title";
+                    const style: React.CSSProperties = {};
 
                     if (p.width) {
-                      style.width = p.width
+                      style.width = p.width;
                     } else if (isTitle) {
-                      style.width = 280
+                      style.width = 280;
                     } else {
-                      style.width = 200
+                      style.width = 200;
                       // style.width = `${100.0 / properties.length}%`
                     }
 
@@ -106,7 +106,7 @@ export const CollectionViewTable: React.FC<CollectionViewProps> = ({
                       <div
                         key={p.property}
                         className={cs(
-                          'notion-table-cell',
+                          "notion-table-cell",
                           `notion-table-cell-${schema.type}`
                         )}
                         style={style}
@@ -118,7 +118,7 @@ export const CollectionViewTable: React.FC<CollectionViewProps> = ({
                           collection={collection}
                         />
                       </div>
-                    )
+                    );
                   })}
                 </div>
               ))}
@@ -127,5 +127,5 @@ export const CollectionViewTable: React.FC<CollectionViewProps> = ({
         )}
       </div>
     </div>
-  )
-}
+  );
+};

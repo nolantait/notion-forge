@@ -1,10 +1,10 @@
-import React from "react";
+import { useState } from "react";
 import throttle from "lodash.throttle";
 
 import { useEffect } from "react";
 
 export default function useScrollSpy(throttleMs: number) {
-  const [activeSection, setActiveSection] = React.useState(null);
+  const [activeSection, setActiveSection] = useState(null);
 
   const actionSectionScrollSpy = throttle(() => {
     const sections = document.getElementsByClassName("notion-h");
