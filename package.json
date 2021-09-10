@@ -8,6 +8,7 @@
   "main": "build/cjs/index.js",
   "module": "build/esm/index.js",
   "typings": "build/esm/index.d.ts",
+  "files": ["build"],
   "scripts": {
     "build": "tsc --build tsconfig.json",
     "watch": "tsc --build tsconfig.json --watch",
