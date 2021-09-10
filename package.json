@@ -9,7 +9,8 @@
   "module": "build/esm/index.js",
   "typings": "build/esm/index.d.ts",
   "files": [
-    "build"
+    "build",
+    "src/styles.css"
   ],
   "scripts": {
     "build": "tsc --build tsconfig.json",
