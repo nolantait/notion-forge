@@ -1,6 +1,6 @@
 {
   "name": "notion-forge",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Customizable React renderer for Notion based on react-notion-x.",
   "repository": "nolantait/notion-forge",
   "author": "Nolan J Tait <nolanjtait@gmail.com>",
@@ -10,7 +10,8 @@
   "typings": "build/esm/index.d.ts",
   "scripts": {
     "build": "tsc --build tsconfig.json",
-    "watch": "tsc --build tsconfig.json --watch"
+    "watch": "tsc --build tsconfig.json --watch",
+    "test": "echo \"No test specified\""
   },
   "dependencies": {
     "@matejmazur/react-katex": "^3.1.3",
