@@ -16,6 +16,7 @@ export type SearchNotion = (
 
 export interface NotionComponents {
   // TODO: better typing for arbitrary react components
+  alias: any;
   assetWrapper: any;
   asset: any;
   audio: any;

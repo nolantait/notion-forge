@@ -10,6 +10,7 @@ import {
 import { defaultMapPageUrl, defaultMapImageUrl } from "./utils";
 
 // All Supported Components
+import { Alias as DefaultAlias } from "./components/alias";
 import { AssetWrapper as DefaultAssetWrapper } from "./components/asset-wrapper";
 import { Asset as DefaultAsset } from "./components/asset";
 import { Audio as DefaultAudio } from "./components/audio";
@@ -117,6 +118,7 @@ export interface PartialNotionContext {
 }
 
 const defaultComponents: NotionComponents = {
+  alias: DefaultAlias,
   assetWrapper: DefaultAssetWrapper,
   asset: DefaultAsset,
   audio: DefaultAudio,

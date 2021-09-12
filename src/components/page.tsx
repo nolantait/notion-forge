@@ -165,7 +165,6 @@ const LightPage = (props: PageProps) => {
 
   return (
     <main className={containerStyle}>
-      <div className="notion-viewport" />
       {pageHeader}
       {block.type === "page" && block.parent_table === "collection" && (
         <components.collectionRow block={block} />

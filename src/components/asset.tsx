@@ -1,43 +1,51 @@
 import React from "react";
-import { BaseContentBlock, Block } from "notion-types";
+import {
+  Block,
+  VideoBlock,
+  ImageBlock,
+  EmbedBlock,
+  FigmaBlock,
+  TypeformBlock,
+  ExcalidrawBlock,
+  MapsBlock,
+  TweetBlock,
+  PdfBlock,
+  GistBlock,
+  CodepenBlock,
+  GoogleDriveBlock,
+} from "notion-types";
 import { getTextContent } from "notion-utils";
 
 import { useNotionContext } from "../context";
 
 const isServer = typeof window === "undefined";
 
-const types = [
-  "video",
-  "image",
-  "embed",
-  "figma",
-  "typeform",
-  "excalidraw",
-  "maps",
-  "tweet",
-  "pdf",
-  "gist",
-  "codepen",
-  "drive",
-];
+type AssetBlock =
+  | VideoBlock
+  | ImageBlock
+  | EmbedBlock
+  | FigmaBlock
+  | TypeformBlock
+  | ExcalidrawBlock
+  | MapsBlock
+  | TweetBlock
+  | PdfBlock
+  | GistBlock
+  | CodepenBlock
+  | GoogleDriveBlock;
 
 interface AssetProps {
-  block: BaseContentBlock;
+  block: AssetBlock;
 }
 
 export const Asset = (props: AssetProps) => {
   const { block } = props;
   const { recordMap, mapImageUrl, components } = useNotionContext();
 
-  if (!block || !types.includes(block.type)) {
-    return null;
-  }
-
   const style: React.CSSProperties = {
     position: "relative",
     display: "flex",
     justifyContent: "center",
-    alignSelf: "center",
     width: "100%",
     maxWidth: "100%",
   };
@@ -91,7 +99,7 @@ export const Asset = (props: AssetProps) => {
       }
     }
 
-    if (block_preserve_scale || block.type === "image") {
+    if (block_preserve_scale) {
       assetStyle.objectFit = "contain";
     }
   }

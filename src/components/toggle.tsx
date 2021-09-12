@@ -17,7 +17,9 @@ export const Toggle = (props: ToggleProps) => {
   return (
     <details className={style}>
       <summary>
-        <components.text value={block.properties?.title} block={block} />
+        <span>
+          <components.text value={block.properties?.title} block={block} />
+        </span>
       </summary>
 
       <div>{children}</div>

@@ -73,8 +73,6 @@ export const NotionContainer = (props: NotionContainerProps) => {
 
   return (
     <div className={outerContainerStyle}>
-      <div className="notion-viewport" />
-
       <div className="notion-frame">
         <components.pageHeader />
 

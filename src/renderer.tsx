@@ -1,59 +1,59 @@
-import React from 'react'
-import mediumZoom from 'medium-zoom'
-import { ExtendedRecordMap } from 'notion-types'
+import React from "react";
+import mediumZoom from "medium-zoom";
+import { ExtendedRecordMap } from "notion-types";
 
 import {
   MapPageUrl,
   MapImageUrl,
   SearchNotion,
-  NotionComponents
-} from './types'
-import { Block } from './block'
-import { useNotionContext, NotionContextProvider } from './context'
+  NotionComponents,
+} from "./types";
+import { Block } from "./block";
+import { useNotionContext, NotionContextProvider } from "./context";
 
 export interface NotionRendererProps {
-  recordMap: ExtendedRecordMap
-  components?: Partial<NotionComponents>
+  recordMap: ExtendedRecordMap;
+  components?: Partial<NotionComponents>;
 
-  mapPageUrl?: MapPageUrl
-  mapImageUrl?: MapImageUrl
-  searchNotion?: SearchNotion
+  mapPageUrl?: MapPageUrl;
+  mapImageUrl?: MapImageUrl;
+  searchNotion?: SearchNotion;
 
-  rootPageId?: string
-  fullPage?: boolean
-  darkMode?: boolean
-  previewImages?: boolean
-  showCollectionViewDropdown?: boolean
+  rootPageId?: string;
+  fullPage?: boolean;
+  darkMode?: boolean;
+  previewImages?: boolean;
+  showCollectionViewDropdown?: boolean;
 
-  showTableOfContents?: boolean
-  minTableOfContentsItems?: number
+  showTableOfContents?: boolean;
+  minTableOfContentsItems?: number;
 
-  defaultPageIcon?: string
-  defaultPageCover?: string
-  defaultPageCoverPosition?: number
+  defaultPageIcon?: string;
+  defaultPageCover?: string;
+  defaultPageCoverPosition?: number;
 
-  className?: string
-  bodyClassName?: string
+  className?: string;
+  bodyClassName?: string;
 
-  footer?: React.ReactNode
-  pageHeader?: React.ReactNode
-  pageFooter?: React.ReactNode
-  pageAside?: React.ReactNode
-  pageCover?: React.ReactNode
+  footer?: React.ReactNode;
+  pageHeader?: React.ReactNode;
+  pageFooter?: React.ReactNode;
+  pageAside?: React.ReactNode;
+  pageCover?: React.ReactNode;
 
-  blockId?: string
-  hideBlockId?: boolean
+  blockId?: string;
+  hideBlockId?: boolean;
 }
 
 interface NotionBlockRendererProps {
-  className?: string
-  bodyClassName?: string
-  footer?: React.ReactNode
+  className?: string;
+  bodyClassName?: string;
+  footer?: React.ReactNode;
 
-  blockId?: string
-  hideBlockId?: boolean
-  level?: number
-  zoom?: any
+  blockId?: string;
+  hideBlockId?: boolean;
+  level?: number;
+  zoom?: any;
 }
 
 export const NotionRenderer: React.FC<NotionRendererProps> = ({
@@ -75,12 +75,12 @@ export const NotionRenderer: React.FC<NotionRendererProps> = ({
   ...rest
 }) => {
   const zoom =
-    typeof window !== 'undefined' &&
+    typeof window !== "undefined" &&
     mediumZoom({
-      container: '.notion-viewport',
-      background: 'rgba(0, 0, 0, 0.8)',
-      margin: getMediumZoomMargin()
-    })
+      container: ".notion-frame",
+      background: "rgba(0, 0, 0, 0.8)",
+      margin: getMediumZoomMargin(),
+    });
 
   return (
     <NotionContextProvider
@@ -103,24 +103,24 @@ export const NotionRenderer: React.FC<NotionRendererProps> = ({
     >
       <NotionBlockRenderer {...rest} />
     </NotionContextProvider>
-  )
-}
+  );
+};
 
 export const NotionBlockRenderer: React.FC<NotionBlockRendererProps> = ({
   level = 0,
   blockId,
   ...props
 }) => {
-  const { recordMap } = useNotionContext()
-  const id = blockId || Object.keys(recordMap.block)[0]
-  const block = recordMap.block[id]?.value
+  const { recordMap } = useNotionContext();
+  const id = blockId || Object.keys(recordMap.block)[0];
+  const block = recordMap.block[id]?.value;
 
   if (!block) {
-    if (process.env.NODE_ENV !== 'production') {
-      console.warn('missing block', blockId)
+    if (process.env.NODE_ENV !== "production") {
+      console.warn("missing block", blockId);
     }
 
-    return null
+    return null;
   }
 
   return (
@@ -134,23 +134,23 @@ export const NotionBlockRenderer: React.FC<NotionBlockRendererProps> = ({
         />
       ))}
     </Block>
-  )
-}
+  );
+};
 
 function getMediumZoomMargin() {
-  const width = window.innerWidth
+  const width = window.innerWidth;
 
   if (width < 500) {
-    return 8
+    return 8;
   } else if (width < 800) {
-    return 20
+    return 20;
   } else if (width < 1280) {
-    return 30
+    return 30;
   } else if (width < 1600) {
-    return 40
+    return 40;
   } else if (width < 1920) {
-    return 48
+    return 48;
   } else {
-    return 72
+    return 72;
   }
 }

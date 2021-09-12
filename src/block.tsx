@@ -1,11 +1,11 @@
 import React from "react";
+import { GoogleDriveBlock, AudioBlock, FileBlock } from "notion-types";
 import { uuidToId } from "notion-utils";
-import * as types from "notion-types";
 
 import { useNotionContext } from "./context";
 
 export interface BlockProps {
-  block: types.Block;
+  block: any;
   level: number;
 
   className?: string;
@@ -31,7 +31,7 @@ export const Block: React.FC<BlockProps> = (props) => {
 
   const blockId = hideBlockId
     ? "notion-block"
-    : `notion-block-${uuidToId(block.id)}`;
+    : `notion-block notion-block-${uuidToId(block.id)}`;
 
   const pageProps = {
     ...props,
@@ -113,7 +113,7 @@ export const Block: React.FC<BlockProps> = (props) => {
 
       return (
         <components.googleDrive
-          block={block as types.GoogleDriveBlock}
+          block={block as GoogleDriveBlock}
           className={blockId}
         />
       );
@@ -121,17 +121,12 @@ export const Block: React.FC<BlockProps> = (props) => {
 
     case "audio": {
       return (
-        <components.audio
-          block={block as types.AudioBlock}
-          className={blockId}
-        />
+        <components.audio block={block as AudioBlock} className={blockId} />
       );
     }
 
     case "file": {
-      return (
-        <components.file block={block as types.FileBlock} className={blockId} />
-      );
+      return <components.file block={block as FileBlock} className={blockId} />;
     }
 
     case "equation": {
@@ -233,6 +228,10 @@ export const Block: React.FC<BlockProps> = (props) => {
 
     case "transclusion_reference": {
       return <components.syncPointerBlock {...props} level={level + 1} />;
+    }
+
+    case "alias": {
+      return <components.alias {...props} level={level + 1} />;
     }
 
     default: {
