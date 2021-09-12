@@ -2,7 +2,6 @@ import React from "react";
 import { Decoration, BaseBlock } from "notion-types";
 import { cs } from "../utils";
 import { useNotionContext } from "../context";
-import { GracefulImage } from "../components/graceful-image";
 
 import { getTextContent } from "notion-utils";
 
@@ -84,7 +83,7 @@ export const Bookmark = (props: BookmarkProps) => {
 
           <div className="notion-bookmark-link">
             {block.format?.bookmark_icon && (
-              <GracefulImage
+              <components.image
                 src={block.format?.bookmark_icon}
                 alt={title}
                 loading="lazy"
@@ -99,7 +98,7 @@ export const Bookmark = (props: BookmarkProps) => {
 
         {block.format?.bookmark_cover && (
           <div className="notion-bookmark-image">
-            <GracefulImage
+            <components.image
               src={block.format?.bookmark_cover}
               alt={getTextContent(block.properties?.title)}
               loading="lazy"

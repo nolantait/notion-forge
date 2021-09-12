@@ -35,6 +35,8 @@ import { Equation as DefaultEquation } from "./components/equation";
 import { File as DefaultFile } from "./components/file";
 import { GoogleDrive as DefaultGoogleDrive } from "./components/google-drive";
 import { Header as DefaultHeader } from "./components/header";
+import { GracefulImage as DefaultImage } from "./components/graceful-image";
+import { LazyImage as DefaultLazyImage } from "./components/lazy-image";
 import { Link as DefaultLink } from "./components/link";
 import { NumberedList as DefaultNumberedList } from "./components/numbered-list";
 import { Page as DefaultPage } from "./components/page";
@@ -140,7 +142,9 @@ const defaultComponents: NotionComponents = {
   file: DefaultFile,
   googleDrive: DefaultGoogleDrive,
   header: DefaultHeader,
+  image: DefaultImage,
   link: DefaultLink,
+  lazyImage: DefaultLazyImage,
   numberedList: DefaultNumberedList,
   page: DefaultPage,
   pageHeader: DefaultPageHeader,

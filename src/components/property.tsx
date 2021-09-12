@@ -7,7 +7,6 @@ import { cs } from "../utils";
 import { Checkbox } from "./checkbox";
 import { useNotionContext } from "../context";
 import { evalFormula } from "../eval-formula";
-import { GracefulImage } from "./graceful-image";
 
 /**
  * Renders a single value of structured Notion data according to its schema.
@@ -127,7 +126,7 @@ export const Property: React.FC<{
               target="_blank"
               rel="noreferrer noopener"
             >
-              <GracefulImage
+              <components.image
                 alt={file[0] as string}
                 src={mapImageUrl(file[2] as string, block)}
                 loading="lazy"

@@ -5,7 +5,6 @@ import { Block, PageBlock, CalloutBlock } from "notion-types";
 import { cs, isUrl } from "../utils";
 import { DefaultPageIcon } from "../icons/default-page-icon";
 import { useNotionContext } from "../context";
-import { GracefulImage } from "./graceful-image";
 
 const isIconBlock = (value: Block): value is PageBlock | CalloutBlock => {
   return (
@@ -22,7 +21,7 @@ export const PageIcon: React.FC<{
   hideDefaultIcon?: boolean;
   defaultIcon?: string;
 }> = ({ block, className, hideDefaultIcon = false, defaultIcon }) => {
-  const { mapImageUrl, recordMap } = useNotionContext();
+  const { mapImageUrl, recordMap, components } = useNotionContext();
 
   if (!isIconBlock(block)) {
     return null;
@@ -35,7 +34,7 @@ export const PageIcon: React.FC<{
     const url = mapImageUrl(icon, block);
 
     return (
-      <GracefulImage
+      <components.image
         className={cs(className, "notion-page-icon")}
         src={url}
         alt={title ? title : "Icon"}

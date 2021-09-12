@@ -4,7 +4,6 @@ import { formatDistance } from "date-fns";
 
 import { useNotionContext } from "../context";
 import { cs } from "../utils";
-import { GracefulImage } from "./graceful-image";
 
 export const GoogleDrive: React.FC<{
   block: GoogleDriveBlock;
@@ -31,7 +30,7 @@ export const GoogleDrive: React.FC<{
         rel="noopener noreferrer"
       >
         <div className="notion-google-drive-preview">
-          <GracefulImage
+          <components.image
             src={mapImageUrl(properties.thumbnail, block)}
             alt={properties.title || "Google Drive Document"}
             loading="lazy"

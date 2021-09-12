@@ -41,6 +41,8 @@ export interface NotionComponents {
   file: any;
   googleDrive: any;
   header: any;
+  lazyImage: any;
+  image: any;
   link: any;
   numberedList: any;
   page: any;

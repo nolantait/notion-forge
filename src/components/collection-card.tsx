@@ -11,7 +11,6 @@ import { getTextContent } from "notion-utils";
 import { CollectionCardProps } from "../types";
 import { Property } from "./property";
 import { useNotionContext, dummyLink, NotionContextProvider } from "../context";
-import { LazyImage } from "./lazy-image";
 
 import { cs } from "../utils";
 
@@ -36,7 +35,7 @@ const PageContent = (
   block: PageBlock,
   coverAspect: CollectionCardCoverAspect
 ) => {
-  const { recordMap, mapImageUrl } = useNotionContext();
+  const { recordMap, mapImageUrl, components } = useNotionContext();
   const contentBlockId = findFirstImage(block);
 
   if (contentBlockId) {
@@ -51,7 +50,7 @@ const PageContent = (
       const caption = contentBlock.properties?.caption?.[0]?.[0];
 
       return (
-        <LazyImage
+        <components.lazyImage
           src={src}
           alt={caption || "notion image"}
           style={{
@@ -69,14 +68,14 @@ const PageCover = (
   block: PageBlock,
   coverAspect: CollectionCardCoverAspect
 ) => {
-  const { mapImageUrl } = useNotionContext();
+  const { mapImageUrl, components } = useNotionContext();
   const { page_cover, page_cover_position = 0.5 } = block.format || {};
 
   if (page_cover) {
     const coverPosition = (1 - page_cover_position) * 100;
 
     return (
-      <LazyImage
+      <components.lazyImage
         src={mapImageUrl(page_cover, block)}
         alt={getTextContent(block.properties?.title)}
         style={{
@@ -96,7 +95,7 @@ const PropertyCover = (
   cover: CollectionCardCover,
   coverAspect: CollectionCardCoverAspect
 ) => {
-  const { mapImageUrl } = useNotionContext();
+  const { mapImageUrl, components } = useNotionContext();
 
   const { page_cover_position = 0.5 } = block.format || {};
   const coverPosition = (1 - page_cover_position) * 100;
@@ -117,7 +116,7 @@ const PropertyCover = (
       if (file) {
         return (
           <span className={`notion-property-${schema.type}`}>
-            <LazyImage
+            <components.lazyImage
               alt={file[0] as string}
               src={mapImageUrl(file[2] as string, block)}
               style={{
