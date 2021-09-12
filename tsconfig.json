@@ -26,6 +26,6 @@
     "types": ["node"]
   },
   "compileOnSave": false,
-  "include": ["src/index.tsx"],
+  "include": ["src/index.ts"],
   "exclude": ["node_modules", "build"]
 }
