@@ -154,11 +154,11 @@ export const CollectionCard: React.FC<CollectionCardProps> = (
   let coverContent = null;
 
   if (cover?.type === "page_content") {
-    return PageContent(block, coverAspect);
+    coverContent = PageContent(block, coverAspect);
   } else if (cover?.type === "page_cover") {
-    return PageCover(block, coverAspect);
+    coverContent = PageCover(block, coverAspect);
   } else if (cover?.type === "property") {
-    return PropertyCover(block, collection, cover, coverAspect);
+    coverContent = PropertyCover(block, collection, cover, coverAspect);
   }
 
   return (

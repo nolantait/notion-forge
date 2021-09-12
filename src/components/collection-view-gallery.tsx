@@ -4,14 +4,13 @@ import { PageBlock } from 'notion-types'
 import { CollectionViewProps } from '../types'
 import { cs } from '../utils'
 import { useNotionContext } from '../context'
-import { CollectionCard } from './collection-card'
 
 export const CollectionViewGallery: React.FC<CollectionViewProps> = ({
   collection,
   collectionView,
   collectionData
 }) => {
-  const { recordMap } = useNotionContext()
+  const { recordMap, components } = useNotionContext()
   const {
     gallery_cover = { type: 'none' },
     gallery_cover_size = 'medium',
@@ -34,7 +33,7 @@ export const CollectionViewGallery: React.FC<CollectionViewProps> = ({
             if (!block) return null
 
             return (
-              <CollectionCard
+              <components.collectionCard
                 collection={collection}
                 block={block}
                 cover={gallery_cover}
