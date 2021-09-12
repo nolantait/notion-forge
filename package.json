@@ -9,11 +9,12 @@
   "module": "build/esm/index.js",
   "typings": "build/esm/index.d.ts",
   "files": [
-    "build",
-    "src/styles.css"
+    "build"
   ],
   "scripts": {
-    "build": "tsc --build tsconfig.json",
+    "clean": "rimraf build/",
+    "copy-files": "copyfiles -u 1 src/**/*.css build/",
+    "build": "yarn clean && tsc --build tsconfig.json && yarn copy-files",
     "watch": "tsc --build tsconfig.json --watch",
     "test": "echo \"No test specified\""
   },
@@ -47,9 +48,11 @@
     "@types/react-pdf": "^5.0.1",
     "@typescript-eslint/eslint-plugin": "^4.31.0",
     "@typescript-eslint/parser": "^4.31.0",
+    "copyfiles": "^2.4.1",
     "eslint": "^7.32.0",
     "eslint-plugin-react": "^7.25.1",
-    "eslint-plugin-react-hooks": "^4.2.0"
+    "eslint-plugin-react-hooks": "^4.2.0",
+    "rimraf": "^3.0.2"
   },
   "peerDependencies": {
     "react": ">=16.8",
