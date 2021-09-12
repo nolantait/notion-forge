@@ -23,9 +23,11 @@ export const Quote = (props: QuoteProps) => {
     blockId
   );
 
+  const title = properties.title ?? "";
+
   return (
     <blockquote className={style}>
-      <components.text value={block.properties.title} block={block} />
+      <components.text value={title} block={block} />
     </blockquote>
   );
 };

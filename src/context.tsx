@@ -54,9 +54,19 @@ import { Todo as DefaultTodo } from "./components/to-do";
 import { Toggle as DefaultToggle } from "./components/toggle";
 import { WrappedText as DefaultWrappedText } from "./components/wrapped-text";
 
-export const dummyLink = ({ href, rel, target, title, ...rest }) => (
-  <span {...rest} />
-);
+interface dummyLinkProps {
+  href?: string;
+  rel?: string;
+  target?: string;
+  title?: string;
+}
+export const dummyLink: React.FC<dummyLinkProps> = ({
+  href,
+  rel,
+  target,
+  title,
+  ...rest
+}) => <span {...rest} />;
 
 const dummyComponent = (name: string) => () => {
   console.warn(
@@ -166,15 +176,15 @@ const defaultNotionContext: NotionContext = {
   components: defaultComponents,
   mapPageUrl: defaultMapPageUrl(),
   mapImageUrl: defaultMapImageUrl,
-  searchNotion: null,
+  searchNotion: undefined,
   fullPage: false,
   darkMode: false,
   previewImages: false,
   showCollectionViewDropdown: true,
   showTableOfContents: false,
   minTableOfContentsItems: 3,
-  defaultPageIcon: null,
-  defaultPageCover: null,
+  defaultPageIcon: undefined,
+  defaultPageCover: undefined,
   defaultPageCoverPosition: 0.5,
   zoom: null,
 };
@@ -189,12 +199,6 @@ export const NotionContextProvider: React.FC<PartialNotionContext> = ({
   rootPageId,
   ...rest
 }) => {
-  for (const key of Object.keys(rest)) {
-    if (rest[key] === undefined) {
-      delete rest[key];
-    }
-  }
-
   return (
     <ctx.Provider
       value={{

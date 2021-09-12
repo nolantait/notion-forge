@@ -7,7 +7,7 @@ import { PageBlock, CollectionViewPageBlock } from "notion-types";
 import { useNotionContext } from "../context";
 import { getBlockIcon, getTextContent } from "notion-utils";
 
-interface NotionContainerProps {
+export interface NotionContainerProps {
   block: PageBlock | CollectionViewPageBlock;
   darkMode: boolean;
   blockId: string;

@@ -117,6 +117,11 @@
   resolved "https://registry.yarnpkg.com/@types/pdfjs-dist/-/pdfjs-dist-2.7.4.tgz#b8f618d382f6d5d14acb6c351ced784f48f4551b"
   integrity sha512-X4CpJgsDr44/xq/SK8NukTV2uyRAMz9dXAVHMUtJrBPtpf4CYnbQevmD95G9fbNwsjJNItOlgsS+yECrBJLUHw==
 
+"@types/prismjs@^1.16.6":
+  version "1.16.6"
+  resolved "https://registry.yarnpkg.com/@types/prismjs/-/prismjs-1.16.6.tgz#377054f72f671b36dbe78c517ce2b279d83ecc40"
+  integrity sha512-dTvnamRITNqNkqhlBd235kZl3KfVJQQoT5jkXeiWSBK7i4/TLKBNLV0S1wOt8gy4E2TY722KLtdmv2xc6+Wevg==
+
 "@types/prop-types@*":
   version "15.7.4"
   resolved "https://registry.yarnpkg.com/@types/prop-types/-/prop-types-15.7.4.tgz#fcf7205c25dff795ee79af1e30da2c9790808f11"

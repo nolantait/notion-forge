@@ -13,7 +13,7 @@ export const GoogleDrive: React.FC<{
   const { components, mapImageUrl } = useNotionContext();
   const properties = block.format?.drive_properties;
   if (!properties) return null;
-  let domain: string;
+  let domain: string | boolean = false;
 
   try {
     const url = new URL(properties.url);

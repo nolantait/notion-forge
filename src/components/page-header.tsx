@@ -96,7 +96,7 @@ export const PageHeader: React.FC<{}> = () => {
             };
 
             if (breadcrumb.active) {
-              componentMap.pageLink = (props) => <div {...props} />;
+              componentMap.pageLink = (props: any) => <div {...props} />;
             } else {
               pageLinkProps.href = mapPageUrl(breadcrumb.pageId);
             }

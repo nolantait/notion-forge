@@ -14,11 +14,11 @@ export const CollectionViewTable: React.FC<CollectionViewProps> = ({
   const { recordMap } = useNotionContext();
   // console.log('table', { collection, collectionView, collectionData })
 
-  let properties = [];
+  let properties: Array<any> = [];
 
   if (collectionView.format?.table_properties) {
     properties = collectionView.format?.table_properties.filter(
-      (p) => p.visible && collection.schema[p.property]
+      (p: any) => p.visible && collection.schema[p.property]
     );
   } else {
     properties = [{ property: "title" }].concat(

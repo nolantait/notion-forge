@@ -2,10 +2,15 @@ import React from "react";
 import { Page, Document } from "react-pdf";
 import Modal from "react-modal";
 
-const Pdf = ({ file, children, ...rest }) => {
-  const [numPages, setNumPages] = React.useState(null);
+interface PdfProps {
+  file: string;
+  children: React.ReactNode;
+}
 
-  function onDocumentLoadSuccess({ numPages }) {
+const Pdf: React.FC<PdfProps> = ({ file, children, ...rest }) => {
+  const [numPages, setNumPages] = React.useState(0);
+
+  function onDocumentLoadSuccess({ numPages }: { numPages: number }) {
     setNumPages(numPages);
   }
 

@@ -4,20 +4,20 @@ import throttle from "lodash.throttle";
 import { useEffect } from "react";
 
 export default function useScrollSpy(throttleMs: number) {
-  const [activeSection, setActiveSection] = useState(null);
+  const [activeSection, setActiveSection] = useState("");
 
   const actionSectionScrollSpy = throttle(() => {
     const sections = document.getElementsByClassName("notion-h");
 
-    let prevBBox: DOMRect = null;
-    let currentSectionId = activeSection;
+    let prevBBox: DOMRect | null = null;
+    let currentSectionId: string = activeSection;
 
     for (let i = 0; i < sections.length; ++i) {
       const section = sections[i];
       if (!section || !(section instanceof Element)) continue;
 
-      if (!currentSectionId) {
-        currentSectionId = section.getAttribute("data-id");
+      if (currentSectionId === "") {
+        currentSectionId = section.getAttribute("data-id") ?? "";
       }
 
       const bbox = section.getBoundingClientRect();
@@ -26,7 +26,7 @@ export default function useScrollSpy(throttleMs: number) {
 
       // GetBoundingClientRect returns values relative to viewport
       if (bbox.top - offset < 0) {
-        currentSectionId = section.getAttribute("data-id");
+        currentSectionId = section.getAttribute("data-id") ?? "";
 
         prevBBox = bbox;
         continue;

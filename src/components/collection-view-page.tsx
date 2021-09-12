@@ -2,7 +2,7 @@ import React from "react";
 import { CollectionViewPageBlock } from "notion-types";
 import { cs } from "../utils";
 
-import { NotionContainer } from "./notion-container";
+import { NotionContainer, NotionContainerProps } from "./notion-container";
 
 import { useNotionContext } from "../context";
 
@@ -60,17 +60,8 @@ const FullPage = (props: CollectionViewPageProps) => {
     darkMode,
   } = useNotionContext();
 
-  const {
-    block,
-    children,
-    className,
-    bodyClassName,
-    footer,
-    pageHeader,
-    pageFooter,
-    pageCover,
-    blockId,
-  } = props;
+  const { block, children, className, pageHeader, pageFooter, pageCover } =
+    props;
 
   const {
     page_icon = defaultPageIcon,
@@ -82,15 +73,12 @@ const FullPage = (props: CollectionViewPageProps) => {
     title: recordMap.collection[block.collection_id]?.value?.name,
   };
 
-  const containerParams = {
-    block,
+  const containerParams: NotionContainerProps = {
+    ...props,
     darkMode,
-    blockId,
-    className,
+    className: className ?? "",
     pageCover: pageCover || page_cover,
     pageCoverPosition: page_cover_position,
-    footer,
-    bodyClassName,
   };
 
   const parentIsCollection = block.parent_table === "collection";

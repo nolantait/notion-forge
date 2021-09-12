@@ -32,7 +32,7 @@ export const Header = (props: HeaderProps) => {
 
   // we use a cache here because constructing the ToC is non-trivial
   let indentLevel = tocIndentLevelCache[block.id];
-  let indentLevelClass: string;
+  let indentLevelClass: string = "";
 
   if (indentLevel === undefined) {
     const page = getBlockParentPage(block, recordMap);

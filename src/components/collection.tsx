@@ -26,7 +26,8 @@ export const Collection: React.FC<{
   });
 
   const collectionViewId =
-    viewIds.find((id) => id === collectionState.collectionViewId) || viewIds[0];
+    viewIds.find((id) => id === collectionState?.collectionViewId) ||
+    viewIds[0];
 
   const onChangeView = React.useCallback(
     ({ key: collectionViewId }) => {
