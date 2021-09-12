@@ -1,5 +1,4 @@
 import React from "react";
-import { LazyImage } from "../components/lazy-image";
 import { cs, isUrl } from "../utils";
 
 import { PageBlock, CollectionViewPageBlock } from "notion-types";
@@ -7,7 +6,7 @@ import { PageBlock, CollectionViewPageBlock } from "notion-types";
 import { useNotionContext } from "../context";
 import { getBlockIcon, getTextContent } from "notion-utils";
 
-interface NotionContainerProps {
+export interface NotionContainerProps {
   block: PageBlock | CollectionViewPageBlock;
   darkMode: boolean;
   blockId: string;
@@ -63,7 +62,7 @@ export const NotionContainer = (props: NotionContainerProps) => {
     typeof pageCover !== "string" ? (
       pageCover
     ) : (
-      <LazyImage
+      <components.lazyImage
         src={mapImageUrl(pageCover, block)}
         alt={getTextContent(properties?.title)}
         className="notion-page-cover"

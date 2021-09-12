@@ -61,7 +61,7 @@ const WrapList = (
 
 const ListItem = (block: NumberedListBlock) => {
   const { components } = useNotionContext();
-  const { title } = block.properties;
+  const { title } = block.properties ?? { title: "" };
 
   return (
     <li>

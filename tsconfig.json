@@ -7,7 +7,6 @@
     "sourceMap": true,
     "declaration": true,
     "esModuleInterop": true,
-    "noEmitOnError": true,
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
@@ -21,8 +20,6 @@
     "rootDir": "src",
     "outDir": "build/esm",
     "tsBuildInfoFile": "build/esm/index.tsbuildinfo",
-    "strict": false,
-    "noImplicitReturns": false,
     "skipLibCheck": true,
     "jsx": "react",
     "lib": ["ESNext", "ES2019", "ESNext.Array", "DOM"]

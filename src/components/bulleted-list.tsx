@@ -52,7 +52,8 @@ const WrapList = (content: React.ReactNode, style: string) => {
 
 const ListItem = (block: BulletedListBlock) => {
   const { components } = useNotionContext();
-  const { title } = block.properties;
+  const { properties } = block
+  const title = properties?.title ?? ''
 
   return (
     <li>

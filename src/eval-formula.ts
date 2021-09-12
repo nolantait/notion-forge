@@ -16,7 +16,7 @@ import {
 
 export interface EvalFormulaContext {
   properties: types.PropertyMap
-  schema: types.CollectionPropertySchemaMap
+  schema: types.CollectionPropertySchemaMap | undefined
 
   endDate?: boolean
 }

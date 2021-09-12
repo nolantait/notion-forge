@@ -1,5 +1,10 @@
 import * as types from "notion-types";
 
+export interface IconProps {
+  className?: string;
+  alt?: string;
+}
+
 export type MapPageUrl = (
   pageId: string,
   recordMap?: types.ExtendedRecordMap | undefined
@@ -36,6 +41,8 @@ export interface NotionComponents {
   file: any;
   googleDrive: any;
   header: any;
+  lazyImage: any;
+  image: any;
   link: any;
   numberedList: any;
   page: any;

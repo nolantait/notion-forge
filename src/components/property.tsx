@@ -7,7 +7,6 @@ import { cs } from "../utils";
 import { Checkbox } from "./checkbox";
 import { useNotionContext } from "../context";
 import { evalFormula } from "../eval-formula";
-import { GracefulImage } from "./graceful-image";
 
 /**
  * Renders a single value of structured Notion data according to its schema.
@@ -51,12 +50,12 @@ export const Property: React.FC<{
           // })
 
           try {
-            content = evalFormula(schema.formula, {
+            content = evalFormula((schema.formula as types.Formula), {
               schema: collection?.schema,
               properties: block?.properties,
             });
 
-            if (isNaN(content)) {
+            if (isNaN((content as number))) {
               console.log("NaN", schema.formula);
             }
 
@@ -87,7 +86,7 @@ export const Property: React.FC<{
         case "select":
         // intentional fallthrough
         case "multi_select":
-          const values = (data[0][0] || "").split(",");
+          const values = (data?.[0][0] || "").split(",");
 
           content = values.map((value, index) => {
             const option = schema.options?.find(
@@ -116,11 +115,10 @@ export const Property: React.FC<{
 
         case "file":
           // TODO: assets should be previewable via image-zoom
-          const files = data
-            .filter((v) => v.length === 2)
+          const files = data?.filter((v) => v.length === 2)
             .map((f) => f.flat().flat());
 
-          content = files.map((file, i) => (
+          content = block && files?.map((file, i) => (
             <components.link
               key={i}
               className="notion-property-file"
@@ -128,7 +126,7 @@ export const Property: React.FC<{
               target="_blank"
               rel="noreferrer noopener"
             >
-              <GracefulImage
+              <components.image
                 alt={file[0] as string}
                 src={mapImageUrl(file[2] as string, block)}
                 loading="lazy"
@@ -141,7 +139,7 @@ export const Property: React.FC<{
         case "checkbox":
           const isChecked = data && data[0][0] === "Yes";
 
-          return <Checkbox isChecked={isChecked} />;
+          return <Checkbox isChecked={isChecked ?? false} />;
 
         case "url":
           // TODO: refactor to less hackyh solution
@@ -182,7 +180,7 @@ export const Property: React.FC<{
           break;
 
         case "number":
-          const value = parseFloat(data[0][0] || "0");
+          const value = parseFloat(data?.[0][0] || "0");
           let breakEarly = false;
           let output = "";
 
@@ -241,12 +239,12 @@ export const Property: React.FC<{
           break;
 
         case "created_time":
-          content = format(new Date(block.created_time), "MMM d, YYY hh:mm aa");
+          content = format(new Date(block?.created_time || ""), "MMM d, YYY hh:mm aa");
           break;
 
         case "last_edited_time":
           content = format(
-            new Date(block.last_edited_time),
+            new Date(block?.last_edited_time || ""),
             "MMM d, YYY hh:mm aa"
           );
           break;

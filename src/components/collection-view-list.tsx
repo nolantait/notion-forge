@@ -1,36 +1,43 @@
-import React from 'react'
-import { PageBlock } from 'notion-types'
+import React from "react";
+import { PageBlock, PropertyID } from "notion-types";
 
-import { CollectionViewProps } from '../types'
-import { Property } from './property'
-import { useNotionContext } from '../context'
+import { CollectionViewProps } from "../types";
+import { Property } from "./property";
+import { useNotionContext } from "../context";
+
+interface ListProperty {
+  property: PropertyID;
+  visible: boolean;
+}
 
 export const CollectionViewList: React.FC<CollectionViewProps> = ({
   collection,
   collectionView,
-  collectionData
+  collectionData,
 }) => {
-  const { components, recordMap, mapPageUrl } = useNotionContext()
+  const { components, recordMap, mapPageUrl } = useNotionContext();
   // console.log('list', { collection, collectionView, collectionData })
 
   return (
-    <div className='notion-list-collection'>
-      <div className='notion-list-view'>
-        <div className='notion-list-body'>
+    <div className="notion-list-collection">
+      <div className="notion-list-view">
+        <div className="notion-list-body">
           {collectionData.blockIds.map((blockId) => {
-            const block = recordMap.block[blockId]?.value as PageBlock
-            if(!block) return null
+            const block = recordMap.block[blockId]?.value as PageBlock;
+            if (!block) return null;
 
-            const titleSchema = collection.schema.title
-            const titleData = block?.properties?.title
+            const properties = block.properties ?? { title: [] };
+
+            const titleSchema = collection.schema.title;
+            const titleData = block?.properties?.title;
 
             return (
               <components.pageLink
-                className='notion-list-item notion-page-link'
+                className="notion-list-item notion-page-link"
                 href={mapPageUrl(block.id)}
                 key={blockId}
               >
-                <div className='notion-list-item-title'>
+                <div className="notion-list-item-title">
                   <Property
                     schema={titleSchema}
                     data={titleData}
@@ -39,21 +46,22 @@ export const CollectionViewList: React.FC<CollectionViewProps> = ({
                   />
                 </div>
 
-                <div className='notion-list-item-body'>
+                <div className="notion-list-item-body">
                   {collectionView.format?.list_properties
-                    ?.filter((p) => p.visible)
-                    .map((p) => {
-                      const schema = collection.schema[p.property]
-                      const data = block && block.properties?.[p.property]
+                    ?.filter((p: ListProperty) => p.visible)
+                    .map((p: ListProperty) => {
+                      const schema = collection.schema[p.property];
+                      const data =
+                        properties && (properties as any)[p.property];
 
                       // console.log('list item body', p, schema, data)
                       if (!schema) {
-                        return null
+                        return null;
                       }
 
                       return (
                         <div
-                          className='notion-list-item-property'
+                          className="notion-list-item-property"
                           key={p.property}
                         >
                           <Property
@@ -63,14 +71,14 @@ export const CollectionViewList: React.FC<CollectionViewProps> = ({
                             collection={collection}
                           />
                         </div>
-                      )
+                      );
                     })}
                 </div>
               </components.pageLink>
-            )
+            );
           })}
         </div>
       </div>
     </div>
-  )
-}
+  );
+};

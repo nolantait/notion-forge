@@ -3,7 +3,6 @@ import { BaseContentBlock, Block } from "notion-types";
 import { getTextContent } from "notion-utils";
 
 import { useNotionContext } from "../context";
-import { LazyImage } from "./lazy-image";
 
 const isServer = typeof window === "undefined";
 
@@ -219,7 +218,7 @@ export const Asset = (props: AssetProps) => {
     const alt = caption || "notion image";
 
     content = (
-      <LazyImage
+      <components.lazyImage
         src={src}
         alt={alt}
         style={assetStyle}

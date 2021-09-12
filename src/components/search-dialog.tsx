@@ -1,3 +1,5 @@
+// @ts-nocheck
+// TODO: To remove no-check after refactoring
 import React from "react";
 import * as types from "notion-types";
 import throttle from "lodash.throttle";
@@ -11,13 +13,15 @@ import { NotionContextConsumer, NotionContextProvider } from "../context";
 
 // TODO: modal.default.setAppElement('.notion-viewport')
 
-export class SearchDialog extends React.Component<{
+interface SearchDialogProps {
   isOpen: boolean;
   rootBlockId: string;
   onClose: () => void;
   searchNotion: (params: types.SearchParams) => Promise<types.SearchResults>;
-}> {
-  constructor(props) {
+}
+
+export class SearchDialog extends React.Component<SearchDialogProps> {
+  constructor(props: SearchDialogProps) {
     super(props);
     this._inputRef = React.createRef();
   }
@@ -150,8 +154,8 @@ export class SearchDialog extends React.Component<{
     }
   };
 
-  _onChangeQuery = (e) => {
-    const query = e.target.value;
+  _onChangeQuery = (event: Event | { target: { value: string } }) => {
+    const query = (event.target as HTMLInputElement).value;
     this.setState({ query });
 
     if (!query.trim()) {
@@ -192,7 +196,7 @@ export class SearchDialog extends React.Component<{
     console.log("search", query, result);
 
     let searchResult: any = null; // TODO
-    let searchError: types.APIError = null;
+    let searchError: types.APIError | null = null;
 
     if (result.error || result.errorId) {
       searchError = result;

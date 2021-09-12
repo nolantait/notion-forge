@@ -1,28 +1,29 @@
 import {
   SyncPointerBlock as SyncPointerBlockType,
-  Block as BlockType
-} from 'notion-types'
-import React from 'react'
+  Block as BlockType,
+} from "notion-types";
+import React from "react";
 
-import { NotionBlockRenderer } from '../renderer'
+import { NotionBlockRenderer } from "../renderer";
 
 export const SyncPointerBlock: React.FC<{
-  block: BlockType
-  level: number
+  block: BlockType;
+  level: number;
 }> = (props) => {
-  const { block, level } = props
+  const { block, level } = props;
+  const { id } = block;
 
   if (!block) {
-    if (process.env.NODE_ENV !== 'production') {
-      console.warn('missing block', block.id)
+    if (process.env.NODE_ENV !== "production") {
+      console.warn("missing block", id);
     }
-    return null
+    return null;
   }
-  const syncPointerBlock = block as SyncPointerBlockType
+  const syncPointerBlock = block as SyncPointerBlockType;
   const referencePointerId =
-    syncPointerBlock?.format?.transclusion_reference_pointer?.id
+    syncPointerBlock?.format?.transclusion_reference_pointer?.id;
 
-  if (!referencePointerId) return null
+  if (!referencePointerId) return null;
 
   return (
     <NotionBlockRenderer
@@ -30,5 +31,5 @@ export const SyncPointerBlock: React.FC<{
       level={level}
       blockId={referencePointerId}
     />
-  )
-}
+  );
+};

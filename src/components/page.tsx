@@ -86,13 +86,13 @@ const FullPage = (props: PageProps) => {
 
   const toc = getPageTableOfContents(block, recordMap);
   const hasToc = showTableOfContents && toc.length >= minTableOfContentsItems;
-  const hasAside = (hasToc || pageAside) && !page_full_width;
+  const hasAside = (hasToc || (pageAside ?? false)) && !page_full_width;
 
   const containerParams = {
     block,
     darkMode,
     blockId,
-    className,
+    className: className ?? "",
     pageCover: pageCover || page_cover,
     pageCoverPosition: page_cover_position,
     footer,

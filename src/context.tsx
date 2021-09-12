@@ -35,6 +35,8 @@ import { Equation as DefaultEquation } from "./components/equation";
 import { File as DefaultFile } from "./components/file";
 import { GoogleDrive as DefaultGoogleDrive } from "./components/google-drive";
 import { Header as DefaultHeader } from "./components/header";
+import { GracefulImage as DefaultImage } from "./components/graceful-image";
+import { LazyImage as DefaultLazyImage } from "./components/lazy-image";
 import { Link as DefaultLink } from "./components/link";
 import { NumberedList as DefaultNumberedList } from "./components/numbered-list";
 import { Page as DefaultPage } from "./components/page";
@@ -54,9 +56,19 @@ import { Todo as DefaultTodo } from "./components/to-do";
 import { Toggle as DefaultToggle } from "./components/toggle";
 import { WrappedText as DefaultWrappedText } from "./components/wrapped-text";
 
-export const dummyLink = ({ href, rel, target, title, ...rest }) => (
-  <span {...rest} />
-);
+interface dummyLinkProps {
+  href?: string;
+  rel?: string;
+  target?: string;
+  title?: string;
+}
+export const dummyLink: React.FC<dummyLinkProps> = ({
+  href,
+  rel,
+  target,
+  title,
+  ...rest
+}) => <span {...rest} />;
 
 const dummyComponent = (name: string) => () => {
   console.warn(
@@ -130,7 +142,9 @@ const defaultComponents: NotionComponents = {
   file: DefaultFile,
   googleDrive: DefaultGoogleDrive,
   header: DefaultHeader,
+  image: DefaultImage,
   link: DefaultLink,
+  lazyImage: DefaultLazyImage,
   numberedList: DefaultNumberedList,
   page: DefaultPage,
   pageHeader: DefaultPageHeader,
@@ -166,15 +180,15 @@ const defaultNotionContext: NotionContext = {
   components: defaultComponents,
   mapPageUrl: defaultMapPageUrl(),
   mapImageUrl: defaultMapImageUrl,
-  searchNotion: null,
+  searchNotion: undefined,
   fullPage: false,
   darkMode: false,
   previewImages: false,
   showCollectionViewDropdown: true,
   showTableOfContents: false,
   minTableOfContentsItems: 3,
-  defaultPageIcon: null,
-  defaultPageCover: null,
+  defaultPageIcon: undefined,
+  defaultPageCover: undefined,
   defaultPageCoverPosition: 0.5,
   zoom: null,
 };
@@ -189,12 +203,6 @@ export const NotionContextProvider: React.FC<PartialNotionContext> = ({
   rootPageId,
   ...rest
 }) => {
-  for (const key of Object.keys(rest)) {
-    if (rest[key] === undefined) {
-      delete rest[key];
-    }
-  }
-
   return (
     <ctx.Provider
       value={{

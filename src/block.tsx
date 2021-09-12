@@ -135,7 +135,7 @@ export const Block: React.FC<BlockProps> = (props) => {
     }
 
     case "equation": {
-      const math = block.properties.title[0][0];
+      const math = block.properties?.title[0][0];
       if (!math) return null;
 
       return <components.equation math={math} block className={blockId} />;
@@ -149,7 +149,6 @@ export const Block: React.FC<BlockProps> = (props) => {
           : "";
         const caption = block.properties.caption;
 
-        // TODO: add className
         return (
           <>
             <components.code
@@ -233,13 +232,7 @@ export const Block: React.FC<BlockProps> = (props) => {
     }
 
     case "transclusion_reference": {
-      return (
-        <components.syncPointerBlock
-          block={block}
-          level={level + 1}
-          {...props}
-        />
-      );
+      return <components.syncPointerBlock {...props} level={level + 1} />;
     }
 
     default: {
