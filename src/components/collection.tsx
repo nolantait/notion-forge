@@ -61,7 +61,6 @@ export const Collection: React.FC<{
   }
 
   const padding = isServer ? 96 : ((width - notionBodyWidth) / 2) | 0;
-  // console.log({ width, notionBodyWidth, padding })
 
   const collection = recordMap.collection[collectionId]?.value;
   const collectionView = recordMap.collection_view[collectionViewId]?.value;

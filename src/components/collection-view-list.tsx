@@ -16,8 +16,6 @@ export const CollectionViewList: React.FC<CollectionViewProps> = ({
   collectionData,
 }) => {
   const { components, recordMap, mapPageUrl } = useNotionContext();
-  // console.log('list', { collection, collectionView, collectionData })
-
   return (
     <div className="notion-list-collection">
       <div className="notion-list-view">
@@ -54,7 +52,6 @@ export const CollectionViewList: React.FC<CollectionViewProps> = ({
                       const data =
                         properties && (properties as any)[p.property];
 
-                      // console.log('list item body', p, schema, data)
                       if (!schema) {
                         return null;
                       }

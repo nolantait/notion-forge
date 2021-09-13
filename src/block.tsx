@@ -220,7 +220,7 @@ export const Block: React.FC<BlockProps> = (props) => {
 
     case "transclusion_container": {
       return (
-        <components.syncContainer blockId={blockId}>
+        <components.syncContainer block={block} blockId={blockId}>
           {children}
         </components.syncContainer>
       );

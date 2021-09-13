@@ -12,7 +12,8 @@
     ".": {
       "import": "./build/esm/index.js",
       "require": "./build/cjs/index.js"
-    }
+    },
+    "./style": "./build/styles.css"
   },
   "files": [
     "build/**/*"

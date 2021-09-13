@@ -51,7 +51,6 @@ export const Asset = (props: AssetProps) => {
   };
 
   const assetStyle: React.CSSProperties = {};
-  // console.log('asset', block)
 
   if (block.format) {
     const {
@@ -71,7 +70,6 @@ export const Asset = (props: AssetProps) => {
       }
 
       if (block_aspect_ratio && block.type !== "image") {
-        // console.log(block.type, block)
         style.paddingBottom = `${block_aspect_ratio * 100}%`;
       } else if (block_height) {
         style.height = block_height;
@@ -135,7 +133,6 @@ export const Asset = (props: AssetProps) => {
     if (!isServer) {
       const signedUrl = recordMap.signed_urls?.[block.id];
       if (!signedUrl) return null;
-      console.log("pdf", block, signedUrl);
 
       content = <components.pdf file={signedUrl} />;
     }
@@ -219,8 +216,6 @@ export const Asset = (props: AssetProps) => {
       }
     }
   } else if (block.type === "image") {
-    // console.log('image', block)
-
     const src = mapImageUrl(source, block as Block);
     const caption = getTextContent(block.properties?.caption);
     const alt = caption || "notion image";

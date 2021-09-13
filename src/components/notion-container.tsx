@@ -39,6 +39,7 @@ export const NotionContainer = (props: NotionContainerProps) => {
   const coverPosition = (1 - (pageCoverPosition || 0.5)) * 100;
   const pageIcon = getBlockIcon(block, recordMap) ?? defaultPageIcon;
   const isPageIconUrl = pageIcon && isUrl(pageIcon);
+  const { page_full_width } = block?.format;
 
   const outerContainerStyle = cs(
     "notion",
@@ -53,7 +54,7 @@ export const NotionContainer = (props: NotionContainerProps) => {
     hasPageCover ? "notion-page-has-cover" : "notion-page-no-cover",
     pageIcon ? "notion-page-has-icon" : "notion-page-no-icon",
     isPageIconUrl ? "notion-page-has-image-icon" : "notion-page-has-text-icon",
-    "notion-full-page",
+    page_full_width && "notion-full-width",
     bodyClassName
   );
 

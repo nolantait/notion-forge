@@ -38,7 +38,6 @@ export const Property: React.FC<{
     ) {
       switch (schema.type) {
         case "relation":
-          // console.log('relation', schema, data)
           content = <components.text value={data} block={block} />;
           break;
 
@@ -50,12 +49,12 @@ export const Property: React.FC<{
           // })
 
           try {
-            content = evalFormula((schema.formula as types.Formula), {
+            content = evalFormula(schema.formula as types.Formula, {
               schema: collection?.schema,
               properties: block?.properties,
             });
 
-            if (isNaN((content as number))) {
+            if (isNaN(content as number)) {
               console.log("NaN", schema.formula);
             }
 
@@ -109,30 +108,32 @@ export const Property: React.FC<{
           break;
 
         case "person":
-          // console.log('person', schema, data)
           content = <components.text value={data} block={block} />;
           break;
 
         case "file":
           // TODO: assets should be previewable via image-zoom
-          const files = data?.filter((v) => v.length === 2)
+          const files = data
+            ?.filter((v) => v.length === 2)
             .map((f) => f.flat().flat());
 
-          content = block && files?.map((file, i) => (
-            <components.link
-              key={i}
-              className="notion-property-file"
-              href={mapImageUrl(file[2] as string, block)}
-              target="_blank"
-              rel="noreferrer noopener"
-            >
-              <components.image
-                alt={file[0] as string}
-                src={mapImageUrl(file[2] as string, block)}
-                loading="lazy"
-              />
-            </components.link>
-          ));
+          content =
+            block &&
+            files?.map((file, i) => (
+              <components.link
+                key={i}
+                className="notion-property-file"
+                href={mapImageUrl(file[2] as string, block)}
+                target="_blank"
+                rel="noreferrer noopener"
+              >
+                <components.image
+                  alt={file[0] as string}
+                  src={mapImageUrl(file[2] as string, block)}
+                  loading="lazy"
+                />
+              </components.link>
+            ));
 
           break;
 
@@ -239,7 +240,10 @@ export const Property: React.FC<{
           break;
 
         case "created_time":
-          content = format(new Date(block?.created_time || ""), "MMM d, YYY hh:mm aa");
+          content = format(
+            new Date(block?.created_time || ""),
+            "MMM d, YYY hh:mm aa"
+          );
           break;
 
         case "last_edited_time":
@@ -250,11 +254,9 @@ export const Property: React.FC<{
           break;
 
         case "created_by":
-          console.log("created_by", schema, data);
           break;
 
         case "last_edited_by":
-          console.log("last_edited_by", schema, data);
           break;
 
         default:

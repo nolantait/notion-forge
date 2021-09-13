@@ -12,8 +12,6 @@ export const CollectionViewTable: React.FC<CollectionViewProps> = ({
   collectionData,
 }) => {
   const { recordMap } = useNotionContext();
-  // console.log('table', { collection, collectionView, collectionData })
-
   let properties: Array<any> = [];
 
   if (collectionView.format?.table_properties) {

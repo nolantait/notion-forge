@@ -54,8 +54,6 @@ export const FormatAll = (
         const id = parsePageId(pathname, { uuid: true });
 
         if (v[0] === "/" && id) {
-          // console.log('a', id)
-
           return (
             <components.pageLink
               className="notion-link"
