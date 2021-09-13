@@ -79,7 +79,7 @@ const FullPage = (props: PageProps) => {
     page_icon = defaultPageIcon,
     page_cover = defaultPageCover,
     page_cover_position = defaultPageCoverPosition,
-    page_full_width,
+    page_full_width = false,
   } = block.format || {};
 
   const { properties } = block;

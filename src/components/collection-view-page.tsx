@@ -121,7 +121,8 @@ const LightPage = (props: CollectionViewPageProps) => {
     blockId,
   } = props;
 
-  const { page_full_width, page_small_text } = block.format || {};
+  const { page_full_width = false, page_small_text = false } =
+    block.format || {};
 
   const containerStyle = cs(
     "notion",
