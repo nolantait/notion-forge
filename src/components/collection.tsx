@@ -1,7 +1,7 @@
 import React from "react";
 import * as types from "notion-types";
-import { getBlockParentPage, getTextContent } from "notion-utils";
-import { useLocalStorage, useWindowSize } from "react-use";
+import { getTextContent } from "notion-utils";
+import { useLocalStorage } from "react-use";
 import Dropdown from "rc-dropdown";
 import Menu, { Item as MenuItem } from "rc-menu";
 
@@ -10,7 +10,6 @@ import { ChevronDownIcon } from "../icons/chevron-down-icon";
 import { useNotionContext } from "../context";
 import { cs } from "../utils";
 
-const isServer = typeof window === "undefined";
 const triggers = ["click"];
 
 export const Collection: React.FC<{
@@ -41,27 +40,6 @@ export const Collection: React.FC<{
     [collectionState]
   );
 
-  let { width } = useWindowSize();
-  if (isServer) {
-    width = 1024;
-  }
-
-  // TODO: customize for mobile?
-  const maxNotionBodyWidth = 708;
-  let notionBodyWidth = maxNotionBodyWidth;
-
-  const parentPage = getBlockParentPage(block, recordMap);
-  if (parentPage?.format?.page_full_width) {
-    notionBodyWidth = (width - 2 * Math.min(96, width * 0.08)) | 0;
-  } else {
-    notionBodyWidth =
-      width < maxNotionBodyWidth
-        ? (width - width * 0.02) | 0 // 2vw
-        : maxNotionBodyWidth;
-  }
-
-  const padding = isServer ? 96 : ((width - notionBodyWidth) / 2) | 0;
-
   const collection = recordMap.collection[collectionId]?.value;
   const collectionView = recordMap.collection_view[collectionViewId]?.value;
   const collectionData =
@@ -71,8 +49,6 @@ export const Collection: React.FC<{
     console.log("skipping missing collection view for block", block.id);
     return null;
   }
-
-  const style: React.CSSProperties = {};
 
   const title = getTextContent(collection.name).trim();
   if (collection.icon) {
@@ -84,7 +60,7 @@ export const Collection: React.FC<{
 
   return (
     <div className={cs("notion-collection", className)}>
-      <div className="notion-collection-header" style={style}>
+      <div className="notion-collection-header">
         {title && (
           <div className="notion-collection-header-title">
             <>
@@ -131,8 +107,6 @@ export const Collection: React.FC<{
         collection={collection}
         collectionView={collectionView}
         collectionData={collectionData}
-        padding={padding}
-        width={width}
       />
     </div>
   );
