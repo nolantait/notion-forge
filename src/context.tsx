@@ -90,8 +90,6 @@ export interface NotionContext {
   darkMode: boolean;
   previewImages: boolean;
   showCollectionViewDropdown: boolean;
-  showTableOfContents: boolean;
-  minTableOfContentsItems: number;
   defaultPageIcon?: string;
   defaultPageCover?: string;
   defaultPageCoverPosition?: number;
@@ -109,8 +107,6 @@ export interface PartialNotionContext {
   darkMode?: boolean;
   previewImages?: boolean;
   showCollectionViewDropdown?: boolean;
-  showTableOfContents?: boolean;
-  minTableOfContentsItems?: number;
   defaultPageIcon?: string;
   defaultPageCover?: string;
   defaultPageCoverPosition?: number;
@@ -187,8 +183,6 @@ const defaultNotionContext: NotionContext = {
   darkMode: false,
   previewImages: false,
   showCollectionViewDropdown: true,
-  showTableOfContents: false,
-  minTableOfContentsItems: 3,
   defaultPageIcon: undefined,
   defaultPageCover: undefined,
   defaultPageCoverPosition: 0.5,

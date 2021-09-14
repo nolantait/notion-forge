@@ -3,8 +3,6 @@ import { PageBlock } from "notion-types";
 import { cs } from "../utils";
 
 import { NotionContainer } from "./notion-container";
-
-import { getPageTableOfContents } from "notion-utils";
 import { useNotionContext } from "../context";
 
 interface PageProps {
@@ -56,9 +54,6 @@ const FullPage = (props: PageProps) => {
     defaultPageIcon,
     defaultPageCover,
     defaultPageCoverPosition,
-    recordMap,
-    showTableOfContents,
-    minTableOfContentsItems,
     darkMode,
   } = useNotionContext();
 
@@ -84,9 +79,7 @@ const FullPage = (props: PageProps) => {
 
   const { properties } = block;
 
-  const toc = getPageTableOfContents(block, recordMap);
-  const hasToc = showTableOfContents && toc.length >= minTableOfContentsItems;
-  const hasAside = (hasToc || (pageAside ?? false)) && !page_full_width;
+  const hasAside = (pageAside ?? false) && !page_full_width;
 
   const containerParams = {
     block,
@@ -101,8 +94,7 @@ const FullPage = (props: PageProps) => {
 
   const tableOfContentsStyle = cs(
     "notion-page-content",
-    hasAside && "notion-page-content-has-aside",
-    hasToc && "notion-page-content-has-toc"
+    hasAside && "notion-page-content-has-aside"
   );
 
   const parentIsCollection = block.parent_table === "collection";
@@ -124,12 +116,7 @@ const FullPage = (props: PageProps) => {
       <div className={tableOfContentsStyle}>
         <article className="notion-page-content-inner">{children}</article>
 
-        {hasAside && (
-          <aside className="notion-aside">
-            {hasToc && <components.tableOfContents block={block} />}
-            {pageAside}
-          </aside>
-        )}
+        {hasAside && <aside className="notion-aside">{pageAside}</aside>}
       </div>
 
       {pageFooter}

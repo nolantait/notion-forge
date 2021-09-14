@@ -10,16 +10,12 @@ import {
 // import useScrollSpy from "../hooks/use-scroll-spy";
 import { useNotionContext } from "../context";
 
-interface AsideTableOfContentsParams {
-  block: PageBlock;
-}
-
-interface TableOfContentsParams {
+interface TOCParams {
   blockId: string;
   block: PageBlock;
 }
 
-export const TableOfContents = (props: TableOfContentsParams) => {
+export const TableOfContents: React.FC<TOCParams> = (props) => {
   const { recordMap } = useNotionContext();
   const { block, blockId } = props;
 
@@ -53,52 +49,6 @@ export const TableOfContents = (props: TableOfContentsParams) => {
           </span>
         </a>
       ))}
-    </div>
-  );
-};
-
-export const AsideTableOfContents = (props: AsideTableOfContentsParams) => {
-  // const throttleMs = 100;
-  const { darkMode, recordMap } = useNotionContext();
-  const { block } = props;
-  // const [activeSection, _setActiveSection] = useScrollSpy(throttleMs);
-  const toc = getPageTableOfContents(block, recordMap);
-
-  return (
-    <div className="notion-aside-table-of-contents">
-      <div className="notion-aside-table-of-contents-header">
-        Table of Contents
-      </div>
-
-      <nav
-        className={cs("notion-table-of-contents", !darkMode && "notion-gray")}
-      >
-        {toc.map((tocItem) => {
-          const id = uuidToId(tocItem.id);
-
-          return (
-            <a
-              key={id}
-              href={`#${id}`}
-              className={cs(
-                "notion-table-of-contents-item",
-                `notion-table-of-contents-item-indent-level-${tocItem.indentLevel}`
-                // activeSection === id && "notion-table-of-contents-active-item"
-              )}
-            >
-              <span
-                className="notion-table-of-contents-item-body"
-                style={{
-                  display: "inline-block",
-                  marginLeft: tocItem.indentLevel * 16,
-                }}
-              >
-                {tocItem.text}
-              </span>
-            </a>
-          );
-        })}
-      </nav>
     </div>
   );
 };

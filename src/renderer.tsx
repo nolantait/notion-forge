@@ -25,9 +25,6 @@ export interface NotionRendererProps {
   previewImages?: boolean;
   showCollectionViewDropdown?: boolean;
 
-  showTableOfContents?: boolean;
-  minTableOfContentsItems?: number;
-
   defaultPageIcon?: string;
   defaultPageCover?: string;
   defaultPageCoverPosition?: number;
@@ -67,8 +64,6 @@ export const NotionRenderer: React.FC<NotionRendererProps> = ({
   darkMode,
   previewImages,
   showCollectionViewDropdown,
-  showTableOfContents,
-  minTableOfContentsItems,
   defaultPageIcon,
   defaultPageCover,
   defaultPageCoverPosition,
@@ -94,8 +89,6 @@ export const NotionRenderer: React.FC<NotionRendererProps> = ({
       darkMode={darkMode}
       previewImages={previewImages}
       showCollectionViewDropdown={showCollectionViewDropdown}
-      showTableOfContents={showTableOfContents}
-      minTableOfContentsItems={minTableOfContentsItems}
       defaultPageIcon={defaultPageIcon}
       defaultPageCover={defaultPageCover}
       defaultPageCoverPosition={defaultPageCoverPosition}
