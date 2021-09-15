@@ -1,14 +1,12 @@
 import React from "react";
-import { BaseContentBlock, Block } from "notion-types";
+import { BaseContentBlock } from "notion-types";
 import { cs } from "../utils";
 import { useNotionContext } from "../context";
+import { AssetBlock } from "../types";
 
-interface AssetWrapperProps {
-  blockId: string;
-  block: Block;
-}
-
-export const AssetWrapper = (props: AssetWrapperProps) => {
+export const AssetWrapper: React.FC<{ blockId: string; block: AssetBlock }> = (
+  props
+) => {
   const { block, blockId } = props;
   const { components } = useNotionContext();
   const value = block as BaseContentBlock;

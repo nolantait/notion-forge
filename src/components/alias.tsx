@@ -27,6 +27,7 @@ export const Alias: React.FC<{
     }
     return null;
   }
+
   const aliasPointerBlock = block;
   const referencePointerId = aliasPointerBlock?.format?.alias_pointer?.id;
 

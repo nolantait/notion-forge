@@ -21,7 +21,6 @@ export interface NotionRendererProps {
 
   rootPageId?: string;
   fullPage?: boolean;
-  darkMode?: boolean;
   previewImages?: boolean;
   showCollectionViewDropdown?: boolean;
 
@@ -61,7 +60,6 @@ export const NotionRenderer: React.FC<NotionRendererProps> = ({
   searchNotion,
   fullPage,
   rootPageId,
-  darkMode,
   previewImages,
   showCollectionViewDropdown,
   defaultPageIcon,
@@ -86,7 +84,6 @@ export const NotionRenderer: React.FC<NotionRendererProps> = ({
       searchNotion={searchNotion}
       fullPage={fullPage}
       rootPageId={rootPageId}
-      darkMode={darkMode}
       previewImages={previewImages}
       showCollectionViewDropdown={showCollectionViewDropdown}
       defaultPageIcon={defaultPageIcon}

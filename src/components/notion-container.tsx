@@ -18,7 +18,7 @@ export interface NotionContainerProps {
   children: React.ReactNode;
 }
 
-export const NotionContainer = (props: NotionContainerProps) => {
+export const NotionContainer: React.FC<NotionContainerProps> = (props) => {
   const { mapImageUrl, defaultPageIcon, recordMap, components } =
     useNotionContext();
 

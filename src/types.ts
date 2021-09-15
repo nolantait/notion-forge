@@ -1,5 +1,19 @@
 import * as types from "notion-types";
 
+export type AssetBlock =
+  | types.VideoBlock
+  | types.ImageBlock
+  | types.EmbedBlock
+  | types.FigmaBlock
+  | types.TypeformBlock
+  | types.ExcalidrawBlock
+  | types.MapsBlock
+  | types.TweetBlock
+  | types.PdfBlock
+  | types.GistBlock
+  | types.CodepenBlock
+  | types.GoogleDriveBlock;
+
 export interface IconProps {
   className?: string;
   alt?: string;

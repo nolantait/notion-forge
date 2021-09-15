@@ -1,38 +1,11 @@
 import React from "react";
-import {
-  Block,
-  VideoBlock,
-  ImageBlock,
-  EmbedBlock,
-  FigmaBlock,
-  TypeformBlock,
-  ExcalidrawBlock,
-  MapsBlock,
-  TweetBlock,
-  PdfBlock,
-  GistBlock,
-  CodepenBlock,
-  GoogleDriveBlock,
-} from "notion-types";
+import { Block } from "notion-types";
 import { getTextContent } from "notion-utils";
 
 import { useNotionContext } from "../context";
+import { AssetBlock } from "../types";
 
 const isServer = typeof window === "undefined";
-
-type AssetBlock =
-  | VideoBlock
-  | ImageBlock
-  | EmbedBlock
-  | FigmaBlock
-  | TypeformBlock
-  | ExcalidrawBlock
-  | MapsBlock
-  | TweetBlock
-  | PdfBlock
-  | GistBlock
-  | CodepenBlock
-  | GoogleDriveBlock;
 
 interface AssetProps {
   block: AssetBlock;
