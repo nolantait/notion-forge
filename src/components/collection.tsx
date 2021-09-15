@@ -15,18 +15,16 @@ import { ChevronDownIcon } from "../icons/chevron-down-icon";
 import { useNotionContext } from "@context";
 import { cs } from "@utils";
 
-import {
-  CollectionViewBlock,
-  CollectionViewPageBlock,
-  CollectionView,
-} from "@types";
+import { Notion } from "@types";
 
 const triggers = ["click"];
 
-type CollectionBlock = CollectionViewBlock | CollectionViewPageBlock;
+type CollectionBlock =
+  | Notion.CollectionViewBlock
+  | Notion.CollectionViewPageBlock;
 
 interface CollectionProps {
-  block: CollectionViewBlock | CollectionViewPageBlock;
+  block: Notion.CollectionViewBlock | Notion.CollectionViewPageBlock;
   className?: string;
 }
 
@@ -51,8 +49,9 @@ export const Collection = ({ block, className }: CollectionProps) => {
   });
 
   const currentViewId =
-    viewIds.find((id) => id === collectionState?.collectionViewId) ||
-    viewIds[0];
+    viewIds.find(
+      (id: string | undefined) => id === collectionState?.collectionViewId
+    ) || viewIds[0];
 
   const collection = recordMap.collection[collectionId]?.value;
   const currentView = recordMap.collection_view[currentViewId]?.value;
@@ -199,7 +198,7 @@ const CollectionViewMenu = (props: CollectionViewMenuProps) => {
 };
 
 const CollectionViewColumnDesc: React.FC<{
-  collectionView: CollectionView;
+  collectionView: Notion.CollectionView;
   className?: string;
   children?: React.ReactNode;
 }> = ({ collectionView, className, children, ...rest }) => {

@@ -13,16 +13,16 @@ import { useNotionContext, NotionContextProvider } from "@context";
 
 export interface NotionRendererProps {
   recordMap: ExtendedRecordMap;
-  components?: Partial<NotionComponents>;
+  components: NotionComponents;
 
-  mapPageUrl?: MapPageUrl;
-  mapImageUrl?: MapImageUrl;
+  mapPageUrl: MapPageUrl;
+  mapImageUrl: MapImageUrl;
   searchNotion?: SearchNotion;
 
   rootPageId?: string;
-  fullPage?: boolean;
-  previewImages?: boolean;
-  showCollectionViewDropdown?: boolean;
+  fullPage: boolean;
+  previewImages: boolean;
+  showCollectionViewDropdown: boolean;
 
   defaultPageIcon: string | null;
   defaultPageCover: string | null;

@@ -17,7 +17,6 @@ export * from "./collection";
 export * from "./collection-view-board";
 export * from "./collection-view-gallery";
 export * from "./collection-view-list";
-export * from "./collection-view-page";
 export * from "./collection-view-table";
 export * from "./collection-view";
 export * from "./column-list";

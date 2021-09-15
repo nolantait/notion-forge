@@ -17,7 +17,7 @@ import {
   GistBlock,
   CodepenBlock,
   GoogleDriveBlock,
-  Collection,
+  Collection as NotionCollection,
   CollectionView,
   ExtendedRecordMap,
   Block,
@@ -25,7 +25,7 @@ import {
   SearchResults,
 } from "notion-types";
 
-export * from "notion-types";
+export * as Notion from "notion-types";
 
 export type AssetBlock =
   | VideoBlock
@@ -146,7 +146,7 @@ export interface NotionComponents {
 }
 
 export interface CollectionViewProps {
-  collection: Collection;
+  collection: NotionCollection;
   collectionView: CollectionView;
   collectionData: CollectionQueryResult;
   padding: number;
@@ -154,7 +154,7 @@ export interface CollectionViewProps {
 }
 
 export interface CollectionCardProps {
-  collection: Collection;
+  collection: NotionCollection;
   block: PageBlock;
   cover: CollectionCardCover;
   coverSize: CollectionCardCoverSize;

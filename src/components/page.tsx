@@ -4,10 +4,10 @@ import { cs } from "@utils";
 
 import { NotionContainer } from "./notion-container";
 import { useNotionContext } from "@context";
-import { CollectionViewPageBlock } from "@types";
+import { Notion } from "@types";
 
 interface PageProps {
-  block: PageBlock | CollectionViewPageBlock;
+  block: PageBlock | Notion.CollectionViewPageBlock;
   blockId: string;
   children: React.ReactNode;
   level: number;
