@@ -1,18 +1,46 @@
-import * as types from "notion-types";
+import {
+  BaseBlock,
+  CollectionQueryResult,
+  CollectionCardCover,
+  CollectionCardCoverAspect,
+  CollectionCardCoverSize,
+  PropertyID,
+  PageBlock,
+  VideoBlock,
+  ImageBlock,
+  EmbedBlock,
+  FigmaBlock,
+  TypeformBlock,
+  ExcalidrawBlock,
+  MapsBlock,
+  TweetBlock,
+  PdfBlock,
+  GistBlock,
+  CodepenBlock,
+  GoogleDriveBlock,
+  Collection,
+  CollectionView,
+  ExtendedRecordMap,
+  Block,
+  SearchParams,
+  SearchResults
+} from "notion-types";
+
+export * from 'notion-types';
 
 export type AssetBlock =
-  | types.VideoBlock
-  | types.ImageBlock
-  | types.EmbedBlock
-  | types.FigmaBlock
-  | types.TypeformBlock
-  | types.ExcalidrawBlock
-  | types.MapsBlock
-  | types.TweetBlock
-  | types.PdfBlock
-  | types.GistBlock
-  | types.CodepenBlock
-  | types.GoogleDriveBlock;
+  | VideoBlock
+  | ImageBlock
+  | EmbedBlock
+  | FigmaBlock
+  | TypeformBlock
+  | ExcalidrawBlock
+  | MapsBlock
+  | TweetBlock
+  | PdfBlock
+  | GistBlock
+  | CodepenBlock
+  | GoogleDriveBlock;
 
 export interface IconProps {
   className?: string;
@@ -21,17 +49,56 @@ export interface IconProps {
 
 export type MapPageUrl = (
   pageId: string,
-  recordMap?: types.ExtendedRecordMap | undefined
+  recordMap?: ExtendedRecordMap | undefined
 ) => string;
-export type MapImageUrl = (url: string, block: types.Block) => string;
+export type MapImageUrl = (url: string, block: Block) => string;
 export type SearchNotion = (
-  params: types.SearchParams
-) => Promise<types.SearchResults>;
+  params: SearchParams
+) => Promise<SearchResults>;
+
+export interface AliasBlock {
+  type: "alias"
+  format: {
+    alias_pointer: {
+      id: string
+      table: string
+      spaceId: string
+    }
+  }
+}
+
+export interface AliasProps extends BaseBlock {
+  block: AliasBlock
+  level: number
+}
+
+export type AliasPresenter = (props: AliasProps) => React.ReactNode
+
+export interface AssetWrapperProps {
+  blockId: string
+  block: AssetBlock
+}
+
+export type AssetWrapperPresenter = (block: AssetBlock) => React.ReactNode
+
+export interface AssetProps {
+  block: AssetBlock
+}
+
+export interface BlockFormat {
+  block_width: number
+  block_height: number
+  display_source: string
+  block_full_width: boolean
+  block_page_width: boolean
+  block_aspect_ratio: number
+  block_preserve_scale: boolean
+}
 
 export interface NotionComponents {
   // TODO: better typing for arbitrary react components
-  alias: any;
-  assetWrapper: any;
+  alias: AliasPresenter;
+  assetWrapper: AssetWrapperPresenter;
   asset: any;
   audio: any;
   bookmark: any;
@@ -84,21 +151,21 @@ export interface NotionComponents {
 }
 
 export interface CollectionViewProps {
-  collection: types.Collection;
-  collectionView: types.CollectionView;
-  collectionData: types.CollectionQueryResult;
+  collection: Collection;
+  collectionView: CollectionView;
+  collectionData: CollectionQueryResult;
   padding: number;
   width: number;
 }
 
 export interface CollectionCardProps {
-  collection: types.Collection;
-  block: types.PageBlock;
-  cover: types.CollectionCardCover;
-  coverSize: types.CollectionCardCoverSize;
-  coverAspect: types.CollectionCardCoverAspect;
+  collection: Collection;
+  block: PageBlock;
+  cover: CollectionCardCover;
+  coverSize: CollectionCardCoverSize;
+  coverAspect: CollectionCardCoverAspect;
   properties?: Array<{
-    property: types.PropertyID;
+    property: PropertyID;
     visible: boolean;
   }>;
   className?: string;

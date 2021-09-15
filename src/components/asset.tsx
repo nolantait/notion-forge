@@ -1,21 +1,127 @@
 import React from "react";
-import { Block } from "notion-types";
 import { getTextContent } from "notion-utils";
 
-import { useNotionContext } from "../context";
-import { AssetBlock } from "../types";
+import { useNotionContext } from "@context";
+import { AssetBlock, AssetProps, BlockFormat } from "@types";
 
 const isServer = typeof window === "undefined";
 
-interface AssetProps {
-  block: AssetBlock;
-}
-
 export const Asset = (props: AssetProps) => {
   const { block } = props;
-  const { recordMap, mapImageUrl, components } = useNotionContext();
+  const { format, type } = block
+  const { containerStyle, assetStyle } = getAssetStyle(format, type)
 
-  const style: React.CSSProperties = {
+  return (
+    <div style={containerStyle}>
+      {RenderAssetByType(block, assetStyle)}
+    </div>
+  )
+};
+
+const RenderAssetByType = (block: AssetBlock, style: React.CSSProperties): React.ReactNode => {
+  const { recordMap, mapImageUrl, components } = useNotionContext();
+  const { type, properties = { source: undefined } } = block
+  const source = properties.source?.[0]?.[0];
+  const signedUrl = recordMap.signed_urls?.[block.id];
+
+  switch (type) {
+    case 'tweet': {
+      if (!source) throw new Error(`Could not parse source for ${source}`);
+      const id = source.split("?")[0].split("/").pop();
+
+      return <components.tweet id={id} />
+    }
+    case 'pdf': {
+      if (isServer) return null
+
+      return <components.pdf file={signedUrl} />
+    }
+    case 'video': {
+      if (!signedUrl) throw new Error(`Could not parse signed url for ${block.id}`)
+
+      if (!isThirdPartyVideo) {
+        return <video
+          playsInline
+          controls
+          preload="metadata"
+          style={style}
+          src={signedUrl}
+          title={type}
+        />
+      }
+
+      return null
+    }
+    case 'gist': {
+      let src = block.format?.display_source ?? source;
+
+      if (!src) throw new Error(`Could not parse github gist src ${src}`)
+
+      if (!src.endsWith(".pibb")) {
+        src = `${src}.pibb`;
+      }
+
+      style.width = "100%";
+
+      return <iframe
+        style={style}
+        className="notion-asset-object-fit"
+        src={src}
+        title="GitHub Gist"
+        frameBorder="0"
+        loading="lazy"
+        scrolling="auto"
+      />
+    }
+    case 'embed':
+      // Fallthrough
+    case 'figma':
+    // Fallthrough
+    case 'typeform':
+    // Fallthrough
+    case 'maps':
+    // Fallthrough
+    case 'excalidraw':
+    // Fallthrough
+    case 'codepen':
+    // Fallthrough
+    case 'drive': {
+      if (!signedUrl) throw new Error(`Could not parse signed url for ${block.id}`)
+
+      return <iframe
+        className="notion-asset-object-fit"
+        style={style}
+        src={signedUrl}
+        title={`iframe ${type}`}
+        frameBorder="0"
+        allowFullScreen
+        loading="lazy"
+      />
+    }
+    case 'image': {
+      if (!source) throw new Error(`Could not load image from source ${source}`)
+
+      const src = mapImageUrl(source, block);
+      const caption = getTextContent(block.properties?.caption);
+      const alt = caption || "notion image";
+
+      return <components.lazyImage
+        src={src}
+        alt={alt}
+        style={style}
+        zoomable={true}
+        height={style.height as number}
+      />
+
+    }
+    default: {
+      throw new Error(`Invalid block type ${type}`)
+    }
+  }
+}
+
+const getAssetStyle = (format: BlockFormat | undefined, type: string) => {
+  const containerStyle: React.CSSProperties = {
     position: "relative",
     display: "flex",
     justifyContent: "center",
@@ -25,184 +131,62 @@ export const Asset = (props: AssetProps) => {
 
   const assetStyle: React.CSSProperties = {};
 
-  if (block.format) {
-    const {
-      block_aspect_ratio,
-      block_height,
-      block_width,
-      block_full_width,
-      block_page_width,
-      block_preserve_scale,
-    } = block.format;
+  if (!format) return { containerStyle, assetStyle }
 
-    if (block_full_width || block_page_width) {
-      if (block_full_width) {
-        style.width = "100vw";
-      } else {
-        style.width = "100%";
-      }
+  const {
+    block_aspect_ratio: aspectRatio,
+    block_height: height,
+    block_width: width,
+    block_full_width: fullWidth,
+    block_page_width: pageWidth,
+    block_preserve_scale: preserveScale,
+  } = format;
 
-      if (block_aspect_ratio && block.type !== "image") {
-        style.paddingBottom = `${block_aspect_ratio * 100}%`;
-      } else if (block_height) {
-        style.height = block_height;
-      } else if (block_preserve_scale) {
-        if (block.type === "image") {
-          style.height = "100%";
-        } else {
-          // TODO: this is just a guess
-          style.paddingBottom = "75%";
-          style.minHeight = 100;
-        }
-      }
-    } else {
-      if (block_width) {
-        style.width = block_width;
-      }
+  const classes = []
 
-      if (block_preserve_scale && block.type !== "image") {
-        style.paddingBottom = "50%";
-        style.minHeight = 100;
-      } else {
-        if (block_height && block.type !== "image") {
-          style.height = block_height;
-        }
-      }
-    }
+  const isImage = type !== "image"
 
-    if (block_preserve_scale) {
-      assetStyle.objectFit = "contain";
-    }
+  const hasContainerWidth = fullWidth || pageWidth
+
+  if (fullWidth) classes.push('notion-asset--full-width');
+  if (pageWidth) classes.push('notion-asset--page-width');
+  if (preserveScale) classes.push('notion-asset--preserve-scale');
+
+  if (hasContainerWidth && !isImage) {
+    containerStyle.paddingBottom = `${aspectRatio * 100}`
   }
 
-  const source = block.properties?.source?.[0]?.[0];
-  let content = null;
-
-  if (block.type === "tweet") {
-    const src = source;
-    if (!src) return null;
-
-    const id = src.split("?")[0].split("/").pop();
-    if (!id) return null;
-
-    content = (
-      <div
-        style={{
-          ...assetStyle,
-          maxWidth: 420,
-          width: "100%",
-          marginLeft: "auto",
-          marginRight: "auto",
-        }}
-      >
-        <components.tweet id={id} />
-      </div>
-    );
-  } else if (block.type === "pdf") {
-    style.overflow = "auto";
-    style.padding = "8px 16px";
-    style.background = "rgb(226, 226, 226)";
-
-    if (!isServer) {
-      const signedUrl = recordMap.signed_urls?.[block.id];
-      if (!signedUrl) return null;
-
-      content = <components.pdf file={signedUrl} />;
-    }
-  } else if (
-    block.type === "embed" ||
-    block.type === "video" ||
-    block.type === "figma" ||
-    block.type === "typeform" ||
-    block.type === "gist" ||
-    block.type === "maps" ||
-    block.type === "excalidraw" ||
-    block.type === "codepen" ||
-    block.type === "drive"
-  ) {
-    const signedUrl = recordMap.signed_urls[block.id];
-
-    if (
-      block.type === "video" &&
-      signedUrl &&
-      signedUrl.indexOf("youtube") < 0 &&
-      signedUrl.indexOf("youtu.be") < 0 &&
-      signedUrl.indexOf("vimeo") < 0 &&
-      signedUrl.indexOf("wistia") < 0 &&
-      signedUrl.indexOf("loom") < 0 &&
-      signedUrl.indexOf("videoask") < 0 &&
-      signedUrl.indexOf("getcloudapp") < 0
-    ) {
-      content = (
-        <video
-          playsInline
-          controls
-          preload="metadata"
-          style={assetStyle}
-          src={signedUrl}
-          title={block.type}
-        />
-      );
-    } else {
-      let src = block.format?.display_source ?? source;
-
-      if (src) {
-        if (block.type === "gist" && !src.endsWith(".pibb")) {
-          src = `${src}.pibb`;
-        }
-
-        if (block.type === "gist") {
-          assetStyle.width = "100%";
-          style.paddingBottom = "50%";
-
-          // TODO: GitHub gists do not resize their height properly
-          content = (
-            <iframe
-              style={assetStyle}
-              className="notion-asset-object-fit"
-              src={src}
-              title="GitHub Gist"
-              frameBorder="0"
-              // TODO: is this sandbox necessary?
-              // sandbox='allow-scripts allow-popups allow-top-navigation-by-user-activation allow-forms allow-same-origin'
-              // this is important for perf but react's TS definitions don't seem to like it
-              loading="lazy"
-              scrolling="auto"
-            />
-          );
-        } else {
-          content = (
-            <iframe
-              className="notion-asset-object-fit"
-              style={assetStyle}
-              src={src}
-              title={`iframe ${block.type}`}
-              frameBorder="0"
-              // TODO: is this sandbox necessary?
-              // sandbox='allow-scripts allow-popups allow-top-navigation-by-user-activation allow-forms allow-same-origin'
-              allowFullScreen
-              // this is important for perf but react's TS definitions don't seem to like it
-              loading="lazy"
-            />
-          );
-        }
-      }
-    }
-  } else if (block.type === "image") {
-    const src = mapImageUrl(source, block as Block);
-    const caption = getTextContent(block.properties?.caption);
-    const alt = caption || "notion image";
-
-    content = (
-      <components.lazyImage
-        src={src}
-        alt={alt}
-        style={assetStyle}
-        zoomable={true}
-        height={style.height as number}
-      />
-    );
+  if (hasContainerWidth && isImage) {
+    containerStyle.height = height
   }
 
-  return <div style={style}>{content}</div>;
-};
+  if (hasContainerWidth && isImage && preserveScale) {
+    containerStyle.height = '100%'
+  }
+
+  if (!hasContainerWidth) {
+    containerStyle.width = width
+  }
+
+  if (!hasContainerWidth && !preserveScale && !isImage) {
+    containerStyle.height = height
+  }
+
+  return { containerStyle, assetStyle }
+}
+
+const isThirdPartyVideo = (signedUrl: string): boolean => {
+  const regExpressions = [
+    /youtube/,
+    /youtu.be/,
+    /vimeo/,
+    /wistia/,
+    /loom/,
+    /videoask/,
+    /getcloudapp/
+  ]
+
+  return regExpressions.some((reg: RegExp) => {
+    reg.test(signedUrl)
+  })
+}

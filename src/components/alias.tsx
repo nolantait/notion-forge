@@ -1,37 +1,14 @@
-import { BaseBlock } from "notion-types";
 import React from "react";
 
 import { NotionBlockRenderer } from "../renderer";
+import { AliasProps } from "@types";
 
-interface AliasBlock extends BaseBlock {
-  type: "alias";
-  format: {
-    alias_pointer: {
-      id: string;
-      table: string;
-      spaceid: string;
-    };
-  };
-}
-
-export const Alias: React.FC<{
-  block: AliasBlock;
-  level: number;
-}> = (props) => {
+export const Alias = (props: AliasProps) => {
   const { block, level } = props;
-  const { id } = block;
 
-  if (!block) {
-    if (process.env.NODE_ENV !== "production") {
-      console.warn("missing block", id);
-    }
-    return null;
-  }
+  const referencePointerId = block.format.alias_pointer.id;
 
-  const aliasPointerBlock = block;
-  const referencePointerId = aliasPointerBlock?.format?.alias_pointer?.id;
-
-  if (!referencePointerId) return null;
+  if (!referencePointerId) throw new Error('Missing reference pointer id for alias block')
 
   return (
     <NotionBlockRenderer

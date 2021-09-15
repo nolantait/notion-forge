@@ -84,33 +84,16 @@ export interface NotionContext {
   components: NotionComponents;
   mapPageUrl: MapPageUrl;
   mapImageUrl: MapImageUrl;
-  searchNotion?: SearchNotion;
-  rootPageId?: string;
+  rootPageId: string;
   fullPage: boolean;
   darkMode: boolean;
   previewImages: boolean;
   showCollectionViewDropdown: boolean;
-  defaultPageIcon?: string;
-  defaultPageCover?: string;
-  defaultPageCoverPosition?: number;
+  defaultPageIcon: string | null;
+  defaultPageCover: string | null;
+  defaultPageCoverPosition: number;
   zoom: any;
-}
-
-export interface PartialNotionContext {
-  recordMap?: ExtendedRecordMap;
-  components?: Partial<NotionComponents>;
-  mapPageUrl?: MapPageUrl;
-  mapImageUrl?: MapImageUrl;
   searchNotion?: SearchNotion;
-  rootPageId?: string;
-  fullPage?: boolean;
-  darkMode?: boolean;
-  previewImages?: boolean;
-  showCollectionViewDropdown?: boolean;
-  defaultPageIcon?: string;
-  defaultPageCover?: string;
-  defaultPageCoverPosition?: number;
-  zoom?: any;
 }
 
 const defaultComponents: NotionComponents = {

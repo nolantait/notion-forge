@@ -1,30 +1,28 @@
 import React from "react";
-import { BaseContentBlock } from "notion-types";
-import { cs } from "../utils";
-import { useNotionContext } from "../context";
-import { AssetBlock } from "../types";
+import { cs } from "@utils";
+import { useNotionContext } from "@context";
+import { AssetWrapperProps } from "@types";
 
-export const AssetWrapper: React.FC<{ blockId: string; block: AssetBlock }> = (
-  props
-) => {
+export const AssetWrapper = (props: AssetWrapperProps) => {
   const { block, blockId } = props;
   const { components } = useNotionContext();
-  const value = block as BaseContentBlock;
+  const isBlockFullWidth = block.format?.block_full_width
+  const caption = block.properties.caption
 
   return (
     <figure
       className={cs(
         "notion-asset-wrapper",
         `notion-asset-wrapper-${block.type}`,
-        value.format?.block_full_width && "notion-asset-wrapper-full",
+        isBlockFullWidth && "notion-asset-wrapper-full",
         blockId
       )}
     >
-      <components.asset block={value} />
+      <components.asset block={block} />
 
-      {value?.properties?.caption && (
+      {caption && (
         <figcaption className="notion-asset-caption">
-          <components.text value={block.properties.caption} block={block} />
+          <components.text value={caption} block={block} />
         </figcaption>
       )}
     </figure>

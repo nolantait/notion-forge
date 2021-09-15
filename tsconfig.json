@@ -23,7 +23,13 @@
     "isolatedModules": true,
     "traceResolution": false,
     "jsx": "react",
-    "types": ["node"]
+    "types": ["node"],
+    "paths": {
+      "@types": ["types.ts"],
+      "@components": ["components"],
+      "@utils": ["utils.ts"],
+      "@context": ["context.tsx"]
+    }
   },
   "compileOnSave": false,
   "include": ["src/index.ts"],

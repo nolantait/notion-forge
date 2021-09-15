@@ -9,7 +9,7 @@ import {
   NotionComponents,
 } from "./types";
 import { Block } from "./block";
-import { useNotionContext, NotionContextProvider } from "./context";
+import { useNotionContext, NotionContextProvider } from "@context";
 
 export interface NotionRendererProps {
   recordMap: ExtendedRecordMap;
@@ -24,9 +24,9 @@ export interface NotionRendererProps {
   previewImages?: boolean;
   showCollectionViewDropdown?: boolean;
 
-  defaultPageIcon?: string;
-  defaultPageCover?: string;
-  defaultPageCoverPosition?: number;
+  defaultPageIcon: string | null;
+  defaultPageCover: string | null;
+  defaultPageCoverPosition: number;
 
   className?: string;
   bodyClassName?: string;
