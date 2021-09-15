@@ -3,11 +3,11 @@ import { cs } from "@utils";
 import { useNotionContext } from "@context";
 import { AssetWrapperProps } from "@types";
 
-export const AssetWrapper = (props: AssetWrapperProps) => {
+export const AssetWrapper = (props: AssetWrapperProps): JSX.Element => {
   const { block, blockId } = props;
   const { components } = useNotionContext();
-  const isBlockFullWidth = block.format?.block_full_width
-  const caption = block.properties.caption
+  const isBlockFullWidth = block.format?.block_full_width;
+  const caption = block.properties.caption;
 
   return (
     <figure

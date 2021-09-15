@@ -1,4 +1,10 @@
-import React, { useCallback, SetStateAction, Dispatch } from "react";
+import React, {
+  useCallback,
+  SetStateAction,
+  Dispatch,
+  useContext,
+  createContext,
+} from "react";
 import { getTextContent } from "notion-utils";
 import { useLocalStorage } from "react-use";
 import Dropdown from "rc-dropdown";
@@ -9,24 +15,39 @@ import { ChevronDownIcon } from "../icons/chevron-down-icon";
 import { useNotionContext } from "@context";
 import { cs } from "@utils";
 
-import { CollectionViewBlock, CollectionViewPageBlock, CollectionView } from "@types"
+import {
+  CollectionViewBlock,
+  CollectionViewPageBlock,
+  CollectionView,
+} from "@types";
 
 const triggers = ["click"];
 
-type CollectionBlock = CollectionViewBlock | CollectionViewPageBlock
+type CollectionBlock = CollectionViewBlock | CollectionViewPageBlock;
 
 interface CollectionProps {
-  block: CollectionViewBlock | CollectionViewPageBlock
-  className?: string
+  block: CollectionViewBlock | CollectionViewPageBlock;
+  className?: string;
 }
 
+interface CollectionState {
+  collectionViewId: string;
+}
+
+interface CollectionActions {
+  collectionState?: CollectionState;
+  setCollectionState?: Dispatch<SetStateAction<CollectionState | undefined>>;
+}
+
+export const CollectionActionContext = createContext<CollectionActions>({});
+
 export const Collection = ({ block, className }: CollectionProps) => {
-  const { recordMap, components } =
-    useNotionContext();
+  const { recordMap, components } = useNotionContext();
   const { collection_id: collectionId, view_ids: viewIds } = block;
+  const defaultViewId: string | undefined = viewIds[0];
 
   const [collectionState, setCollectionState] = useLocalStorage(block.id, {
-    collectionViewId: viewIds[0],
+    collectionViewId: defaultViewId,
   });
 
   const currentViewId =
@@ -38,10 +59,10 @@ export const Collection = ({ block, className }: CollectionProps) => {
   const currentViewData =
     recordMap.collection_query[collectionId]?.[currentViewId];
 
-  const isValidCollection = collection && currentView && currentViewData
+  const isValidCollection = collection && currentView && currentViewData;
 
   if (!isValidCollection) {
-    throw new Error(`Invalid collection ${collection}`)
+    throw new Error(`Invalid collection ${collection}`);
   }
 
   const title = getTextContent(collection.name).trim();
@@ -52,35 +73,41 @@ export const Collection = ({ block, className }: CollectionProps) => {
     };
   }
 
-  const containerStyle = cs("notion-collection", className)
+  const containerStyle = cs("notion-collection", className);
+  const collectionHeaderProps: CollectionHeaderProps = {
+    title,
+    block,
+    viewIds,
+    currentViewId,
+  };
 
   return (
-    <div className={containerStyle}>
-      <CollectionHeader {...{title, block, viewIds, currentViewId, collectionState, setCollectionState}} />
-      
+    <CollectionActionContext.Provider
+      value={{ collectionState, setCollectionState }}
+    >
+      <div className={containerStyle}>
+        <CollectionHeader {...collectionHeaderProps} />
 
-      <components.collectionView
-        collection={collection}
-        collectionView={currentView}
-        collectionData={currentViewData}
-      />
-    </div>
+        <components.collectionView
+          collection={collection}
+          collectionView={currentView}
+          collectionData={currentViewData}
+        />
+      </div>
+    </CollectionActionContext.Provider>
   );
 };
 
 interface CollectionHeaderProps {
-  title?: string
-  block: CollectionBlock
-  viewIds: Array<string>
-  collectionState: Record<string, any>
-  setCollectionState: Dispatch<SetStateAction<Record<string, any>>>
-  currentViewId: string
+  title?: string;
+  block: CollectionBlock;
+  viewIds: Array<string>;
+  currentViewId: string;
 }
 
 const CollectionHeader = (props: CollectionHeaderProps) => {
-  const { components, showCollectionViewDropdown } = useNotionContext()
-  const { title, block, viewIds, collectionState, setCollectionState, currentViewId } = props
-
+  const { components, showCollectionViewDropdown } = useNotionContext();
+  const { title, block, viewIds, currentViewId } = props;
 
   return (
     <div className="notion-collection-header">
@@ -98,29 +125,27 @@ const CollectionHeader = (props: CollectionHeaderProps) => {
       )}
 
       {viewIds.length > 1 && showCollectionViewDropdown && (
-        <CollectionViewDropdown {...{onChangeView, viewIds, currentViewId}}/>
+        <CollectionViewDropdown {...{ viewIds, currentViewId }} />
       )}
     </div>
-  )
-}
+  );
+};
 
 interface CollectionViewDropdown {
-  onChangeView: () => void
-  viewIds: Array<string>
-  currentViewId: string
+  viewIds: Array<string>;
+  currentViewId: string;
 }
 
 const CollectionViewDropdown = (props: CollectionViewDropdown) => {
-  const { recordMap } = useNotionContext()
-  const { onChangeView, viewIds, currentViewId } = props
+  const { recordMap } = useNotionContext();
+  const { viewIds, currentViewId } = props;
   const collectionView = recordMap.collection_view[currentViewId]?.value;
 
-  return(
-    <Dropdown
-      trigger={triggers}
-      overlay={<CollectionViewMenu {...{onChangeView, viewIds}} />}
-      animation="slide-up"
-    >
+  const collectionViewMenuProps = { viewIds };
+  const collectionMenu = <CollectionViewMenu {...collectionViewMenuProps} />;
+
+  return (
+    <Dropdown trigger={triggers} overlay={collectionMenu} animation="slide-up">
       <CollectionViewColumnDesc
         className="notion-collection-view-dropdown"
         collectionView={collectionView}
@@ -128,21 +153,27 @@ const CollectionViewDropdown = (props: CollectionViewDropdown) => {
         <ChevronDownIcon className="notion-collection-view-dropdown-icon" />
       </CollectionViewColumnDesc>
     </Dropdown>
-  )
-}
+  );
+};
 
 interface CollectionViewMenuProps {
-  onChangeView: () => void
-  viewIds: Array<string>
+  viewIds: Array<string>;
 }
 
 const CollectionViewMenu = (props: CollectionViewMenuProps) => {
-  const { recordMap } = useNotionContext()
-  const { viewIds } = props
+  const { collectionState, setCollectionState } = useContext(
+    CollectionActionContext
+  );
+  const { recordMap } = useNotionContext();
+  const { viewIds } = props;
 
   // Changing the view from a collection dropdown
   const onChangeView = useCallback(
-      ({ key: collectionViewId }: { key: string }) => {
+    (event) => {
+      const collectionViewId = event.key;
+
+      if (!setCollectionState) return;
+
       setCollectionState({
         ...collectionState,
         collectionViewId,
@@ -151,9 +182,7 @@ const CollectionViewMenu = (props: CollectionViewMenuProps) => {
     [collectionState]
   );
 
-
-
-  return(
+  return (
     <Menu onSelect={onChangeView}>
       {viewIds.map((viewId: string) => (
         <MenuItem
@@ -166,8 +195,8 @@ const CollectionViewMenu = (props: CollectionViewMenuProps) => {
         </MenuItem>
       ))}
     </Menu>
-  )
-}
+  );
+};
 
 const CollectionViewColumnDesc: React.FC<{
   collectionView: CollectionView;

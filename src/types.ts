@@ -1,5 +1,4 @@
 import {
-  BaseBlock,
   CollectionQueryResult,
   CollectionCardCover,
   CollectionCardCoverAspect,
@@ -23,10 +22,10 @@ import {
   ExtendedRecordMap,
   Block,
   SearchParams,
-  SearchResults
+  SearchResults,
 } from "notion-types";
 
-export * from 'notion-types';
+export * from "notion-types";
 
 export type AssetBlock =
   | VideoBlock
@@ -52,47 +51,43 @@ export type MapPageUrl = (
   recordMap?: ExtendedRecordMap | undefined
 ) => string;
 export type MapImageUrl = (url: string, block: Block) => string;
-export type SearchNotion = (
-  params: SearchParams
-) => Promise<SearchResults>;
+export type SearchNotion = (params: SearchParams) => Promise<SearchResults>;
 
 export interface AliasBlock {
-  type: "alias"
+  type: "alias";
   format: {
     alias_pointer: {
-      id: string
-      table: string
-      spaceId: string
-    }
-  }
+      id: string;
+      table: string;
+      spaceId: string;
+    };
+  };
 }
 
-export interface AliasProps extends BaseBlock {
-  block: AliasBlock
-  level: number
+export interface AliasProps {
+  block: AliasBlock;
+  level: number;
 }
 
-export type AliasPresenter = (props: AliasProps) => React.ReactNode
+export type AliasPresenter = (props: AliasProps) => JSX.Element;
 
 export interface AssetWrapperProps {
-  blockId: string
-  block: AssetBlock
+  blockId: string;
+  block: AssetBlock;
 }
 
-export type AssetWrapperPresenter = (block: AssetBlock) => React.ReactNode
+export type AssetWrapperPresenter = (props: AssetWrapperProps) => JSX.Element;
 
-export interface AssetProps {
-  block: AssetBlock
-}
+export interface AssetProps extends AssetWrapperProps {}
 
 export interface BlockFormat {
-  block_width: number
-  block_height: number
-  display_source: string
-  block_full_width: boolean
-  block_page_width: boolean
-  block_aspect_ratio: number
-  block_preserve_scale: boolean
+  block_width: number;
+  block_height: number;
+  display_source: string;
+  block_full_width: boolean;
+  block_page_width: boolean;
+  block_aspect_ratio: number;
+  block_preserve_scale: boolean;
 }
 
 export interface NotionComponents {
