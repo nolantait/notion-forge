@@ -8,10 +8,8 @@ import { getBlockIcon, getTextContent } from "notion-utils";
 
 export interface NotionContainerProps {
   block: PageBlock | CollectionViewPageBlock;
-  darkMode: boolean;
   blockId: string;
-  className: string;
-  bodyClassName: string;
+  className?: string;
   pageCover?: React.ReactNode | string;
   pageCoverPosition?: number;
   footer?: React.ReactNode;
@@ -26,36 +24,27 @@ export const NotionContainer: React.FC<NotionContainerProps> = (props) => {
     block,
     pageCover,
     footer,
-    darkMode,
     blockId,
     className,
-    pageCoverPosition,
+    pageCoverPosition = 0.5,
     children,
-    bodyClassName,
   } = props;
 
   const { properties } = block;
   const hasPageCover = pageCover;
-  const coverPosition = (1 - (pageCoverPosition || 0.5)) * 100;
+  const coverPosition = (1 - pageCoverPosition) * 100;
   const pageIcon = getBlockIcon(block, recordMap) ?? defaultPageIcon;
   const isPageIconUrl = pageIcon && isUrl(pageIcon);
-  const { page_full_width = false } = block?.format ?? {};
+  const { page_full_width: pageFullWidth = false } = block?.format ?? {};
 
-  const outerContainerStyle = cs(
-    "notion",
-    "notion-app",
-    darkMode ? "dark-mode" : "light-mode",
-    blockId,
-    className
-  );
+  const outerContainerStyle = cs("notion", "notion-app", blockId, className);
 
   const innerContainerStyle = cs(
     "notion-page",
     hasPageCover ? "notion-page-has-cover" : "notion-page-no-cover",
     pageIcon ? "notion-page-has-icon" : "notion-page-no-icon",
     isPageIconUrl ? "notion-page-has-image-icon" : "notion-page-has-text-icon",
-    page_full_width && "notion-full-width",
-    bodyClassName
+    pageFullWidth && "notion-full-width"
   );
 
   const renderPageCover =
@@ -79,7 +68,9 @@ export const NotionContainer: React.FC<NotionContainerProps> = (props) => {
 
         <div className="notion-page-scroller">
           {hasPageCover ? renderPageCover : null}
+
           <main className={innerContainerStyle}>{children}</main>
+
           {footer}
         </div>
       </div>

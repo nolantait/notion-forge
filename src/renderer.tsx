@@ -28,9 +28,6 @@ export interface NotionRendererProps {
   defaultPageCover: string | null;
   defaultPageCoverPosition: number;
 
-  className?: string;
-  bodyClassName?: string;
-
   footer?: React.ReactNode;
   pageHeader?: React.ReactNode;
   pageFooter?: React.ReactNode;
@@ -42,8 +39,6 @@ export interface NotionRendererProps {
 }
 
 interface NotionBlockRendererProps {
-  className?: string;
-  bodyClassName?: string;
   footer?: React.ReactNode;
 
   blockId?: string;

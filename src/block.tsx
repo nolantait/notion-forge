@@ -8,9 +8,6 @@ export interface BlockProps {
   block: any;
   level: number;
 
-  className?: string;
-  bodyClassName?: string;
-
   footer?: React.ReactNode;
   pageHeader?: React.ReactNode;
   pageFooter?: React.ReactNode;
@@ -44,10 +41,16 @@ export const Block: React.FC<BlockProps> = (props) => {
     block.type = "collection_view_page";
   }
 
+  const parentIsCollection = block.parent_table === "collection";
+
   switch (block.type) {
     case "collection_view_page":
-      return <components.collectionViewPage {...pageProps} />;
+      return <components.page {...pageProps} />;
     case "page":
+      if (parentIsCollection) {
+        return <components.collectionRow block={block} />;
+      }
+
       return <components.page {...pageProps} />;
     case "header":
     // Fallthrough

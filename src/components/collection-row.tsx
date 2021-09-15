@@ -1,21 +1,27 @@
 import React from "react";
 import { PageBlock } from "notion-types";
+import { cs } from "@utils";
 
 import { CollectionColumnTitle } from "./collection-column-title";
 import { Property } from "./property";
 import { useNotionContext } from "../context";
 
-export const CollectionRow: React.FC<{
+interface CollectionRowProps {
   block: PageBlock;
-}> = ({ block }) => {
+  blockId: string;
+}
+
+export const CollectionRow = ({
+  block,
+  blockId,
+}: CollectionRowProps): JSX.Element => {
   const { recordMap } = useNotionContext();
   const collectionId = block.parent_id;
   const collection = recordMap.collection[collectionId]?.value;
-  const schemas = collection?.schema;
 
-  if (!collection || !schemas) {
-    return null;
-  }
+  if (!collection) throw new Error(`Missing collection for block ${blockId}`);
+
+  const schemas = collection.schema;
 
   let propertyIds = Object.keys(schemas).filter((id) => id !== "title");
 
@@ -47,8 +53,10 @@ export const CollectionRow: React.FC<{
     propertyIds.sort((a, b) => schemas[a].name.localeCompare(schemas[b].name));
   }
 
+  const rowStyle = cs(blockId, "notion-collection-row");
+
   return (
-    <div className="notion-collection-row">
+    <div className={rowStyle}>
       <div className="notion-collection-row-body">
         {propertyIds.map((id) => {
           const schema = schemas[id];

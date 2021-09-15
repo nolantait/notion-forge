@@ -22,7 +22,7 @@ import { Code as DefaultCode } from "./components/code";
 import { CollectionCard as DefaultCollectionCard } from "./components/collection-card";
 import { CollectionColumnTitle as DefaultCollectionColumnTitle } from "./components/collection-column-title";
 import { CollectionRow as DefaultCollectionRow } from "./components/collection-row";
-import { CollectionViewPage as DefaultCollectionViewPage } from "./components/collection-view-page";
+import { Page as DefaultCollectionViewPage } from "./components/page";
 import { CollectionViewBoard as DefaultCollectionViewBoard } from "./components/collection-view-board";
 import { CollectionViewGallery as DefaultCollectionViewGallery } from "./components/collection-view-gallery";
 import { CollectionViewList as DefaultCollectionViewList } from "./components/collection-view-list";
@@ -84,9 +84,8 @@ export interface NotionContext {
   components: NotionComponents;
   mapPageUrl: MapPageUrl;
   mapImageUrl: MapImageUrl;
-  rootPageId: string;
+  rootPageId: string | undefined;
   fullPage: boolean;
-  darkMode: boolean;
   previewImages: boolean;
   showCollectionViewDropdown: boolean;
   defaultPageIcon: string | null;
@@ -150,6 +149,7 @@ const defaultComponents: NotionComponents = {
 };
 
 const defaultNotionContext: NotionContext = {
+  rootPageId: undefined,
   recordMap: {
     block: {},
     collection: {},
@@ -163,18 +163,17 @@ const defaultNotionContext: NotionContext = {
   mapImageUrl: defaultMapImageUrl,
   searchNotion: undefined,
   fullPage: false,
-  darkMode: false,
   previewImages: false,
   showCollectionViewDropdown: true,
-  defaultPageIcon: undefined,
-  defaultPageCover: undefined,
+  defaultPageIcon: null,
+  defaultPageCover: null,
   defaultPageCoverPosition: 0.5,
   zoom: null,
 };
 
 const ctx = React.createContext<NotionContext>(defaultNotionContext);
 
-export const NotionContextProvider: React.FC<PartialNotionContext> = ({
+export const NotionContextProvider: React.FC<NotionContext> = ({
   components: themeComponents = {},
   children,
   mapPageUrl,
@@ -182,14 +181,16 @@ export const NotionContextProvider: React.FC<PartialNotionContext> = ({
   rootPageId,
   ...rest
 }) => {
+  const pageMapper = rootPageId ? defaultMapPageUrl(rootPageId) : mapPageUrl;
+
   return (
     <ctx.Provider
       value={{
         ...defaultNotionContext,
         ...rest,
         rootPageId,
-        mapPageUrl: mapPageUrl ?? defaultMapPageUrl(rootPageId),
-        mapImageUrl: mapImageUrl ?? defaultMapImageUrl,
+        mapImageUrl,
+        mapPageUrl: pageMapper,
         components: { ...defaultComponents, ...themeComponents },
       }}
     >
