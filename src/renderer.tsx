@@ -47,7 +47,7 @@ interface NotionBlockRendererProps {
   zoom?: any;
 }
 
-export const NotionRenderer: React.FC<NotionRendererProps> = ({
+export const NotionRenderer = ({
   components,
   recordMap,
   mapPageUrl,
@@ -61,7 +61,7 @@ export const NotionRenderer: React.FC<NotionRendererProps> = ({
   defaultPageCover,
   defaultPageCoverPosition,
   ...rest
-}) => {
+}: NotionRendererProps): JSX.Element => {
   const zoom =
     typeof window !== "undefined" &&
     mediumZoom({
@@ -91,21 +91,17 @@ export const NotionRenderer: React.FC<NotionRendererProps> = ({
   );
 };
 
-export const NotionBlockRenderer: React.FC<NotionBlockRendererProps> = ({
+export const NotionBlockRenderer = ({
   level = 0,
   blockId,
   ...props
-}) => {
+}: NotionBlockRendererProps): JSX.Element => {
   const { recordMap } = useNotionContext();
   const id = blockId || Object.keys(recordMap.block)[0];
   const block = recordMap.block[id]?.value;
 
   if (!block) {
-    if (process.env.NODE_ENV !== "production") {
-      console.warn("missing block", blockId);
-    }
-
-    return null;
+    throw new Error(`Missing block ${blockId}`);
   }
 
   return (
