@@ -5,15 +5,14 @@ import React, {
   useContext,
   createContext,
 } from "react";
-import { getTextContent } from "notion-utils";
 import { useLocalStorage } from "react-use";
 import Dropdown from "rc-dropdown";
 import Menu, { Item as MenuItem } from "rc-menu";
 
-import { CollectionViewIcon } from "../icons/collection-view-icon";
-import { ChevronDownIcon } from "../icons/chevron-down-icon";
+import { CollectionViewIcon, ChevronDownIcon } from "@icons";
 import { useNotionContext } from "@context";
-import { cs } from "@utils";
+import { cs, getTextContent } from "@utils";
+import { CollectionProps } from "@types";
 
 import { Notion } from "@types";
 
@@ -23,11 +22,6 @@ type CollectionBlock =
   | Notion.CollectionViewBlock
   | Notion.CollectionViewPageBlock;
 
-interface CollectionProps {
-  block: Notion.CollectionViewBlock | Notion.CollectionViewPageBlock;
-  className?: string;
-}
-
 interface CollectionState {
   collectionViewId: string;
 }
@@ -35,6 +29,11 @@ interface CollectionState {
 interface CollectionActions {
   collectionState?: CollectionState;
   setCollectionState?: Dispatch<SetStateAction<CollectionState | undefined>>;
+}
+
+interface CollectionViewDropdown {
+  viewIds: Array<string>;
+  currentViewId: string;
 }
 
 export const CollectionActionContext = createContext<CollectionActions>({});
@@ -130,12 +129,7 @@ const CollectionHeader = (props: CollectionHeaderProps) => {
   );
 };
 
-interface CollectionViewDropdown {
-  viewIds: Array<string>;
-  currentViewId: string;
-}
-
-const CollectionViewDropdown = (props: CollectionViewDropdown) => {
+const CollectionViewDropdown = (props: CollectionViewDropdown): JSX.Element => {
   const { recordMap } = useNotionContext();
   const { viewIds, currentViewId } = props;
   const collectionView = recordMap.collection_view[currentViewId]?.value;

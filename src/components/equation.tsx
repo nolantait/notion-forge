@@ -1,18 +1,20 @@
 import React from "react";
-import { cs } from "../utils";
-import { useNotionContext } from "../context";
+
+import { cs } from "@utils";
+import { useNotionContext } from "@context";
+import { EquationProps } from "@types";
 
 const katexSettings = {
   throwOnError: true,
   strict: false,
 };
 
-export const Equation: React.FC<{
-  math: string;
-  block?: boolean;
-  children?: React.ReactNode;
-  className?: string;
-}> = ({ math, className, ...rest }) => {
+export const Equation = ({
+  math,
+  className,
+  block,
+  ...rest
+}: EquationProps): JSX.Element => {
   const { components } = useNotionContext();
 
   return (
@@ -21,7 +23,7 @@ export const Equation: React.FC<{
       tabIndex={0}
       className={cs(
         "notion-equation",
-        rest.block ? "notion-equation-block" : "notion-equation-inline",
+        block ? "notion-equation-block" : "notion-equation-inline",
         className
       )}
     >

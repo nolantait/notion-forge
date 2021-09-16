@@ -1,30 +1,24 @@
 import React from "react";
+
 import {
+  cs,
   getTextContent,
   getPageTableOfContents,
   getBlockParentPage,
   uuidToId,
-} from "notion-utils";
-import * as types from "notion-types";
-
-import { LinkIcon } from "../icons/link-icon";
-import { useNotionContext } from "../context";
-import { cs } from "../utils";
-
-interface HeaderProps {
-  block: types.HeaderBlock | types.SubHeaderBlock | types.SubSubHeaderBlock;
-  blockId: string;
-}
+} from "@utils";
+import { HeaderProps } from "@types";
+import { LinkIcon } from "@icons";
+import { useNotionContext } from "@context";
 
 const tocIndentLevelCache: {
   [blockId: string]: number;
 } = {};
 
-export const Header = (props: HeaderProps) => {
+export const Header = ({ block, blockId }: HeaderProps): JSX.Element => {
   const { recordMap, components } = useNotionContext();
-  const { block, blockId } = props;
 
-  if (!block.properties) return null;
+  if (!block.properties) return <></>;
 
   const blockColor = block.format?.block_color;
   const id = uuidToId(block.id);

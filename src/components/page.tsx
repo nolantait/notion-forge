@@ -1,29 +1,17 @@
 import React from "react";
-import { PageBlock } from "notion-types";
 import { cs } from "@utils";
 
 import { NotionContainer } from "./notion-container";
 import { useNotionContext } from "@context";
-import { Notion } from "@types";
+import { PageProps } from "@types";
 
-interface PageProps {
-  block: PageBlock | Notion.CollectionViewPageBlock;
-  blockId: string;
-  children: React.ReactNode;
-  level: number;
-  footer: React.ReactNode;
-  pageHeader: React.ReactNode;
-  pageFooter: React.ReactNode;
-  pageAside: React.ReactNode;
-  pageCover: React.ReactNode;
-}
-
-export const Page = (props: PageProps) => {
+export const Page = (props: PageProps): JSX.Element => {
   const { fullPage } = useNotionContext();
   const { block, level, blockId } = props;
 
-  // Render a page link if this is a nested block
-  const Content = level > 0 ? PageLink : fullPage ? FullPage : LightPage;
+  // Render a page link instead of a page if this is a nested block
+  const PageRenderer = fullPage ? FullPage : LightPage;
+  const Content = level > 0 ? PageLink : PageRenderer;
 
   return (
     <NotionContainer {...{ block, blockId }}>
@@ -32,7 +20,7 @@ export const Page = (props: PageProps) => {
   );
 };
 
-const RenderContent = (props: PageProps) => {
+const RenderContent = (props: PageProps): JSX.Element => {
   const { components } = useNotionContext();
   const { block, children } = props;
   const isCollection = block.type === "collection_view_page";

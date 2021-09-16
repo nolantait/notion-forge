@@ -1,40 +1,38 @@
-import React from 'react'
-import { FileBlock } from 'notion-types'
+import React from "react";
 
-import { FileIcon } from '../icons/file-icon'
-import { useNotionContext } from '../context'
-import { cs } from '../utils'
-import { Text } from './text'
+import { FileIcon } from "@icons";
+import { useNotionContext } from "@context";
+import { cs } from "@utils";
+import { FileProps } from "@types";
 
-export const File: React.FC<{
-  block: FileBlock
-  className?: string
-}> = ({ block, className }) => {
-  const { components, recordMap } = useNotionContext()
-  const signedUrl = recordMap.signed_urls[block.id]
+export const File = ({ block, className }: FileProps) => {
+  const { components, recordMap } = useNotionContext();
+  const signedUrl = recordMap.signed_urls[block.id];
+  const size = block.properties?.size;
+  const title = block.properties?.title || [["File"]];
 
   return (
-    <div className={cs('notion-file', className)}>
+    <div className={cs("notion-file", className)}>
       <components.link
-        className='notion-file-link'
+        className="notion-file-link"
         href={signedUrl}
-        target='_blank'
-        rel='noopener noreferrer'
+        target="_blank"
+        rel="noopener noreferrer"
       >
-        <FileIcon className='notion-file-icon' />
+        <FileIcon className="notion-file-icon" />
 
-        <div className='notion-file-info'>
-          <div className='notion-file-title'>
-            <Text value={block.properties?.title || [['File']]} block={block} />
+        <div className="notion-file-info">
+          <div className="notion-file-title">
+            <components.text value={title} block={block} />
           </div>
 
-          {block.properties?.size && (
-            <div className='notion-file-size'>
-              <Text value={block.properties.size} block={block} />
+          {size && (
+            <div className="notion-file-size">
+              <components.text value={size} block={block} />
             </div>
           )}
         </div>
       </components.link>
     </div>
-  )
-}
+  );
+};

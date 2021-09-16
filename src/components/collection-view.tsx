@@ -1,10 +1,12 @@
 import React from "react";
 
 import { CollectionViewProps } from "@types";
-import { CollectionViewTable } from "./collection-view-table";
-import { CollectionViewGallery } from "./collection-view-gallery";
-import { CollectionViewList } from "./collection-view-list";
-import { CollectionViewBoard } from "./collection-view-board";
+import {
+  CollectionViewList,
+  CollectionViewBoard,
+  CollectionViewGallery,
+  CollectionViewTable,
+} from "@components";
 
 export const CollectionView = (props: CollectionViewProps) => {
   const { collectionView } = props;

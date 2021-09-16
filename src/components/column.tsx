@@ -1,13 +1,8 @@
 import React from "react";
-import { cs } from "../utils";
-import { useNotionContext } from "../context";
-import { ColumnBlock } from "notion-types";
 
-interface ColumnProps {
-  block: ColumnBlock;
-  blockId: string;
-  children?: React.ReactNode;
-}
+import { cs } from "@utils";
+import { useNotionContext } from "@context";
+import { ColumnProps } from "@types";
 
 export const Column = (props: ColumnProps) => {
   const { recordMap } = useNotionContext();

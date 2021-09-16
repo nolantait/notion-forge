@@ -1,23 +1,23 @@
-import React from 'react'
-import { highlight, languages } from 'prismjs'
+import React from "react";
+import { highlight, languages } from "prismjs";
 
-import 'prismjs/components/prism-jsx'
+import { CodeProps } from "@types";
 
-export const Code: React.FC<{ code: string; language: string }> = ({
+export const Code = ({
   code,
-  language = 'javascript'
-}) => {
-  const languageL = language.toLowerCase()
-  const prismLanguage = languages[languageL] || languages.javascript
+  language = "javascript",
+}: CodeProps): JSX.Element => {
+  const languageL = language.toLowerCase();
+  const prismLanguage = languages[languageL] || languages.javascript;
 
   return (
-    <pre className='notion-code'>
+    <pre className="notion-code">
       <code
         className={`language-${languageL}`}
         dangerouslySetInnerHTML={{
-          __html: highlight(code, prismLanguage, language)
+          __html: highlight(code, prismLanguage, language),
         }}
       />
     </pre>
-  )
-}
+  );
+};

@@ -1,10 +1,6 @@
 import React from "react";
-import { cs } from "../utils";
-
-interface ColumnListProps {
-  blockId: string;
-  children: React.ReactNode;
-}
+import { cs } from "@utils";
+import { ColumnListProps } from "@types";
 
 export const ColumnList = (props: ColumnListProps) => {
   const { blockId, children } = props;

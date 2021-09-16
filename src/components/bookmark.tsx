@@ -1,113 +1,105 @@
 import React from "react";
-import { Decoration, BaseBlock } from "notion-types";
-import { cs } from "../utils";
-import { useNotionContext } from "../context";
 
-import { getTextContent } from "notion-utils";
-
-interface BookmarkProps {
-  blockId: string;
-  block: BookmarkBlock;
-}
-
-interface BookmarkBlock extends BaseBlock {
-  type: "bookmark";
-  properties: {
-    link: Decoration[];
-    title: Decoration[];
-    description: Decoration[];
-    caption?: Decoration[];
-  };
-
-  format: {
-    block_color?: string;
-    bookmark_icon: string;
-    bookmark_cover: string;
-  };
-}
+import { useNotionContext } from "@context";
+import { cs, getTextContent } from "@utils";
+import { Notion, BookmarkProps, BookmarkBlockProps } from "@types";
 
 export const Bookmark = (props: BookmarkProps) => {
   const { block, blockId } = props;
   const { components } = useNotionContext();
-  const { properties } = block;
+  const { properties, format } = block;
+  const { caption } = properties;
 
-  if (!properties) return null;
+  const { hasTitle, title, decoratedTitle } = getBookmarkTitle(properties);
+  const link = properties.link[0][0];
 
-  let title = getTextContent(properties.title);
-  if (!title) {
-    title = getTextContent(properties.link);
-  }
+  const captionText = caption ? properties.caption : null;
 
-  const caption = properties.caption ? (
-    <components.text value={properties.caption} block={block} />
-  ) : null;
-
-  if (title) {
-    if (title.startsWith("http")) {
-      try {
-        const url = new URL(title);
-        title = url.hostname;
-      } catch (err) {
-        // ignore invalid links
-      }
-    }
-  }
+  const containerStyle = cs(
+    "notion-bookmark",
+    block.format?.block_color && `notion-${block.format.block_color}`,
+    blockId
+  );
 
   return (
     <>
       <components.link
         target="_blank"
         rel="noopener noreferrer"
-        className={cs(
-          "notion-bookmark",
-          block.format?.block_color && `notion-${block.format.block_color}`,
-          blockId
-        )}
-        href={block.properties.link[0][0]}
+        className={containerStyle}
+        href={link}
       >
         <div>
-          {title && (
+          {hasTitle && (
             <div className="notion-bookmark-title">
-              <components.text value={[[title]]} block={block} />
+              <components.text value={decoratedTitle} block={block} />
             </div>
           )}
 
           {block.properties?.description && (
             <div className="notion-bookmark-description">
-              <components.text
-                value={block.properties?.description}
-                block={block}
-              />
+              <components.text value={properties.description} block={block} />
             </div>
           )}
 
           <div className="notion-bookmark-link">
-            {block.format?.bookmark_icon && (
+            {format.bookmark_icon && (
               <components.image
-                src={block.format?.bookmark_icon}
+                src={format.bookmark_icon}
                 alt={title}
                 loading="lazy"
               />
             )}
 
             <div>
-              <components.text value={block.properties?.link} block={block} />
+              <components.text value={properties.link} block={block} />
             </div>
           </div>
         </div>
 
-        {block.format?.bookmark_cover && (
+        {format.bookmark_cover && (
           <div className="notion-bookmark-image">
             <components.image
-              src={block.format?.bookmark_cover}
-              alt={getTextContent(block.properties?.title)}
+              src={format.bookmark_cover}
+              alt={title}
               loading="lazy"
             />
           </div>
         )}
       </components.link>
 
-      {caption && <div className="notion-bookmark-caption">{caption}</div>}
+      {captionText && (
+        <div className="notion-bookmark-caption">
+          <components.text value={captionText} block={block} />
+        </div>
+      )}
     </>
   );
+};
+
+function getBookmarkTitle(properties: BookmarkBlockProps): {
+  decoratedTitle: Notion.Decoration[];
+  title: string;
+  hasTitle: boolean;
+} {
+  const linkProperty = getTextContent(properties.link);
+  const titleProperty = getTextContent(properties.title);
+  const rawTitle = titleProperty ?? linkProperty ?? "";
+  const title = formatLinkTitle(rawTitle);
+  const decoratedTitle: Notion.Decoration[] = [[title]];
+  const hasTitle = title.length > 0;
+
+  return { decoratedTitle, title, hasTitle };
+}
+
+const formatLinkTitle = (title: string): string => {
+  if (title.startsWith("http")) {
+    try {
+      return new URL(title).hostname;
+    } catch (err) {
+      // ignore if invalid link
+    }
+  }
+
+  return title;
 };

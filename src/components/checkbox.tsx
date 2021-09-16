@@ -1,23 +1,28 @@
-import React from 'react'
+import React from "react";
 
-import CheckIcon from '../icons/check'
+import CheckIcon from "../icons/check";
+import { CheckboxProps } from "@types";
+import { cs } from "@utils";
 
-export const Checkbox: React.FC<{
-  isChecked: boolean
-}> = ({ isChecked }) => {
-  let content = null
+export const Checkbox = ({
+  isChecked,
+  blockId,
+}: CheckboxProps): JSX.Element => {
+  const content = isChecked ? <CheckedCheckbox /> : <UncheckedCheckbox />;
 
-  if (isChecked) {
-    content = (
-      <div className='notion-property-checkbox-checked'>
-        <CheckIcon />
-      </div>
-    )
-  } else {
-    content = <div className='notion-property-checkbox-unchecked' />
-  }
+  const checkboxStyle = cs("notion-property notion-property-checkbox", blockId);
 
+  return <span className={checkboxStyle}>{content}</span>;
+};
+
+const CheckedCheckbox = () => {
   return (
-    <span className='notion-property notion-property-checkbox'>{content}</span>
-  )
-}
+    <div className="notion-property-checkbox-checked">
+      <CheckIcon />
+    </div>
+  );
+};
+
+const UncheckedCheckbox = () => {
+  return <div className="notion-property-checkbox-unchecked" />;
+};

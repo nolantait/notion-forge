@@ -1,10 +1,8 @@
 import React from "react";
-import { getTextContent } from "notion-utils";
 
 import { useNotionContext } from "@context";
 import { AssetBlock, AssetProps, BlockFormat } from "@types";
-
-const isServer = typeof window === "undefined";
+import { getTextContent, isServer } from "@utils";
 
 export const Asset = (props: AssetProps): JSX.Element => {
   const { block } = props;
@@ -12,17 +10,21 @@ export const Asset = (props: AssetProps): JSX.Element => {
   const { containerStyle, assetStyle } = getAssetStyle(format, type);
 
   return (
-    <div style={containerStyle}>{RenderAssetByType(block, assetStyle)}</div>
+    <div style={containerStyle}>
+      <RenderAssetByType block={block} style={assetStyle} />
+    </div>
   );
 };
 
-const RenderAssetByType = (
-  block: AssetBlock,
-  style: React.CSSProperties
-): React.ReactNode => {
+interface RenderAssetProps {
+  block: AssetBlock;
+  style: React.CSSProperties;
+}
+
+const RenderAssetByType = ({ block, style }: RenderAssetProps): JSX.Element => {
   const { recordMap, mapImageUrl, components } = useNotionContext();
-  const { type, properties = { source: undefined } } = block;
-  const source = properties.source?.[0]?.[0];
+  const { type } = block;
+  const source = block.properties.source?.[0]?.[0];
   const signedUrl = recordMap.signed_urls?.[block.id];
 
   switch (type) {
@@ -33,7 +35,7 @@ const RenderAssetByType = (
       return <components.tweet id={id} />;
     }
     case "pdf": {
-      if (isServer) return null;
+      if (isServer) return <div />;
 
       return <components.pdf file={signedUrl} />;
     }
@@ -54,7 +56,7 @@ const RenderAssetByType = (
         );
       }
 
-      return null;
+      return <div />;
     }
     case "gist": {
       let src = block.format?.display_source ?? source;

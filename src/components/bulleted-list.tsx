@@ -1,59 +1,73 @@
 import React from "react";
 
-import { useNotionContext } from "../context";
-import { BulletedListBlock } from "notion-types";
-import { cs } from "../utils";
+import { useNotionContext } from "@context";
+import { Notion, BulletedListProps } from "@types";
+import { cs } from "@utils";
 
-interface BulletedListProps {
-  block: BulletedListBlock;
-  blockId: string;
-  children?: React.ReactNode;
-}
-
-export const BulletedList = (props: BulletedListProps) => {
+export const BulletedList = (props: BulletedListProps): JSX.Element => {
   const { recordMap } = useNotionContext();
   const { block, blockId, children } = props;
-  const { content, properties } = block;
+  const { content } = block;
+  const { type } = block;
 
-  const isTopLevel =
-    block.type !== recordMap.block[block.parent_id]?.value?.type;
+  const parentBlock = recordMap.block[block.parent_id];
+
+  const isTopLevel = type !== parentBlock?.value?.type;
   const hasChildren = content;
 
   const listStyle = cs("notion-list", "notion-list-disc", blockId);
 
-  let output: JSX.Element | null = null;
+  const output = hasChildren ? (
+    <NestedList block={block} style={listStyle}>
+      {children}
+    </NestedList>
+  ) : (
+    <ListItem block={block} />
+  );
 
-  if (hasChildren) {
-    output = NestedList(block, listStyle, children);
-  } else {
-    output = properties ? ListItem(block) : null;
-  }
-
-  return isTopLevel ? WrapList(output, listStyle) : output;
+  return isTopLevel ? (
+    <WrapList className={listStyle}>{output}</WrapList>
+  ) : (
+    output
+  );
 };
 
-const NestedList = (
-  block: BulletedListBlock,
-  style: string,
-  children?: React.ReactNode
-) => {
+const WrapList = ({
+  children,
+  className,
+}: {
+  children: React.ReactNode;
+  className: string;
+}): JSX.Element => {
+  return <ul className={className}>{children}</ul>;
+};
+
+const NestedList = ({
+  block,
+  style,
+  children,
+}: {
+  block: Notion.BulletedListBlock;
+  style: string;
+  children?: React.ReactNode;
+}) => {
   const { properties } = block;
   return (
     <>
-      {properties && ListItem(block)}
-      {WrapList(children, style)}
+      {properties && <ListItem block={block} />}
+      {<WrapList className={style} children={children} />}
     </>
   );
 };
 
-const WrapList = (content: React.ReactNode, style: string) => {
-  return <ul className={style}>{content}</ul>;
-};
-
-const ListItem = (block: BulletedListBlock) => {
+const ListItem = ({
+  block,
+}: {
+  block: Notion.BulletedListBlock;
+}): JSX.Element => {
   const { components } = useNotionContext();
-  const { properties } = block
-  const title = properties?.title ?? ''
+  const { properties } = block;
+  const title = properties?.title ?? "";
 
   return (
     <li>

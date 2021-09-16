@@ -4,8 +4,9 @@ import { useNotionContext } from "@context";
 import { AssetWrapperProps } from "@types";
 
 export const AssetWrapper = (props: AssetWrapperProps): JSX.Element => {
-  const { block, blockId } = props;
   const { components } = useNotionContext();
+  const { block, blockId } = props;
+  const { type } = block;
   const isBlockFullWidth = block.format?.block_full_width;
   const caption = block.properties.caption;
 
@@ -13,7 +14,7 @@ export const AssetWrapper = (props: AssetWrapperProps): JSX.Element => {
     <figure
       className={cs(
         "notion-asset-wrapper",
-        `notion-asset-wrapper-${block.type}`,
+        `notion-asset-wrapper-${type}`,
         isBlockFullWidth && "notion-asset-wrapper-full",
         blockId
       )}

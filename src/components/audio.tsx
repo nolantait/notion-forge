@@ -1,13 +1,9 @@
 import React from "react";
 
-import { AudioBlock } from "notion-types";
-import { useNotionContext } from "../context";
-import { cs } from "../utils";
+import { useNotionContext } from "@context";
+import { cs } from "@utils";
+import { AudioProps } from "@types";
 
-interface AudioProps {
-  block: AudioBlock;
-  className?: string;
-}
 export const Audio = (props: AudioProps) => {
   const { block, className } = props;
   const { recordMap } = useNotionContext();

@@ -107,11 +107,12 @@ export const Block: React.FC<BlockProps> = (props) => {
 
     case "drive": {
       const properties = block.format?.drive_properties;
-      if (!properties) {
-        //check if this drive actually needs to be embeded ex. google sheets.
-        if (block.format?.display_source) {
-          return <components.assetWrapper blockId={blockId} block={block} />;
-        }
+      if (!properties)
+        throw new Error(`Missing properties for google drive embed`);
+
+      //check if this drive actually needs to be embeded ex. google sheets.
+      if (block.format?.display_source) {
+        return <components.assetWrapper blockId={blockId} block={block} />;
       }
 
       return (
@@ -230,7 +231,7 @@ export const Block: React.FC<BlockProps> = (props) => {
     }
 
     case "transclusion_reference": {
-      return <components.syncPointerBlock {...props} level={level + 1} />;
+      return <components.syncPointer {...props} level={level + 1} />;
     }
 
     case "alias": {
@@ -239,12 +240,10 @@ export const Block: React.FC<BlockProps> = (props) => {
 
     default: {
       if (process.env.NODE_ENV !== "production") {
-        console.log(
-          "Unsupported type " + (block as any).type,
-          JSON.stringify(block, null, 2)
-        );
+        throw new Error(`Unsupported type ${block.type}`);
       }
 
+      // Allow rendering blank div in production in case Notion updates
       return <div />;
     }
   }

@@ -25,10 +25,13 @@
     "jsx": "react",
     "types": ["node"],
     "paths": {
+      "@icons": ["icons"],
       "@types": ["types.ts"],
       "@components": ["components"],
+      "@components/*": ["components/*"],
       "@utils": ["utils.ts"],
-      "@context": ["context.tsx"]
+      "@context": ["context.tsx"],
+      "@lib": ["lib"]
     }
   },
   "compileOnSave": false,

@@ -1,61 +1,57 @@
 import React, { useContext } from "react";
-import { ExtendedRecordMap } from "notion-types";
 
-import {
-  MapPageUrl,
-  MapImageUrl,
-  SearchNotion,
-  NotionComponents,
-} from "./types";
-import { defaultMapPageUrl, defaultMapImageUrl } from "./utils";
+import { NotionComponents, NotionContext } from "@types";
+import { defaultMapPageUrl, defaultMapImageUrl } from "@utils";
 
 // All Supported Components
-import { Alias as DefaultAlias } from "./components/alias";
-import { AssetWrapper as DefaultAssetWrapper } from "./components/asset-wrapper";
-import { Asset as DefaultAsset } from "./components/asset";
-import { Audio as DefaultAudio } from "./components/audio";
-import { Bookmark as DefaultBookmark } from "./components/bookmark";
-import { BulletedList as DefaultBulletedList } from "./components/bulleted-list";
-import { Callout as DefaultCallout } from "./components/callout";
-import { Checkbox as DefaultCheckbox } from "./components/checkbox";
-import { Code as DefaultCode } from "./components/code";
-import { CollectionCard as DefaultCollectionCard } from "./components/collection-card";
-import { CollectionColumnTitle as DefaultCollectionColumnTitle } from "./components/collection-column-title";
-import { CollectionRow as DefaultCollectionRow } from "./components/collection-row";
-import { Page as DefaultCollectionViewPage } from "./components/page";
-import { CollectionViewBoard as DefaultCollectionViewBoard } from "./components/collection-view-board";
-import { CollectionViewGallery as DefaultCollectionViewGallery } from "./components/collection-view-gallery";
-import { CollectionViewList as DefaultCollectionViewList } from "./components/collection-view-list";
-import { CollectionViewTable as DefaultCollectionViewTable } from "./components/collection-view-table";
-import { CollectionView as DefaultCollectionView } from "./components/collection-view";
-import { Collection as DefaultCollection } from "./components/collection";
-import { ColumnList as DefaultColumnList } from "./components/column-list";
-import { Column as DefaultColumn } from "./components/column";
-import { Divider as DefaultDivider } from "./components/divider";
-import { Equation as DefaultEquation } from "./components/equation";
-import { File as DefaultFile } from "./components/file";
-import { GoogleDrive as DefaultGoogleDrive } from "./components/google-drive";
-import { Header as DefaultHeader } from "./components/header";
-import { GracefulImage as DefaultImage } from "./components/graceful-image";
-import { LazyImage as DefaultLazyImage } from "./components/lazy-image";
-import { Link as DefaultLink } from "./components/link";
-import { NumberedList as DefaultNumberedList } from "./components/numbered-list";
-import { Page as DefaultPage } from "./components/page";
-import { PageHeader as DefaultPageHeader } from "./components/page-header";
-import { PageIcon as DefaultPageIcon } from "./components/page-icon";
-import { PageLink as DefaultPageLink } from "./components/page-link";
-import { PageTitle as DefaultPageTitle } from "./components/page-title";
-import { Property as DefaultProperty } from "./components/property";
-import { Quote as DefaultQuote } from "./components/quote";
-import { SearchDialog as DefaultSearchDialog } from "./components/search-dialog";
-import { SyncContainer as DefaultSyncContainer } from "./components/sync-container";
-import { SyncPointerBlock as DefaultSyncPointerBlock } from "./components/sync-pointer-block";
-import { TableOfContents as DefaultTableOfContents } from "./components/table-of-contents";
-import { Text as DefaultText } from "./components/text";
-import { Title as DefaultTitle } from "./components/title";
-import { Todo as DefaultTodo } from "./components/to-do";
-import { Toggle as DefaultToggle } from "./components/toggle";
-import { WrappedText as DefaultWrappedText } from "./components/wrapped-text";
+import {
+  Alias as DefaultAlias,
+  AssetWrapper as DefaultAssetWrapper,
+  Asset as DefaultAsset,
+  Audio as DefaultAudio,
+  Bookmark as DefaultBookmark,
+  BulletedList as DefaultBulletedList,
+  Callout as DefaultCallout,
+  Checkbox as DefaultCheckbox,
+  Code as DefaultCode,
+  CollectionCard as DefaultCollectionCard,
+  CollectionColumnTitle as DefaultCollectionColumnTitle,
+  CollectionRow as DefaultCollectionRow,
+  Page as DefaultCollectionViewPage,
+  CollectionViewBoard as DefaultCollectionViewBoard,
+  CollectionViewGallery as DefaultCollectionViewGallery,
+  CollectionViewList as DefaultCollectionViewList,
+  CollectionViewTable as DefaultCollectionViewTable,
+  CollectionView as DefaultCollectionView,
+  Collection as DefaultCollection,
+  ColumnList as DefaultColumnList,
+  Column as DefaultColumn,
+  Divider as DefaultDivider,
+  Equation as DefaultEquation,
+  File as DefaultFile,
+  GoogleDrive as DefaultGoogleDrive,
+  Header as DefaultHeader,
+  GracefulImage as DefaultImage,
+  LazyImage as DefaultLazyImage,
+  Link as DefaultLink,
+  NumberedList as DefaultNumberedList,
+  Page as DefaultPage,
+  PageHeader as DefaultPageHeader,
+  PageIcon as DefaultPageIcon,
+  PageLink as DefaultPageLink,
+  PageTitle as DefaultPageTitle,
+  Property as DefaultProperty,
+  Quote as DefaultQuote,
+  SearchDialog as DefaultSearchDialog,
+  SyncContainer as DefaultSyncContainer,
+  SyncPointer as DefaultSyncPointer,
+  TableOfContents as DefaultTableOfContents,
+  Text as DefaultText,
+  Title as DefaultTitle,
+  Todo as DefaultTodo,
+  Toggle as DefaultToggle,
+  WrappedText as DefaultWrappedText,
+} from "@components";
 
 interface dummyLinkProps {
   href?: string;
@@ -63,13 +59,7 @@ interface dummyLinkProps {
   target?: string;
   title?: string;
 }
-export const dummyLink: React.FC<dummyLinkProps> = ({
-  href,
-  rel,
-  target,
-  title,
-  ...rest
-}) => <span {...rest} />;
+export const dummyLink = (props: dummyLinkProps) => <span {...props} />;
 
 const dummyComponent = (name: string) => () => {
   console.warn(
@@ -78,22 +68,6 @@ const dummyComponent = (name: string) => () => {
 
   return null;
 };
-
-export interface NotionContext {
-  recordMap: ExtendedRecordMap;
-  components: NotionComponents;
-  mapPageUrl: MapPageUrl;
-  mapImageUrl: MapImageUrl;
-  rootPageId: string | undefined;
-  fullPage: boolean;
-  previewImages: boolean;
-  showCollectionViewDropdown: boolean;
-  defaultPageIcon: string | null;
-  defaultPageCover: string | null;
-  defaultPageCoverPosition: number;
-  zoom: any;
-  searchNotion?: SearchNotion;
-}
 
 const defaultComponents: NotionComponents = {
   alias: DefaultAlias,
@@ -135,7 +109,7 @@ const defaultComponents: NotionComponents = {
   quote: DefaultQuote,
   searchDialog: DefaultSearchDialog,
   syncContainer: DefaultSyncContainer,
-  syncPointerBlock: DefaultSyncPointerBlock,
+  syncPointer: DefaultSyncPointer,
   tableOfContents: DefaultTableOfContents,
   text: DefaultText,
   title: DefaultTitle,
@@ -150,14 +124,6 @@ const defaultComponents: NotionComponents = {
 
 const defaultNotionContext: NotionContext = {
   rootPageId: undefined,
-  recordMap: {
-    block: {},
-    collection: {},
-    collection_view: {},
-    collection_query: {},
-    notion_user: {},
-    signed_urls: {},
-  },
   components: defaultComponents,
   mapPageUrl: defaultMapPageUrl(),
   mapImageUrl: defaultMapImageUrl,
@@ -169,6 +135,14 @@ const defaultNotionContext: NotionContext = {
   defaultPageCover: null,
   defaultPageCoverPosition: 0.5,
   zoom: null,
+  recordMap: {
+    block: {},
+    collection: {},
+    collection_view: {},
+    collection_query: {},
+    notion_user: {},
+    signed_urls: {},
+  },
 };
 
 const ctx = React.createContext<NotionContext>(defaultNotionContext);
