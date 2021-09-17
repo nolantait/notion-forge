@@ -1,7 +1,7 @@
 import React from "react";
 
 import { useNotionContext } from "@context";
-import { TableOfContentsPresenter } from "@types";
+import { Presenter, TableOfContentsPresenter } from "@types";
 import {
   cs,
   getBlockParentPage,
@@ -44,9 +44,7 @@ export const TableOfContents: TableOfContentsPresenter = ({
   );
 };
 
-const TableOfContentsItem = ({
-  item,
-}: TableOfContentsItemProps): React.ReactElement => {
+const TableOfContentsItem: Presenter<TableOfContentsItemProps> = ({ item }) => {
   const { id, indentLevel, text } = item;
   const href = `#${uuidToId(id)}`;
   const itemStyle = {

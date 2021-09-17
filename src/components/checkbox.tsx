@@ -1,13 +1,10 @@
 import React from "react";
 
 import CheckIcon from "../icons/check";
-import { CheckboxProps } from "@types";
+import { CheckboxPresenter } from "@types";
 import { cs } from "@utils";
 
-export const Checkbox = ({
-  isChecked,
-  blockId,
-}: CheckboxProps): JSX.Element => {
+export const Checkbox: CheckboxPresenter = ({ isChecked, blockId }) => {
   const content = isChecked ? <CheckedCheckbox /> : <UncheckedCheckbox />;
 
   const checkboxStyle = cs("notion-property notion-property-checkbox", blockId);

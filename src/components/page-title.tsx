@@ -2,12 +2,9 @@ import React from "react";
 
 import { cs, getBlockTitle, decorate } from "@utils";
 import { useNotionContext } from "@context";
-import { PageTitleProps, PageTitlePresenter } from "@types";
+import { PageTitlePresenter } from "@types";
 
-export const PageTitle: PageTitlePresenter = ({
-  block,
-  className,
-}: PageTitleProps) => {
+export const PageTitle: PageTitlePresenter = ({ block, className }) => {
   const { recordMap, components, defaultPageIcon } = useNotionContext();
 
   const title = getBlockTitle(block, recordMap);

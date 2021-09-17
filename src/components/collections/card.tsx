@@ -7,12 +7,13 @@ import {
   Notion,
   CollectionCardProps,
   CollectionCardProperty,
+  CollectionCardPresenter,
   Presenter,
 } from "@types";
 
 import { cs } from "@utils";
 
-export const CollectionCard = (props: CollectionCardProps): JSX.Element => {
+export const CollectionCard: CollectionCardPresenter = (props) => {
   const context = useNotionContext();
   const { components, mapPageUrl } = context;
 

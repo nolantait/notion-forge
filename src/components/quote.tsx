@@ -1,15 +1,14 @@
 import React from "react";
 
-import { Notion, QuoteProps } from "@types";
 import { cs } from "@utils";
 import { useNotionContext } from "@context";
+import { Notion, QuotePresenter } from "@types";
 
 const defaultTitle: Notion.Decoration[] = [[""]];
 const defaultProperties = { title: defaultTitle };
 
-export const Quote = (props: QuoteProps): React.ReactElement => {
+export const Quote: QuotePresenter = ({ block, blockId }) => {
   const { components } = useNotionContext();
-  const { block, blockId } = props;
   const { properties = defaultProperties } = block;
   const blockColor = block.format?.block_color;
   const title = properties.title;

@@ -1,9 +1,14 @@
 import React from "react";
 
-import { Notion, CollectionViewProps } from "@types";
 import { Property } from "@components/property";
 import { useNotionContext } from "@context";
 import { getPagesFromQuery } from "@utils";
+import {
+  Notion,
+  Presenter,
+  CollectionViewProps,
+  CollectionViewPresenter,
+} from "@types";
 
 interface ListItemProps
   extends Pick<CollectionViewProps, "collection" | "collectionView"> {
@@ -15,11 +20,11 @@ interface ListProperty {
   visible: boolean;
 }
 
-export const CollectionViewList = ({
+export const CollectionViewList: CollectionViewPresenter = ({
   collection,
   collectionView,
   collectionData,
-}: CollectionViewProps) => {
+}) => {
   const blocks = getPagesFromQuery(collectionData);
 
   const mapItemProps = (block: Notion.PageBlock): ListItemProps => {
@@ -41,7 +46,11 @@ export const CollectionViewList = ({
   );
 };
 
-const ListItem = ({ block, collection, collectionView }: ListItemProps) => {
+const ListItem: Presenter<ListItemProps> = ({
+  block,
+  collection,
+  collectionView,
+}) => {
   const { components, mapPageUrl } = useNotionContext();
   const properties: Record<string, any> = block.properties ?? {};
   const titleSchema = collection.schema.title;

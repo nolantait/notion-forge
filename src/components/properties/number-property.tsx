@@ -1,7 +1,7 @@
 import React from "react";
 import formatNumber from "format-number";
 
-import { Notion, PropertyProps, NumberPropertySchema } from "@types";
+import { Notion, Presenter, PropertyProps, NumberPropertySchema } from "@types";
 import { useNotionContext } from "@context";
 import { decorate } from "@utils";
 
@@ -10,11 +10,11 @@ interface NumberPropertyProps
   schema: NumberPropertySchema;
 }
 
-export const NumberProperty = ({
+export const NumberProperty: Presenter<NumberPropertyProps> = ({
   data,
   block,
   schema,
-}: NumberPropertyProps): React.ReactElement => {
+}) => {
   const { components } = useNotionContext();
   const dataText = data[0][0] ?? "0";
   const parsableNumberFormat = /^[a-fA-F0-9]+$/;

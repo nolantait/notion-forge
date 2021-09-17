@@ -2,10 +2,9 @@ import React from "react";
 
 import { useNotionContext } from "@context";
 import { cs, getTextContent } from "@utils";
-import { Notion, BookmarkProps, BookmarkBlockProps } from "@types";
+import { Notion, BookmarkBlockProps, BookmarkPresenter } from "@types";
 
-export const Bookmark = (props: BookmarkProps) => {
-  const { block, blockId } = props;
+export const Bookmark: BookmarkPresenter = ({ block, blockId }) => {
   const { components } = useNotionContext();
   const { properties, format } = block;
   const { caption } = properties;

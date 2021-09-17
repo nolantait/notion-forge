@@ -2,10 +2,14 @@ import React from "react";
 
 import { Notion } from "@types";
 import { cs, decorate } from "@utils";
-import { CollectionViewProps, CollectionViewPresenter } from "@types";
 import { EmptyIcon } from "@icons";
 import { Property } from "@components/property";
 import { useNotionContext } from "@context";
+import {
+  Presenter,
+  CollectionViewProps,
+  CollectionViewPresenter,
+} from "@types";
 
 interface BoardGroupValue {
   type: Notion.PropertyType;
@@ -85,9 +89,12 @@ export const CollectionViewBoard: CollectionViewPresenter = ({
   );
 };
 
-const BoardGroupHeader = (props: BoardGroupHeaderProps): React.ReactElement => {
-  const { collectionData, collection, index, group } = props;
-
+const BoardGroupHeader: Presenter<BoardGroupHeaderProps> = ({
+  collectionData,
+  collection,
+  index,
+  group,
+}) => {
   if (!collectionData.groupResults || group.hidden) {
     // No groupResults in the data when collection is in a toggle
     return <></>;
@@ -125,9 +132,14 @@ const BoardGroupHeader = (props: BoardGroupHeaderProps): React.ReactElement => {
   );
 };
 
-const BoardGroupBody = (props: BoardGroupBodyProps): JSX.Element => {
+const BoardGroupBody: Presenter<BoardGroupBodyProps> = ({
+  collectionData,
+  collection,
+  collectionView,
+  index,
+  group,
+}) => {
   const { recordMap, components } = useNotionContext();
-  const { collectionData, collection, collectionView, index, group } = props;
   const { format } = collectionView;
 
   if (!collectionData.groupResults || group.hidden) {

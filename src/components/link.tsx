@@ -1,7 +1,7 @@
 import React from "react";
 
-import { LinkProps } from "@types";
+import { LinkPresenter } from "@types";
 
-export const Link = (props: LinkProps): React.ReactElement => (
+export const Link: LinkPresenter = (props) => (
   <a target="_blank" rel="noopener noreferrer" {...props} />
 );

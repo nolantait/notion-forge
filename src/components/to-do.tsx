@@ -4,11 +4,7 @@ import { useNotionContext } from "@context";
 import { TodoPresenter } from "@types";
 import { cs } from "@utils";
 
-export const Todo: TodoPresenter = ({
-  block,
-  blockId,
-  children,
-}): React.ReactElement => {
+export const Todo: TodoPresenter = ({ block, blockId, children }) => {
   const { components } = useNotionContext();
   const { properties = { checked: [["No"]] } } = block;
   const isChecked = properties.checked[0][0] === "Yes";

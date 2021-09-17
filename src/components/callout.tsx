@@ -1,11 +1,10 @@
 import React from "react";
 
-import { CalloutProps } from "@types";
+import { CalloutPresenter } from "@types";
 import { cs } from "@utils";
 import { useNotionContext } from "@context";
 
-export const Callout = (props: CalloutProps): JSX.Element => {
-  const { block, blockId, children } = props;
+export const Callout: CalloutPresenter = ({ block, blockId, children }) => {
   const { components } = useNotionContext();
   const { properties } = block;
 

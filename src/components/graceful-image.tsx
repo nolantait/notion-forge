@@ -1,9 +1,10 @@
 import React from "react";
-import { Img, ImgProps } from "react-image";
+import { Img } from "react-image";
 
 import { isBrowser } from "@utils";
+import { ImagePresenter } from "@types";
 
-export const GracefulImage = (props: ImgProps): JSX.Element => {
+export const GracefulImage: ImagePresenter = (props) => {
   if (isBrowser) {
     return <Img {...props} />;
   } else {

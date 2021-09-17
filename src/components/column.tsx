@@ -2,11 +2,10 @@ import React from "react";
 
 import { cs } from "@utils";
 import { useNotionContext } from "@context";
-import { ColumnProps } from "@types";
+import { ColumnPresenter } from "@types";
 
-export const Column = (props: ColumnProps) => {
+export const Column: ColumnPresenter = ({ block, blockId, children }) => {
   const { recordMap } = useNotionContext();
-  const { block, blockId, children } = props;
   // note: notion uses 46px
   const spacerWidth = `min(32px, 4vw)`;
   const ratio = block.format?.column_ratio || 0.5;

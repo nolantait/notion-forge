@@ -3,12 +3,9 @@ import { formatDistance } from "date-fns";
 
 import { useNotionContext } from "@context";
 import { cs } from "@utils";
-import { GoogleDriveProps } from "@types";
+import { GoogleDrivePresenter } from "@types";
 
-export const GoogleDrive = ({
-  block,
-  className,
-}: GoogleDriveProps): JSX.Element => {
+export const GoogleDrive: GoogleDrivePresenter = ({ block, className }) => {
   const { components, mapImageUrl } = useNotionContext();
   const properties = block.format?.drive_properties;
 

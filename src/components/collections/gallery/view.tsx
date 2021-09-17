@@ -1,14 +1,14 @@
 import React from "react";
 
-import { Notion, CollectionViewProps } from "@types";
+import { Notion, CollectionViewPresenter } from "@types";
 import { cs, getPagesFromQuery } from "@utils";
 import { useNotionContext } from "@context";
 
-export const CollectionViewGallery = ({
+export const CollectionViewGallery: CollectionViewPresenter = ({
   collection,
   collectionView,
   collectionData,
-}: CollectionViewProps): JSX.Element => {
+}) => {
   const { components } = useNotionContext();
   const {
     gallery_cover = { type: "none" },

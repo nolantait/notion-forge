@@ -1,16 +1,16 @@
 import React from "react";
 
-import { Notion, PropertyProps } from "@types";
+import { Notion, PropertyProps, Presenter } from "@types";
 import { useNotionContext } from "@context";
 
 interface UrlPropertyProps
   extends Pick<PropertyProps, "data" | "inline" | "block"> {}
 
-export const UrlProperty = ({
+export const UrlProperty: Presenter<UrlPropertyProps> = ({
   data,
   inline,
   block,
-}: UrlPropertyProps): React.ReactElement => {
+}) => {
   const { components } = useNotionContext();
   const decoration: Notion.Decoration[] = data ?? [];
   let dataText = decoration[0][0] ?? "";

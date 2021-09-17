@@ -1,15 +1,15 @@
 import React from "react";
 
-import { PropertyProps } from "@types";
+import { Presenter, PropertyProps } from "@types";
 import { cs } from "@utils";
 
 interface SelectTagPropertyProps
   extends Pick<PropertyProps, "data" | "schema"> {}
 
-export const SelectTagProperty = ({
+export const SelectTagProperty: Presenter<SelectTagPropertyProps> = ({
   data,
   schema,
-}: SelectTagPropertyProps): React.ReactElement => {
+}) => {
   const decorationText = data?.[0][0] ?? "";
   const values = decorationText.split(",");
   const options = schema.options ?? [];

@@ -3,7 +3,7 @@ import React from "react";
 import { cs, isUrl, getBlockIcon, getBlockTitle } from "@utils";
 import { DefaultPageIcon } from "@icons";
 import { useNotionContext } from "@context";
-import { PageIconProps } from "@types";
+import { Presenter, PageIconProps, PageIconPresenter } from "@types";
 
 interface ImageIconProps extends Pick<PageIconProps, "block"> {
   title: string | null;
@@ -16,12 +16,12 @@ interface TextIconProps {
   className?: string;
 }
 
-export const PageIcon = ({
+export const PageIcon: PageIconPresenter = ({
   block,
   className,
   defaultIcon = null,
   hideDefaultIcon = false,
-}: PageIconProps): React.ReactElement => {
+}) => {
   if (hideDefaultIcon) return <EmptyIcon />;
 
   const { recordMap } = useNotionContext();
@@ -49,12 +49,12 @@ export const PageIcon = ({
   }
 };
 
-const ImageIcon = ({
+const ImageIcon: Presenter<ImageIconProps> = ({
   block,
   iconUrl,
   title,
   className,
-}: ImageIconProps): React.ReactElement => {
+}) => {
   const { mapImageUrl, components } = useNotionContext();
   const mappedUrl = mapImageUrl(iconUrl, block);
   const altText = title ? title : "Icon";
@@ -73,7 +73,7 @@ const EmptyIcon = (): React.ReactElement => {
   return <></>;
 };
 
-const TextIcon = ({ icon, className }: TextIconProps): React.ReactElement => {
+const TextIcon: Presenter<TextIconProps> = ({ icon, className }) => {
   return (
     <span className={className} role="img" aria-label={icon}>
       {icon}

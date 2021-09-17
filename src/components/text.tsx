@@ -1,5 +1,6 @@
 import React from "react";
-import { TextProps } from "@types";
+
+import { TextPresenter } from "@types";
 import { DecoratedText } from "./decorators";
 
 /**
@@ -11,12 +12,12 @@ import { DecoratedText } from "./decorators";
  * attributes to the final element's style.
  */
 
-export const Text = ({
+export const Text: TextPresenter = ({
   value,
   block,
   linkProps,
   linkProtocol,
-}: TextProps): React.ReactElement => {
+}) => {
   return (
     <React.Fragment>
       {value.map((decoration, index) => {

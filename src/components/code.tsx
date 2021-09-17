@@ -1,12 +1,9 @@
 import React from "react";
 import { highlight, languages } from "prismjs";
 
-import { CodeProps } from "@types";
+import { CodePresenter } from "@types";
 
-export const Code = ({
-  code,
-  language = "javascript",
-}: CodeProps): JSX.Element => {
+export const Code: CodePresenter = ({ code, language = "javascript" }) => {
   const languageL = language.toLowerCase();
   const prismLanguage = languages[languageL] || languages.javascript;
 

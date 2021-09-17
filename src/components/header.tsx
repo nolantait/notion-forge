@@ -1,5 +1,8 @@
 import React from "react";
 
+import { HeaderPresenter } from "@types";
+import { LinkIcon } from "@icons";
+import { useNotionContext } from "@context";
 import {
   cs,
   getTextContent,
@@ -7,15 +10,12 @@ import {
   getBlockParentPage,
   uuidToId,
 } from "@utils";
-import { HeaderProps } from "@types";
-import { LinkIcon } from "@icons";
-import { useNotionContext } from "@context";
 
 const tocIndentLevelCache: {
   [blockId: string]: number;
 } = {};
 
-export const Header = ({ block, blockId }: HeaderProps): JSX.Element => {
+export const Header: HeaderPresenter = ({ block, blockId }) => {
   const { recordMap, components } = useNotionContext();
 
   if (!block.properties) return <></>;

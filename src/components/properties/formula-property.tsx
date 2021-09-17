@@ -1,19 +1,19 @@
 import React from "react";
+import { format } from "date-fns";
 
 import { evalFormula } from "@utils";
-import { Notion, PropertyProps } from "@types";
-import { format } from "date-fns";
+import { Notion, Presenter, PropertyProps } from "@types";
 
 interface FormulaPropertyProps
   extends Pick<PropertyProps, "schema" | "collection"> {
   properties: Notion.PropertyMap;
 }
 
-export const FormulaProperty = ({
+export const FormulaProperty: Presenter<FormulaPropertyProps> = ({
   schema,
   properties,
   collection,
-}: FormulaPropertyProps): React.ReactElement => {
+}) => {
   const { schema: collectionSchema } = collection;
   const { formula } = schema;
 

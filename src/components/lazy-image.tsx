@@ -3,12 +3,12 @@ import { LazyImageFull, ImageState } from "react-lazy-images";
 
 import { useNotionContext } from "@context";
 import { cs } from "@utils";
-import { LazyImageProps } from "@types";
+import { LazyImagePresenter } from "@types";
 
 /**
  * Progressive, lazy images modeled after Medium's LQIP technique.
  */
-export const LazyImage = ({
+export const LazyImage: LazyImagePresenter = ({
   src,
   alt,
   className,
@@ -16,7 +16,7 @@ export const LazyImage = ({
   zoomable = false,
   height,
   ...rest
-}: LazyImageProps): JSX.Element => {
+}) => {
   const { recordMap, zoom, previewImages } = useNotionContext();
 
   const zoomRef = React.useRef(zoom ? zoom.clone() : null);

@@ -3,9 +3,9 @@ import React from "react";
 import { FileIcon } from "@icons";
 import { useNotionContext } from "@context";
 import { cs } from "@utils";
-import { FileProps } from "@types";
+import { FilePresenter } from "@types";
 
-export const File = ({ block, className }: FileProps) => {
+export const File: FilePresenter = ({ block, className }) => {
   const { components, recordMap } = useNotionContext();
   const signedUrl = recordMap.signed_urls[block.id];
   const size = block.properties?.size;

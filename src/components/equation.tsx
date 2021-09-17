@@ -2,19 +2,19 @@ import React from "react";
 
 import { cs } from "@utils";
 import { useNotionContext } from "@context";
-import { EquationProps } from "@types";
+import { EquationPresenter } from "@types";
 
 const katexSettings = {
   throwOnError: true,
   strict: false,
 };
 
-export const Equation = ({
+export const Equation: EquationPresenter = ({
   math,
   className,
   block,
   ...rest
-}: EquationProps): JSX.Element => {
+}) => {
   const { components } = useNotionContext();
 
   return (

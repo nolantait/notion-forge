@@ -30,7 +30,7 @@ interface CardCoverWithPropertyProps
     | "collection"
   > {}
 
-export const CardCover = (props: CardCoverProps): JSX.Element => {
+export const CardCover: Presenter<CardCoverProps> = (props) => {
   const { cover } = props;
   const { type } = cover;
 
@@ -46,10 +46,10 @@ export const CardCover = (props: CardCoverProps): JSX.Element => {
   }
 };
 
-const CardCoverWithContent = ({
+const CardCoverWithContent: Presenter<CardCoverWithContentProps> = ({
   block,
   coverAspect,
-}: CardCoverWithContentProps): JSX.Element => {
+}) => {
   const { recordMap } = useNotionContext();
   const contentBlockId = findFirstImage(block);
 
@@ -61,12 +61,12 @@ const CardCoverWithContent = ({
   return <CardCoverImage block={contentBlock} coverAspect={coverAspect} />;
 };
 
-const CardCoverWithImage = ({
+const CardCoverWithImage: Presenter<CardCoverWithImageProps> = ({
   block,
   coverAspect,
   coverUrl,
   coverPosition,
-}: CardCoverWithImageProps): JSX.Element => {
+}) => {
   const { mapImageUrl, components } = useNotionContext();
   const blockTitleProperty = block.properties?.title;
   const title =

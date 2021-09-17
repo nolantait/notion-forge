@@ -1,5 +1,5 @@
 import React from "react";
 
-import { PageLinkProps } from "@types";
+import { PageLinkPresenter } from "@types";
 
-export const PageLink = (props: PageLinkProps) => <a {...props} />;
+export const PageLink: PageLinkPresenter = (props) => <a {...props} />;

@@ -1,14 +1,11 @@
 import React from "react";
 
-import { Notion, CollectionRowProps, PropertyVisibility } from "@types";
+import { Notion, CollectionRowPresenter, PropertyVisibility } from "@types";
 import { cs, filterHiddenProperties } from "@utils";
 import { Property, CollectionColumnTitle } from "@components";
 import { useNotionContext } from "@context";
 
-export const CollectionRow = ({
-  block,
-  blockId,
-}: CollectionRowProps): JSX.Element => {
+export const CollectionRow: CollectionRowPresenter = ({ block, blockId }) => {
   const { recordMap } = useNotionContext();
   const collectionId = block.parent_id;
   const collection = recordMap.collection[collectionId]?.value;
