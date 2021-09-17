@@ -3,11 +3,10 @@ import { cs } from "@utils";
 
 import { NotionContainer } from "./notion-container";
 import { useNotionContext } from "@context";
-import { PageProps } from "@types";
+import { PagePresenter } from "@types";
 
-export const Page = (props: PageProps): JSX.Element => {
+export const Page: PagePresenter = ({ block, level, blockId }) => {
   const { fullPage } = useNotionContext();
-  const { block, level, blockId } = props;
 
   // Render a page link instead of a page if this is a nested block
   const PageRenderer = fullPage ? FullPage : LightPage;
@@ -15,28 +14,36 @@ export const Page = (props: PageProps): JSX.Element => {
 
   return (
     <NotionContainer {...{ block, blockId }}>
-      <Content {...props} />
+      <Content {...{ block, blockId, level }} />
     </NotionContainer>
   );
 };
 
-const RenderContent = (props: PageProps): JSX.Element => {
+const RenderContent: PagePresenter = ({ block, children, blockId }) => {
   const { components } = useNotionContext();
-  const { block, children } = props;
   const isCollection = block.type === "collection_view_page";
 
   return (
     <>
-      {isCollection && <components.collection block={block} />}
+      {isCollection && (
+        <components.collection block={block} blockId={blockId} />
+      )}
       {children}
     </>
   );
 };
 
-const FullPage = (props: PageProps): JSX.Element => {
+const FullPage: PagePresenter = ({
+  block,
+  blockId,
+  level,
+  children,
+  pageHeader,
+  pageFooter,
+  pageAside,
+}) => {
   const { components, defaultPageIcon } = useNotionContext();
-  const { block, children, pageHeader, pageFooter, pageAside } = props;
-  const { title } = block.properties ?? { title: "" };
+  const { title } = block.properties ?? { title: [[""]] };
 
   const {
     page_icon: pageIcon = defaultPageIcon,
@@ -64,7 +71,11 @@ const FullPage = (props: PageProps): JSX.Element => {
 
       <div className={containerStyle}>
         <article className="notion-page-content-inner">
-          <RenderContent {...props}>{children}</RenderContent>
+          <RenderContent
+            {...{ blockId, level, block, pageHeader, pageFooter, pageAside }}
+          >
+            {children}
+          </RenderContent>
         </article>
 
         {hasAside && <aside className="notion-aside">{pageAside}</aside>}
@@ -75,21 +86,27 @@ const FullPage = (props: PageProps): JSX.Element => {
   );
 };
 
-const LightPage = (props: PageProps): JSX.Element => {
-  const { children, pageHeader, pageFooter } = props;
-
+const LightPage: PagePresenter = ({
+  block,
+  blockId,
+  level,
+  children,
+  pageHeader,
+  pageFooter,
+}) => {
   return (
     <>
       {pageHeader}
-      <RenderContent {...props}>{children}</RenderContent>
+      <RenderContent {...{ block, blockId, level, pageHeader, pageFooter }}>
+        {children}
+      </RenderContent>
       {pageFooter}
     </>
   );
 };
 
-const PageLink = (props: PageProps): JSX.Element => {
+const PageLink: PagePresenter = ({ blockId, block }) => {
   const { components, mapPageUrl } = useNotionContext();
-  const { block, blockId } = props;
   const blockColor = block.format?.block_color;
   const pageLinkStyle = cs(
     "notion-page-link",

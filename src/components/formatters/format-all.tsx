@@ -1,19 +1,28 @@
 import React from "react";
-import { Block, SubDecoration } from "notion-types";
-import { parsePageId } from "notion-utils";
+import { LinkProps, Notion } from "@types";
+import { parsePageId } from "@utils";
 
 import { useNotionContext } from "../../context";
 
 import { FormatDate, FormatExternalPage, FormatPage, FormatUser } from "./";
 
-export const FormatAll = (
-  text: string,
-  decorations: Array<SubDecoration>,
-  index: number,
-  block: Block,
-  linkProps?: any,
-  linkProtocol?: string
-): React.ReactNode => {
+interface DecoratedTextProps {
+  text: string;
+  decorations: Array<Notion.SubDecoration>;
+  index: number;
+  block: Notion.Block;
+  linkProps?: LinkProps;
+  linkProtocol?: string;
+}
+
+export const DecoratedText = ({
+  decorations,
+  text,
+  index,
+  block,
+  linkProps = {},
+  linkProtocol,
+}: DecoratedTextProps): React.ReactElement => {
   const { components, mapPageUrl } = useNotionContext();
 
   const formatted = decorations.reduce((element: any, decorator: any) => {

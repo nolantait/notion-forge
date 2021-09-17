@@ -1,16 +1,21 @@
 import React from "react";
-import { Notion } from "@types";
 
+import { Notion } from "@types";
 import { cs, decorate } from "@utils";
-import { CollectionViewProps } from "@types";
+import { CollectionViewProps, CollectionViewPresenter } from "@types";
 import { EmptyIcon } from "@icons";
 import { Property } from "@components/property";
 import { useNotionContext } from "@context";
 
+interface BoardGroupValue {
+  type: Notion.PropertyType;
+  value: string;
+}
+
 interface BoardGroup {
   property: Notion.PropertyID;
   hidden: boolean;
-  value: Record<string, string | number>;
+  value: BoardGroupValue;
 }
 
 interface BoardGroupHeaderProps
@@ -24,10 +29,11 @@ interface BoardGroupBodyProps extends CollectionViewProps {
   group: BoardGroup;
 }
 
-export const CollectionViewBoard = (
-  props: CollectionViewProps
-): JSX.Element => {
-  const { collectionView, collectionData, collection } = props;
+export const CollectionViewBoard: CollectionViewPresenter = ({
+  collectionView,
+  collectionData,
+  collection,
+}) => {
   const { format } = collectionView;
   const { board_cover_size: boardCoverSize = "medium" } = format;
 
@@ -79,7 +85,7 @@ export const CollectionViewBoard = (
   );
 };
 
-const BoardGroupHeader = (props: BoardGroupHeaderProps): JSX.Element => {
+const BoardGroupHeader = (props: BoardGroupHeaderProps): React.ReactElement => {
   const { collectionData, collection, index, group } = props;
 
   if (!collectionData.groupResults || group.hidden) {

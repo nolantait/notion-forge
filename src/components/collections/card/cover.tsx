@@ -1,6 +1,7 @@
 import React from "react";
+
 import { getTextContent } from "@utils";
-import { Notion, CardCoverProps } from "@types";
+import { Notion, CardCoverProps, Presenter } from "@types";
 import { useNotionContext } from "@context";
 import { Property } from "@components/property";
 
@@ -21,7 +22,12 @@ interface CardCoverWithImageProps
 interface CardCoverWithPropertyProps
   extends Pick<
     CardCoverProps,
-    "block" | "coverAspect" | "coverUrl" | "coverPosition"
+    | "block"
+    | "cover"
+    | "coverAspect"
+    | "coverUrl"
+    | "coverPosition"
+    | "collection"
   > {}
 
 export const CardCover = (props: CardCoverProps): JSX.Element => {
@@ -80,17 +86,17 @@ const CardCoverWithImage = ({
   );
 };
 
-const CardCoverWithProperty = ({
+const CardCoverWithProperty: Presenter<CardCoverWithPropertyProps> = ({
   block,
   collection,
   cover,
   coverAspect,
   coverPosition,
-}: CardCoverWithPropertyProps) => {
+}) => {
   const { mapImageUrl, components } = useNotionContext();
   const { property } = cover;
 
-  if (!property) return null;
+  if (!property) return <></>;
   const schema = collection.schema[property];
   const data = (block as any).properties?.[property];
 
@@ -116,21 +122,21 @@ const CardCoverWithProperty = ({
         );
       }
     } else {
-      return <Property schema={schema} data={data} />;
+      return <Property {...{ block, collection, schema, data }} />;
     }
   }
 
-  return null;
+  return <></>;
 };
 
-const CardCoverEmpty = (): JSX.Element => {
+const CardCoverEmpty = (): React.ReactElement => {
   return <div className="notion-collection-card-cover-empty" />;
 };
 
-const CardCoverImage = ({
+const CardCoverImage: Presenter<CardCoverImageProps> = ({
   block,
   coverAspect,
-}: CardCoverImageProps): JSX.Element => {
+}) => {
   const { components, mapImageUrl } = useNotionContext();
   const { format, properties } = block;
   const source = format?.display_source;
@@ -138,10 +144,10 @@ const CardCoverImage = ({
   if (!source) return <CardCoverEmpty />;
 
   const src = mapImageUrl(source, block);
-  const caption = properties.caption ?? "Background cover image for card";
+  const caption = properties.caption ?? [["Background cover image for card"]];
   const style = coverAspect ? { objectFit: coverAspect } : {};
 
-  return <components.lazyImage src={src} alt={caption} style={style} />;
+  return <components.lazyImage src={src} alt={caption[0][0]} style={style} />;
 };
 
 const findFirstImage = (block: Notion.PageBlock) => {

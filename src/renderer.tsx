@@ -1,51 +1,9 @@
 import React from "react";
 import mediumZoom from "medium-zoom";
-import { ExtendedRecordMap } from "notion-types";
 
-import {
-  MapPageUrl,
-  MapImageUrl,
-  SearchNotion,
-  NotionComponents,
-} from "./types";
-import { Block } from "./block";
+import { NotionRendererProps, NotionBlockRendererProps } from "@types";
 import { useNotionContext, NotionContextProvider } from "@context";
-
-export interface NotionRendererProps {
-  recordMap: ExtendedRecordMap;
-  components: NotionComponents;
-
-  mapPageUrl: MapPageUrl;
-  mapImageUrl: MapImageUrl;
-  searchNotion?: SearchNotion;
-
-  rootPageId?: string;
-  fullPage: boolean;
-  previewImages: boolean;
-  showCollectionViewDropdown: boolean;
-
-  defaultPageIcon: string | null;
-  defaultPageCover: string | null;
-  defaultPageCoverPosition: number;
-
-  footer?: React.ReactNode;
-  pageHeader?: React.ReactNode;
-  pageFooter?: React.ReactNode;
-  pageAside?: React.ReactNode;
-  pageCover?: React.ReactNode;
-
-  blockId?: string;
-  hideBlockId?: boolean;
-}
-
-interface NotionBlockRendererProps {
-  footer?: React.ReactNode;
-
-  blockId?: string;
-  hideBlockId?: boolean;
-  level?: number;
-  zoom?: any;
-}
+import { Block } from "./block";
 
 export const NotionRenderer = ({
   components,
@@ -61,7 +19,7 @@ export const NotionRenderer = ({
   defaultPageCover,
   defaultPageCoverPosition,
   ...rest
-}: NotionRendererProps): JSX.Element => {
+}: NotionRendererProps): React.ReactElement => {
   const zoom =
     typeof window !== "undefined" &&
     mediumZoom({
@@ -95,7 +53,7 @@ export const NotionBlockRenderer = ({
   level = 0,
   blockId,
   ...props
-}: NotionBlockRendererProps): JSX.Element => {
+}: NotionBlockRendererProps): React.ReactElement => {
   const { recordMap } = useNotionContext();
   const id = blockId || Object.keys(recordMap.block)[0];
   const block = recordMap.block[id]?.value;

@@ -1,29 +1,24 @@
 import React from "react";
-import { QuoteBlock } from "notion-types";
-import { cs } from "../utils";
-import { useNotionContext } from "../context";
 
-interface QuoteProps {
-  blockId: string;
-  block: QuoteBlock;
-}
+import { Notion, QuoteProps } from "@types";
+import { cs } from "@utils";
+import { useNotionContext } from "@context";
 
-export const Quote = (props: QuoteProps) => {
+const defaultTitle: Notion.Decoration[] = [[""]];
+const defaultProperties = { title: defaultTitle };
+
+export const Quote = (props: QuoteProps): React.ReactElement => {
   const { components } = useNotionContext();
   const { block, blockId } = props;
-  const { properties } = block;
-
-  if (!properties) return null;
-
+  const { properties = defaultProperties } = block;
   const blockColor = block.format?.block_color;
+  const title = properties.title;
 
   const style = cs(
     "notion-quote",
     blockColor && `notion-${blockColor}`,
     blockId
   );
-
-  const title = properties.title ?? "";
 
   return (
     <blockquote className={style}>

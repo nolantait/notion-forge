@@ -1,27 +1,28 @@
 import React from "react";
 
 import { useNotionContext } from "@context";
-import { AssetBlock, AssetProps, BlockFormat } from "@types";
-import { getTextContent, isServer } from "@utils";
+import { AssetProps, Presenter, AssetPresenter, BlockFormat } from "@types";
+import { getTextContent } from "@utils";
 
-export const Asset = (props: AssetProps): JSX.Element => {
-  const { block } = props;
+export const Asset: AssetPresenter = ({ block }) => {
   const { format, type } = block;
   const { containerStyle, assetStyle } = getAssetStyle(format, type);
 
   return (
     <div style={containerStyle}>
-      <RenderAssetByType block={block} style={assetStyle} />
+      <PolymorphicAsset block={block} style={assetStyle} />
     </div>
   );
 };
 
-interface RenderAssetProps {
-  block: AssetBlock;
+interface PolymorphicAssetProps extends Pick<AssetProps, "block"> {
   style: React.CSSProperties;
 }
 
-const RenderAssetByType = ({ block, style }: RenderAssetProps): JSX.Element => {
+const PolymorphicAsset: Presenter<PolymorphicAssetProps> = ({
+  block,
+  style,
+}) => {
   const { recordMap, mapImageUrl, components } = useNotionContext();
   const { type } = block;
   const source = block.properties.source?.[0]?.[0];
@@ -29,15 +30,17 @@ const RenderAssetByType = ({ block, style }: RenderAssetProps): JSX.Element => {
 
   switch (type) {
     case "tweet": {
-      if (!source) throw new Error(`Could not parse source for ${source}`);
-      const id = source.split("?")[0].split("/").pop();
+      //if (!source) throw new Error(`Could not parse source for ${source}`);
+      //const id = source.split("?")[0].split("/").pop();
 
-      return <components.tweet id={id} />;
+      //TODO: Add
+      return <></>;
     }
     case "pdf": {
-      if (isServer) return <div />;
+      //if (isServer) return <div />;
 
-      return <components.pdf file={signedUrl} />;
+      //TODO: Add
+      return <></>;
     }
     case "video": {
       if (!signedUrl)

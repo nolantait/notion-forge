@@ -1,17 +1,14 @@
 import React from "react";
-import * as types from "notion-types";
-import { cs } from "../utils";
-import { useNotionContext } from "../context";
+import { WrappedTextPresenter } from "@types";
+import { cs } from "@utils";
+import { useNotionContext } from "@context";
 
-interface WrappedTextProps {
-  block: types.TextBlock;
-  blockId: string;
-  children: React.ReactNode;
-}
-
-export const WrappedText = (props: WrappedTextProps) => {
+export const WrappedText: WrappedTextPresenter = ({
+  block,
+  blockId,
+  children,
+}) => {
   const { components } = useNotionContext();
-  const { block, blockId, children } = props;
 
   if (!block.properties && !block.content?.length) {
     return <div className={cs("notion-blank", blockId)}>&nbsp;</div>;

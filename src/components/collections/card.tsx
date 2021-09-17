@@ -1,14 +1,14 @@
 import React from "react";
 
-import {
-  Notion,
-  CollectionCardProps,
-  CollectionItemProperties,
-  CollectionItemProperty,
-} from "@types";
 import { Property } from "@components/property";
 import { useNotionContext, dummyLink, NotionContextProvider } from "@context";
 import { CardCover } from "@components/collections/card/cover";
+import {
+  Notion,
+  CollectionCardProps,
+  CollectionCardProperty,
+  Presenter,
+} from "@types";
 
 import { cs } from "@utils";
 
@@ -97,16 +97,16 @@ export const CollectionCard = (props: CollectionCardProps): JSX.Element => {
 interface CardTitleProps
   extends Pick<CollectionCardProps, "collection" | "block"> {
   value?: Notion.Decoration[];
-  schema?: Notion.CollectionPropertySchema;
   propertyTitle?: string;
+  schema: Notion.CollectionPropertySchema;
 }
 
-const CardTitle = ({
+const CardTitle: Presenter<CardTitleProps> = ({
   schema,
   value,
   block,
   collection,
-}: CardTitleProps): JSX.Element => {
+}) => {
   return (
     <CardPropertyWrapper>
       <Property
@@ -126,16 +126,16 @@ const CardPropertyWrapper: React.FC<{ children: React.ReactNode }> = ({
 };
 
 interface CardPropertiesProps {
-  properties: CollectionItemProperties;
+  properties: CollectionCardProperty[];
   block: Notion.PageBlock;
   collection: Notion.Collection;
 }
 
-const CardProperties = ({
+const CardProperties: Presenter<CardPropertiesProps> = ({
   properties,
   block,
   collection,
-}: CardPropertiesProps): JSX.Element => {
+}) => {
   if (properties.length < 1 || !block.properties) {
     return <></>;
   }
@@ -151,14 +151,14 @@ const CardProperties = ({
 
 interface CardPropertyProps
   extends Pick<CardPropertiesProps, "block" | "collection"> {
-  property: CollectionItemProperty;
+  property: CollectionCardProperty;
 }
 
-const CardProperty = ({
+const CardProperty: Presenter<CardPropertyProps> = ({
   block,
   collection,
   property,
-}: CardPropertyProps): JSX.Element => {
+}) => {
   const schema = collection.schema[property.property];
   const data = (block.properties as any)[property.property];
 
@@ -177,8 +177,8 @@ const CardProperty = ({
 
 function getRenderableProperties(
   collection: Notion.Collection,
-  properties: CollectionItemProperties
-): CollectionItemProperties {
+  properties: CollectionCardProperty[]
+): CollectionCardProperty[] {
   return properties.filter((prop) => {
     const isTitle = prop.property === "title";
     const isVisible = prop.visible;

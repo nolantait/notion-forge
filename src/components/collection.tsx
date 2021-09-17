@@ -12,7 +12,7 @@ import Menu, { Item as MenuItem } from "rc-menu";
 import { CollectionViewIcon, ChevronDownIcon } from "@icons";
 import { useNotionContext } from "@context";
 import { cs, getTextContent } from "@utils";
-import { CollectionProps } from "@types";
+import { CollectionPresenter } from "@types";
 
 import { Notion } from "@types";
 
@@ -38,7 +38,7 @@ interface CollectionViewDropdown {
 
 export const CollectionActionContext = createContext<CollectionActions>({});
 
-export const Collection = ({ block, className }: CollectionProps) => {
+export const Collection: CollectionPresenter = ({ block, className }) => {
   const { recordMap, components } = useNotionContext();
   const { collection_id: collectionId, view_ids: viewIds } = block;
   const defaultViewId: string | undefined = viewIds[0];

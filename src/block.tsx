@@ -1,57 +1,52 @@
 import React from "react";
-import { GoogleDriveBlock, AudioBlock, FileBlock } from "notion-types";
-import { uuidToId } from "notion-utils";
 
-import { useNotionContext } from "./context";
+import { Notion, BlockPresenter } from "@types";
+import { uuidToId } from "@utils";
+import { useNotionContext } from "@context";
 
-export interface BlockProps {
-  block: any;
-  level: number;
-
-  footer?: React.ReactNode;
-  pageHeader?: React.ReactNode;
-  pageFooter?: React.ReactNode;
-  pageAside?: React.ReactNode;
-  pageCover?: React.ReactNode;
-
-  hideBlockId?: boolean;
-}
-
-export const Block: React.FC<BlockProps> = (props) => {
+export const Block: BlockPresenter = (props) => {
   const { components } = useNotionContext();
   const { block, children, level, hideBlockId } = props;
   const blockMissing = !block;
 
   if (blockMissing) {
-    return null;
+    throw new Error(`Missing block ${block}`);
   }
+
+  const isTopLevel = level === 0;
+  const isCollectionView = block.type === "collection_view";
+  const parentIsCollection = block.parent_table === "collection";
 
   const blockId = hideBlockId
     ? "notion-block"
     : `notion-block notion-block-${uuidToId(block.id)}`;
 
-  const pageProps = {
-    ...props,
-    blockId,
-  };
-
   // ugly hack to make viewing raw collection views work properly
   // e.g., 6d886ca87ab94c21a16e3b82b43a57fb
-  if (level === 0 && block.type === "collection_view") {
-    block.type = "collection_view_page";
-  }
+  if (isTopLevel && isCollectionView) {
+    if (!block) return <></>;
 
-  const parentIsCollection = block.parent_table === "collection";
+    // @ts-ignore
+    block.type = "collection_view_page";
+
+    return (
+      <components.page
+        {...props}
+        block={block as unknown as Notion.CollectionViewPageBlock}
+        blockId={blockId}
+      />
+    );
+  }
 
   switch (block.type) {
     case "collection_view_page":
-      return <components.page {...pageProps} />;
+      return <components.page {...props} block={block} blockId={blockId} />;
     case "page":
       if (parentIsCollection) {
-        return <components.collectionRow block={block} />;
+        return <components.collectionRow block={block} blockId={blockId} />;
       }
 
-      return <components.page {...pageProps} />;
+      return <components.page {...props} block={block} blockId={blockId} />;
     case "header":
     // Fallthrough
     case "sub_header":
@@ -59,7 +54,7 @@ export const Block: React.FC<BlockProps> = (props) => {
     case "sub_sub_header":
       return <components.header block={block} blockId={blockId} />;
     case "divider":
-      return <components.divider />;
+      return <components.divider blockId={blockId} />;
     case "text": {
       return (
         <components.wrappedText block={block} blockId={blockId}>
@@ -115,27 +110,20 @@ export const Block: React.FC<BlockProps> = (props) => {
         return <components.assetWrapper blockId={blockId} block={block} />;
       }
 
-      return (
-        <components.googleDrive
-          block={block as GoogleDriveBlock}
-          className={blockId}
-        />
-      );
+      return <components.googleDrive block={block} className={blockId} />;
     }
 
     case "audio": {
-      return (
-        <components.audio block={block as AudioBlock} className={blockId} />
-      );
+      return <components.audio block={block} className={blockId} />;
     }
 
     case "file": {
-      return <components.file block={block as FileBlock} className={blockId} />;
+      return <components.file block={block} className={blockId} />;
     }
 
     case "equation": {
       const math = block.properties?.title[0][0];
-      if (!math) return null;
+      if (!math) return <></>;
 
       return <components.equation math={math} block className={blockId} />;
     }
@@ -163,12 +151,13 @@ export const Block: React.FC<BlockProps> = (props) => {
           </>
         );
       }
-      break;
+
+      return <></>;
     }
 
     case "column_list": {
       return (
-        <components.columnList block={block} blockId={blockId}>
+        <components.columnList blockId={blockId}>
           {children}
         </components.columnList>
       );
@@ -231,7 +220,9 @@ export const Block: React.FC<BlockProps> = (props) => {
     }
 
     case "transclusion_reference": {
-      return <components.syncPointer {...props} level={level + 1} />;
+      return (
+        <components.syncPointer {...props} block={block} level={level + 1} />
+      );
     }
 
     case "alias": {
@@ -240,13 +231,11 @@ export const Block: React.FC<BlockProps> = (props) => {
 
     default: {
       if (process.env.NODE_ENV !== "production") {
-        throw new Error(`Unsupported type ${block.type}`);
+        throw new Error(`Unsupported type ${(block as any).type}`);
       }
 
       // Allow rendering blank div in production in case Notion updates
       return <div />;
     }
   }
-
-  return null;
 };

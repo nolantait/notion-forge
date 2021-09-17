@@ -1,12 +1,7 @@
 import React from "react";
-import { SyncBlock } from "notion-types";
-import { cs } from "../utils";
 
-interface SyncContainerProps {
-  block: SyncBlock;
-  blockId: string;
-  children?: React.ReactNode;
-}
+import { SyncContainerProps } from "@types";
+import { cs } from "@utils";
 
 export const SyncContainer = (props: SyncContainerProps) => {
   const { children, blockId } = props;

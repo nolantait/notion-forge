@@ -1,52 +1,27 @@
 import React from "react";
-import { Block } from "notion-types";
 
-import { cs } from "../utils";
-import { useNotionContext } from "../context";
+import { cs, getBlockTitle, decorate } from "@utils";
+import { useNotionContext } from "@context";
+import { PageTitleProps, PageTitlePresenter } from "@types";
 
-export const PageTitle: React.FC<{
-  block: Block;
-  className?: string;
-  defaultIcon?: string;
-}> = ({ block, className, defaultIcon, ...rest }) => {
-  const { recordMap, components } = useNotionContext();
+export const PageTitle: PageTitlePresenter = ({
+  block,
+  className,
+}: PageTitleProps) => {
+  const { recordMap, components, defaultPageIcon } = useNotionContext();
 
-  if (!block) return null;
-
-  // TODO: replace with getBlockTitle
-  if (
-    block.type === "collection_view_page" ||
-    block.type === "collection_view"
-  ) {
-    const collection = recordMap.collection[block.collection_id]?.value;
-
-    if (collection) {
-      block.properties = {
-        ...block.properties,
-        title: collection.name,
-      };
-
-      block.format = {
-        ...block.format,
-        page_icon: collection.icon,
-      };
-    }
-  }
-
-  if (!block.properties?.title) {
-    return null;
-  }
+  const title = getBlockTitle(block, recordMap);
 
   return (
-    <span className={cs("notion-page-title", className)} {...rest}>
+    <span className={cs("notion-page-title", className)}>
       <components.pageIcon
         block={block}
-        defaultIcon={defaultIcon}
+        defaultIcon={defaultPageIcon}
         className="notion-page-title-icon"
       />
 
       <span className="notion-page-title-text">
-        <components.text value={block.properties?.title} block={block} />
+        <components.text value={decorate(title)} block={block} />
       </span>
     </span>
   );

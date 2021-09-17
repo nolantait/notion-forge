@@ -1,28 +1,33 @@
 import React from "react";
-import { cs } from "../utils";
-import { PageBlock } from "notion-types";
+
+import { useNotionContext } from "@context";
+import { TableOfContentsPresenter } from "@types";
 import {
+  cs,
   getBlockParentPage,
   getPageTableOfContents,
+  TableOfContentsEntry,
   uuidToId,
-} from "notion-utils";
+} from "@utils";
 
-// import useScrollSpy from "../hooks/use-scroll-spy";
-import { useNotionContext } from "../context";
-
-interface TOCParams {
-  blockId: string;
-  block: PageBlock;
+interface TableOfContentsItemProps {
+  item: TableOfContentsEntry;
 }
 
-export const TableOfContents: React.FC<TOCParams> = (props) => {
+export const TableOfContents: TableOfContentsPresenter = ({
+  block,
+  blockId,
+}) => {
   const { recordMap } = useNotionContext();
-  const { block, blockId } = props;
-
   const page = getBlockParentPage(block, recordMap);
-  if (!page) return null;
 
-  const toc = getPageTableOfContents(page, recordMap);
+  if (!page) {
+    throw new Error(
+      `Missing parent block for table of contents block ${block.id}`
+    );
+  }
+
+  const tableOfContents = getPageTableOfContents(page, recordMap);
   const blockColor = block.format?.block_color;
   const style = cs(
     "notion-table-of-contents",
@@ -32,23 +37,28 @@ export const TableOfContents: React.FC<TOCParams> = (props) => {
 
   return (
     <div className={style}>
-      {toc.map((tocItem) => (
-        <a
-          key={tocItem.id}
-          href={`#${uuidToId(tocItem.id)}`}
-          className="notion-table-of-contents-item"
-        >
-          <span
-            className="notion-table-of-contents-item-body"
-            style={{
-              display: "inline-block",
-              marginLeft: tocItem.indentLevel * 24,
-            }}
-          >
-            {tocItem.text}
-          </span>
-        </a>
+      {tableOfContents.map((item) => (
+        <TableOfContentsItem item={item} />
       ))}
     </div>
+  );
+};
+
+const TableOfContentsItem = ({
+  item,
+}: TableOfContentsItemProps): React.ReactElement => {
+  const { id, indentLevel, text } = item;
+  const href = `#${uuidToId(id)}`;
+  const itemStyle = {
+    display: "inline-block",
+    marginLeft: indentLevel * 24,
+  };
+
+  return (
+    <a key={id} href={href} className="notion-table-of-contents-item">
+      <span className="notion-table-of-contents-item-body" style={itemStyle}>
+        {text}
+      </span>
+    </a>
   );
 };

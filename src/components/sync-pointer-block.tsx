@@ -1,10 +1,9 @@
 import React from "react";
 
 import { NotionBlockRenderer } from "../renderer";
-import { SyncPointerProps } from "@types";
+import { SyncPointerPresenter } from "@types";
 
-export const SyncPointer = (props: SyncPointerProps): JSX.Element => {
-  const { block, level } = props;
+export const SyncPointer: SyncPointerPresenter = ({ block, level }) => {
   const { format } = block;
   const referencePointerId = format.transclusion_reference_pointer.id;
 

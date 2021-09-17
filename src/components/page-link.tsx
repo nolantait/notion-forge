@@ -1,3 +1,5 @@
 import React from "react";
 
-export const PageLink: React.FC = (props) => <a {...props} />;
+import { PageLinkProps } from "@types";
+
+export const PageLink = (props: PageLinkProps) => <a {...props} />;

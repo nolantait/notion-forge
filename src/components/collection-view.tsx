@@ -1,6 +1,6 @@
 import React from "react";
 
-import { CollectionViewProps } from "@types";
+import { CollectionViewPresenter } from "@types";
 import {
   CollectionViewList,
   CollectionViewBoard,
@@ -8,7 +8,7 @@ import {
   CollectionViewTable,
 } from "@components";
 
-export const CollectionView = (props: CollectionViewProps) => {
+export const CollectionView: CollectionViewPresenter = (props) => {
   const { collectionView } = props;
 
   switch (collectionView.type) {

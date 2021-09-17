@@ -1,16 +1,10 @@
 import React from "react";
-import { ToggleBlock } from "notion-types";
-import { cs } from "../utils";
-import { useNotionContext } from "../context";
 
-interface ToggleProps {
-  blockId: string;
-  block: ToggleBlock;
-  children?: React.ReactNode;
-}
+import { TogglePresenter } from "@types";
+import { cs } from "@utils";
+import { useNotionContext } from "@context";
 
-export const Toggle = (props: ToggleProps) => {
-  const { block, blockId, children } = props;
+export const Toggle: TogglePresenter = ({ block, blockId, children }) => {
   const { components } = useNotionContext();
   const style = cs("notion-toggle", blockId);
 

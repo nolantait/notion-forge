@@ -1,21 +1,19 @@
 import React from "react";
-import { useNotionContext } from "../context";
-import { TodoBlock } from "notion-types";
-import { cs } from "../utils";
 
-interface TodoProps {
-  block: TodoBlock;
-  blockId: string;
-  children?: React.ReactNode;
-}
+import { useNotionContext } from "@context";
+import { TodoPresenter } from "@types";
+import { cs } from "@utils";
 
-export const Todo = (props: TodoProps) => {
+export const Todo: TodoPresenter = ({
+  block,
+  blockId,
+  children,
+}): React.ReactElement => {
   const { components } = useNotionContext();
-  const { block, blockId, children } = props;
-
-  const isChecked = block.properties?.checked?.[0]?.[0] === "Yes";
-
+  const { properties = { checked: [["No"]] } } = block;
+  const isChecked = properties.checked[0][0] === "Yes";
   const containerStyle = cs("notion-to-do", blockId);
+  const title = block.properties?.title ?? [[""]];
   const wrapperStyle = cs(
     "notion-to-do-body",
     isChecked && `notion-to-do-checked`
@@ -24,10 +22,10 @@ export const Todo = (props: TodoProps) => {
   return (
     <div className={containerStyle}>
       <div className="notion-to-do-item">
-        <components.checkbox isChecked={isChecked} />
+        <components.checkbox isChecked={isChecked} blockId={blockId} />
 
         <div className={wrapperStyle}>
-          <components.text value={block.properties?.title} block={block} />
+          <components.text value={title} block={block} />
         </div>
       </div>
 

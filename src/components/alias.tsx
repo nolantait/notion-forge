@@ -1,14 +1,14 @@
 import React from "react";
 
 import { NotionBlockRenderer } from "../renderer";
-import { AliasProps } from "@types";
+import { AliasPresenter } from "@types";
 
-export const Alias = (props: AliasProps) => {
-  const { block, level } = props;
-
+export const Alias: AliasPresenter = ({ block, level }) => {
   const referencePointerId = block.format.alias_pointer.id;
 
-  if (!referencePointerId) throw new Error('Missing reference pointer id for alias block')
+  if (!referencePointerId) {
+    throw new Error("Missing reference pointer id for alias block");
+  }
 
   return (
     <NotionBlockRenderer

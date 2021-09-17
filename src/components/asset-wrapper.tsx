@@ -1,11 +1,11 @@
 import React from "react";
+
 import { cs } from "@utils";
 import { useNotionContext } from "@context";
-import { AssetWrapperProps } from "@types";
+import { AssetWrapperPresenter } from "@types";
 
-export const AssetWrapper = (props: AssetWrapperProps): JSX.Element => {
+export const AssetWrapper: AssetWrapperPresenter = ({ block, blockId }) => {
   const { components } = useNotionContext();
-  const { block, blockId } = props;
   const { type } = block;
   const isBlockFullWidth = block.format?.block_full_width;
   const caption = block.properties.caption;
@@ -19,7 +19,7 @@ export const AssetWrapper = (props: AssetWrapperProps): JSX.Element => {
         blockId
       )}
     >
-      <components.asset block={block} />
+      <components.asset block={block} blockId={blockId} />
 
       {caption && (
         <figcaption className="notion-asset-caption">

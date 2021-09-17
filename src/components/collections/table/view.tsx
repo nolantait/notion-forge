@@ -1,9 +1,14 @@
 import React from "react";
 
-import { Notion, CollectionViewProps } from "@types";
 import { cs } from "@utils";
 import { Property, CollectionColumnTitle } from "@components";
 import { useNotionContext } from "@context";
+import {
+  Notion,
+  CollectionViewProps,
+  CollectionViewPresenter,
+  Presenter,
+} from "@types";
 
 interface TableProperty {
   property: Notion.PropertyID;
@@ -11,41 +16,27 @@ interface TableProperty {
   width?: number;
 }
 
-interface TableCellProps {
-  collection: Notion.Collection;
+interface TableCellProps extends Pick<CollectionViewProps, "collection"> {
   property: TableProperty;
   blockId: Notion.ID;
 }
 
-interface TableHeadProps {
-  collection: Notion.Collection;
+interface TableHeadProps extends Pick<CollectionViewProps, "collection"> {
   property: TableProperty;
 }
 
-export const CollectionViewTable = ({
+export const CollectionViewTable: CollectionViewPresenter = ({
   collection,
   collectionView,
   collectionData,
-}: CollectionViewProps): JSX.Element => {
+}) => {
   const tableProperties: TableProperty[] =
     collectionView.format?.table_properties ?? [];
 
-  const fetchTableProperties = (
-    tableProperties: TableProperty[]
-  ): TableProperty[] => {
-    if (tableProperties.length > 0) {
-      return tableProperties.filter(
-        (prop) => prop.visible && collection.schema[prop.property]
-      );
-    }
-    return [{ property: "title" }].concat(
-      Object.keys(collection.schema)
-        .filter((p) => p !== "title")
-        .map((property) => ({ property }))
-    );
-  };
-
-  const filteredProperties = fetchTableProperties(tableProperties);
+  const filteredProperties = fetchTableProperties(
+    collection.schema,
+    tableProperties
+  );
 
   return (
     <div className="notion-table">
@@ -78,15 +69,15 @@ export const CollectionViewTable = ({
   );
 };
 
-const TableCell = ({
+const TableCell: Presenter<TableCellProps> = ({
   property,
   collection,
   blockId,
-}: TableCellProps): JSX.Element => {
+}) => {
   const { recordMap } = useNotionContext();
   const propertyId = property.property;
   const schema = collection.schema?.[propertyId];
-  const block: Notion.Block = recordMap.block[blockId].value;
+  const block = recordMap.block[blockId].value;
   const data = block?.properties?.[propertyId];
 
   const style: React.CSSProperties = {
@@ -103,7 +94,7 @@ const TableCell = ({
       <Property
         schema={schema}
         data={data}
-        block={block}
+        block={block as Notion.PageBlock}
         collection={collection}
       />
     </div>
@@ -138,4 +129,20 @@ const getPropertyWidth = (property: TableProperty): number => {
   } else {
     return 200;
   }
+};
+
+const fetchTableProperties = (
+  schema: Notion.CollectionPropertySchemaMap,
+  tableProperties: TableProperty[]
+): TableProperty[] => {
+  if (tableProperties.length > 0) {
+    return tableProperties.filter(
+      (prop) => prop.visible && schema[prop.property]
+    );
+  }
+  return [{ property: "title" }].concat(
+    Object.keys(schema)
+      .filter((p) => p !== "title")
+      .map((property) => ({ property }))
+  );
 };

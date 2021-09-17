@@ -19,6 +19,16 @@ export interface NotionContext {
   searchNotion?: SearchNotion;
 }
 
+export interface NotionContainerProps {
+  block: Notion.PageBlock | Notion.CollectionViewPageBlock;
+  blockId: string;
+  className?: string;
+  pageCover?: React.ReactNode | string;
+  pageCoverPosition?: number;
+  footer?: React.ReactNode;
+  children: React.ReactNode;
+}
+
 export type AssetBlock =
   | Notion.VideoBlock
   | Notion.ImageBlock
@@ -47,9 +57,9 @@ export type SearchNotion = (
   params: Notion.SearchParams
 ) => Promise<Notion.SearchResults>;
 
-type Presenter<T> = (props: T) => JSX.Element;
+export type Presenter<T> = (props: T) => React.ReactElement;
 
-export interface AliasBlock {
+export interface AliasBlock extends Notion.BaseBlock {
   type: "alias";
   format: {
     alias_pointer: {
@@ -77,11 +87,6 @@ export type AssetWrapperPresenter = Presenter<AssetWrapperProps>;
 export interface AssetProps extends AssetWrapperProps {}
 
 export type AssetPresenter = Presenter<AssetProps>;
-
-export interface SyncPointerProps {
-  block: Notion.SyncPointerBlock;
-  level: number;
-}
 
 export interface AudioProps {
   block: Notion.AudioBlock;
@@ -117,6 +122,24 @@ export interface BlockFormat {
   block_aspect_ratio: number;
   block_preserve_scale: boolean;
 }
+
+export type Block = Notion.Block | AliasBlock;
+
+export interface BlockProps {
+  block: Block;
+  level: number;
+
+  footer?: React.ReactNode;
+  pageHeader?: React.ReactNode;
+  pageFooter?: React.ReactNode;
+  pageAside?: React.ReactNode;
+  pageCover?: React.ReactNode;
+
+  hideBlockId?: boolean;
+  children?: React.ReactNode;
+}
+
+export type BlockPresenter = Presenter<BlockProps>;
 
 export interface BulletedListProps {
   block: Notion.BulletedListBlock;
@@ -166,11 +189,16 @@ export type PropertyVisibility = {
   visibility: "show" | "hide";
 };
 
+export type CollectionCardProperty = {
+  property: Notion.PropertyID;
+  visible: boolean;
+};
+
 export interface CollectionCardProps
   extends Pick<CardCoverOptions, "cover" | "coverSize" | "coverAspect"> {
   collection: Notion.Collection;
   block: Notion.PageBlock;
-  properties?: PropertyVisibility[];
+  properties?: CollectionCardProperty[];
   className?: string;
 }
 
@@ -198,22 +226,11 @@ export type CollectionRowPresenter = Presenter<CollectionRowProps>;
 
 export interface CollectionProps {
   block: Notion.CollectionViewBlock | Notion.CollectionViewPageBlock;
+  blockId: string;
   className?: string;
 }
 
 export type CollectionPresenter = Presenter<CollectionProps>;
-
-export interface PageProps {
-  block: Notion.PageBlock | Notion.CollectionViewPageBlock;
-  blockId: string;
-  children: React.ReactNode;
-  level: number;
-  footer: React.ReactNode;
-  pageHeader: React.ReactNode;
-  pageFooter: React.ReactNode;
-  pageAside: React.ReactNode;
-  pageCover: React.ReactNode;
-}
 
 export type CollectionViewPresenter = Presenter<CollectionViewProps>;
 
@@ -236,7 +253,41 @@ export interface DividerProps {
   blockId: string;
 }
 
-export type DividerPresenter = Presenter<ColumnProps>;
+export type DividerPresenter = Presenter<DividerProps>;
+
+export interface DecoratedExternalPageProps
+  extends Pick<DecoratedTextProps, "linkProps" | "block"> {
+  decoration: Notion.ExternalLinkFormat;
+}
+
+export interface DecoratedPageLinkProps
+  extends Pick<DecoratedTextProps, "linkProps"> {
+  decoration: Notion.PageFormat;
+}
+
+export interface DecoratedUserProps
+  extends Required<Pick<DecoratedTextProps, "block">> {
+  decoration: Notion.UserFormat;
+}
+
+export interface DecoratedLinkProps
+  extends Pick<DecoratedTextProps, "linkProps" | "linkProtocol"> {
+  decoration: Notion.LinkFormat;
+  element: React.ReactElement;
+}
+
+export interface DecoratedTextProps
+  extends Pick<TextProps, "block" | "linkProps" | "linkProtocol"> {
+  decorations: Array<Notion.SubDecoration>;
+  text: string;
+  index: number;
+}
+
+export interface DecoratedElementProps
+  extends Pick<DecoratedTextProps, "linkProps" | "linkProtocol" | "block"> {
+  element: React.ReactElement;
+  decoration: Notion.SubDecoration;
+}
 
 export interface EquationProps {
   math: string;
@@ -284,14 +335,179 @@ export type ImagePresenter = Presenter<ImgProps>;
 
 export interface LinkProps extends React.HTMLProps<HTMLAnchorElement> {}
 
+export type LinkProtocol = "https" | "http" | "mailto" | "tel" | undefined;
+
 export type LinkPresenter = Presenter<LinkProps>;
 
+export interface NumberedListProps {
+  block: Notion.NumberedListBlock;
+  blockId: string;
+  children?: React.ReactNode;
+}
+
+export type NumberedListPresenter = Presenter<NumberedListProps>;
+
+export interface PageLinkProps extends React.ComponentProps<"a"> {}
+export type PageLinkPresenter = Presenter<PageLinkProps>;
+
+export interface PageProps {
+  block: Notion.PageBlock | Notion.CollectionViewPageBlock;
+  blockId: string;
+  children?: React.ReactNode;
+  level: number;
+  footer?: React.ReactNode;
+  pageHeader?: React.ReactNode;
+  pageFooter?: React.ReactNode;
+  pageAside?: React.ReactNode;
+  pageCover?: React.ReactNode;
+}
 export type PagePresenter = Presenter<PageProps>;
+
+export type PageHeaderPresenter = Presenter<{}>;
+
+export interface PageIconProps {
+  block:
+    | Notion.PageBlock
+    | Notion.CalloutBlock
+    | Notion.CollectionViewBlock
+    | Notion.CollectionViewPageBlock;
+  className?: string;
+  hideDefaultIcon?: boolean;
+  defaultIcon?: string | null;
+}
+export type PageIconPresenter = Presenter<PageIconProps>;
+
+export interface PageTitleProps {
+  block:
+    | Notion.PageBlock
+    | Notion.CollectionViewBlock
+    | Notion.CollectionViewPageBlock;
+  className?: string;
+}
+export type PageTitlePresenter = Presenter<PageTitleProps>;
+
+export interface PropertyProps {
+  schema: Notion.CollectionPropertySchema;
+  block?: Notion.PageBlock;
+  collection: Notion.Collection;
+  data?: Notion.Decoration[];
+  inline?: boolean;
+}
+
+export type PropertyPresenter = Presenter<PropertyProps>;
+
+export interface NumberPropertySchema
+  extends Omit<Notion.CollectionPropertySchema, "number_format"> {
+  number_format: Notion.NumberFormat;
+}
+
+export interface NotionRendererProps {
+  recordMap: Notion.ExtendedRecordMap;
+  components: Components;
+
+  mapPageUrl: MapPageUrl;
+  mapImageUrl: MapImageUrl;
+  searchNotion?: SearchNotion;
+
+  rootPageId?: string;
+  fullPage: boolean;
+  previewImages: boolean;
+  showCollectionViewDropdown: boolean;
+
+  defaultPageIcon: string | null;
+  defaultPageCover: string | null;
+  defaultPageCoverPosition: number;
+
+  footer?: React.ReactNode;
+  pageHeader?: React.ReactNode;
+  pageFooter?: React.ReactNode;
+  pageAside?: React.ReactNode;
+  pageCover?: React.ReactNode;
+
+  blockId?: string;
+  hideBlockId?: boolean;
+}
+
+export interface NotionBlockRendererProps {
+  footer?: React.ReactNode;
+
+  blockId?: string;
+  hideBlockId?: boolean;
+  level?: number;
+  zoom?: any;
+}
+
+export interface QuoteProps {
+  blockId: string;
+  block: Notion.QuoteBlock;
+}
+
+export type QuotePresenter = Presenter<QuoteProps>;
+
+export interface SyncContainerProps {
+  block: Notion.SyncBlock;
+  blockId: string;
+  children?: React.ReactNode;
+}
+
+export type SyncContainerPresenter = Presenter<SyncContainerProps>;
+
+export interface SyncPointerProps {
+  block: Notion.SyncPointerBlock;
+  level: number;
+}
 
 export type SyncPointerPresenter = Presenter<SyncPointerProps>;
 
+export interface TableOfContentsProps {
+  blockId: string;
+  block: Notion.TableOfContentsBlock;
+}
+
+export type TableOfContentsPresenter = Presenter<TableOfContentsProps>;
+
+export interface TextProps {
+  value: Notion.Decoration[];
+  block?: Notion.Block;
+  linkProps?: LinkProps;
+  linkProtocol?: LinkProtocol;
+  inline?: boolean; // TODO: currently unused
+}
+
+export type TextPresenter = Presenter<TextProps>;
+
+export interface TitleProps {
+  value: Notion.Decoration[];
+  block: Notion.TextBlock | Notion.PageBlock | Notion.CollectionViewPageBlock;
+}
+
+export type TitlePresenter = Presenter<TitleProps>;
+
+export interface TodoProps {
+  block: Notion.TodoBlock;
+  blockId: Notion.ID;
+  children?: React.ReactNode;
+}
+
+export type TodoPresenter = Presenter<TodoProps>;
+
+export interface ToggleProps {
+  blockId: Notion.ID;
+  block: Notion.ToggleBlock;
+  children?: React.ReactNode;
+}
+
+export type TogglePresenter = Presenter<ToggleProps>;
+
+export interface WrappedTextProps {
+  block: Notion.TextBlock;
+  blockId: string;
+  children: React.ReactNode;
+}
+
+export type WrappedTextPresenter = Presenter<WrappedTextProps>;
+
 export interface Components {
-  // TODO: better typing for arbitrary react components
   alias: AliasPresenter;
   assetWrapper: AssetWrapperPresenter;
   asset: AssetPresenter;
@@ -321,26 +537,20 @@ export interface Components {
   lazyImage: LazyImagePresenter;
   image: ImagePresenter;
   link: LinkPresenter;
-  numberedList: any;
-  page: any;
-  pageHeader: any;
-  pageIcon: any;
-  pageLink: any;
-  pageTitle: any;
-  property: any;
-  quote: any;
-  searchDialog: any;
-  syncContainer: any;
+  numberedList: NumberedListPresenter;
+  page: PagePresenter;
+  pageHeader: PageHeaderPresenter;
+  pageIcon: PageIconPresenter;
+  pageLink: PageLinkPresenter;
+  pageTitle: PageTitlePresenter;
+  property: PropertyPresenter;
+  quote: QuotePresenter;
+  syncContainer: SyncContainerPresenter;
   syncPointer: SyncPointerPresenter;
-  tableOfContents: any;
-  text: any;
-  title: any;
-  todo: any;
-  toggle: any;
-  wrappedText: any;
-
-  // assets
-  pdf: any;
-  tweet: any;
-  modal: any;
+  tableOfContents: TableOfContentsPresenter;
+  text: TextPresenter;
+  title: TitlePresenter;
+  todo: TodoPresenter;
+  toggle: TogglePresenter;
+  wrappedText: WrappedTextPresenter;
 }

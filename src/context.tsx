@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 
-import { NotionComponents, NotionContext } from "@types";
+import { Components, NotionContext } from "@types";
 import { defaultMapPageUrl, defaultMapImageUrl } from "@utils";
 
 // All Supported Components
@@ -42,7 +42,6 @@ import {
   PageTitle as DefaultPageTitle,
   Property as DefaultProperty,
   Quote as DefaultQuote,
-  SearchDialog as DefaultSearchDialog,
   SyncContainer as DefaultSyncContainer,
   SyncPointer as DefaultSyncPointer,
   TableOfContents as DefaultTableOfContents,
@@ -61,15 +60,7 @@ interface dummyLinkProps {
 }
 export const dummyLink = (props: dummyLinkProps) => <span {...props} />;
 
-const dummyComponent = (name: string) => () => {
-  console.warn(
-    `Error using empty component: ${name}\nYou should override this in NotionRenderer.components`
-  );
-
-  return null;
-};
-
-const defaultComponents: NotionComponents = {
+const defaultComponents: Components = {
   alias: DefaultAlias,
   assetWrapper: DefaultAssetWrapper,
   asset: DefaultAsset,
@@ -107,7 +98,6 @@ const defaultComponents: NotionComponents = {
   pageTitle: DefaultPageTitle,
   property: DefaultProperty,
   quote: DefaultQuote,
-  searchDialog: DefaultSearchDialog,
   syncContainer: DefaultSyncContainer,
   syncPointer: DefaultSyncPointer,
   tableOfContents: DefaultTableOfContents,
@@ -116,10 +106,6 @@ const defaultComponents: NotionComponents = {
   todo: DefaultTodo,
   toggle: DefaultToggle,
   wrappedText: DefaultWrappedText,
-
-  pdf: dummyComponent("pdf"),
-  tweet: dummyComponent("tweet"),
-  modal: dummyComponent("modal"),
 };
 
 const defaultNotionContext: NotionContext = {

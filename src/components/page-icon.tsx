@@ -1,70 +1,82 @@
 import React from "react";
-import { getBlockIcon, getBlockTitle } from "notion-utils";
-import { Block, PageBlock, CalloutBlock } from "notion-types";
 
-import { cs, isUrl } from "../utils";
-import { DefaultPageIcon } from "../icons/default-page-icon";
-import { useNotionContext } from "../context";
+import { cs, isUrl, getBlockIcon, getBlockTitle } from "@utils";
+import { DefaultPageIcon } from "@icons";
+import { useNotionContext } from "@context";
+import { PageIconProps } from "@types";
 
-const isIconBlock = (value: Block): value is PageBlock | CalloutBlock => {
-  return (
-    value.type === "page" ||
-    value.type === "callout" ||
-    value.type === "collection_view" ||
-    value.type === "collection_view_page"
-  );
-};
-
-export const PageIcon: React.FC<{
-  block: Block;
+interface ImageIconProps extends Pick<PageIconProps, "block"> {
+  title: string | null;
+  iconUrl: string;
   className?: string;
-  hideDefaultIcon?: boolean;
-  defaultIcon?: string;
-}> = ({ block, className, hideDefaultIcon = false, defaultIcon }) => {
-  const { mapImageUrl, recordMap, components } = useNotionContext();
+}
 
-  if (!isIconBlock(block)) {
-    return null;
-  }
+interface TextIconProps {
+  icon: string;
+  className?: string;
+}
 
+export const PageIcon = ({
+  block,
+  className,
+  defaultIcon = null,
+  hideDefaultIcon = false,
+}: PageIconProps): React.ReactElement => {
+  if (hideDefaultIcon) return <EmptyIcon />;
+
+  const { recordMap } = useNotionContext();
   const icon = getBlockIcon(block, recordMap) ?? defaultIcon;
+
+  if (!icon) return <EmptyIcon />;
+
   const title = getBlockTitle(block, recordMap);
+  const iconStyle = cs(className, "notion-page-icon");
 
-  if (icon && isUrl(icon)) {
-    const url = mapImageUrl(icon, block);
-
+  if (isUrl(icon)) {
     return (
-      <components.image
-        className={cs(className, "notion-page-icon")}
-        src={url}
-        alt={title ? title : "Icon"}
-        loading="lazy"
-      />
+      <ImageIcon {...{ block, iconUrl: icon, title, iconStyle: className }} />
     );
   } else {
-    const iconValue = icon?.trim();
+    const iconValue = icon.trim();
 
     if (!iconValue) {
-      if (hideDefaultIcon) {
-        return null;
-      }
-
       return (
-        <DefaultPageIcon
-          className={cs(className, "notion-page-icon")}
-          alt={title ? title : "Page"}
-        />
+        <DefaultPageIcon className={iconStyle} alt={title ? title : "Page"} />
       );
     }
 
-    return (
-      <span
-        className={cs(className, "notion-page-icon")}
-        role="img"
-        aria-label={icon}
-      >
-        {iconValue}
-      </span>
-    );
+    return <TextIcon icon={icon} className={iconStyle} />;
   }
+};
+
+const ImageIcon = ({
+  block,
+  iconUrl,
+  title,
+  className,
+}: ImageIconProps): React.ReactElement => {
+  const { mapImageUrl, components } = useNotionContext();
+  const mappedUrl = mapImageUrl(iconUrl, block);
+  const altText = title ? title : "Icon";
+
+  return (
+    <components.image
+      className={className}
+      src={mappedUrl}
+      alt={altText}
+      loading="lazy"
+    />
+  );
+};
+
+const EmptyIcon = (): React.ReactElement => {
+  return <></>;
+};
+
+const TextIcon = ({ icon, className }: TextIconProps): React.ReactElement => {
+  return (
+    <span className={className} role="img" aria-label={icon}>
+      {icon}
+    </span>
+  );
 };

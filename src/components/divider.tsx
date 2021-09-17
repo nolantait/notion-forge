@@ -1,8 +1,8 @@
 import React from "react";
 
 import { cs } from "@utils";
-import { DividerProps } from "@types";
+import { DividerPresenter } from "@types";
 
-export const Divider = ({ blockId }: DividerProps): JSX.Element => {
+export const Divider: DividerPresenter = ({ blockId }): React.ReactElement => {
   return <hr className={cs("notion-hr", blockId)} />;
 };
