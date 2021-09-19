@@ -1,8 +1,18 @@
 import React from "react";
 
-import { NotionContainerProps } from "@types";
+import { PageBlock, CollectionViewPageBlock } from "@types";
 import { useNotionContext } from "@context";
 import { cs, isUrl, getBlockIcon, getTextContent } from "@utils";
+
+interface NotionContainerProps {
+  block: PageBlock | CollectionViewPageBlock;
+  blockId: string;
+  className?: string;
+  pageCover?: React.ReactNode | string;
+  pageCoverPosition?: number;
+  footer?: React.ReactNode;
+  children: React.ReactNode;
+}
 
 export const NotionContainer = (props: NotionContainerProps) => {
   const { mapImageUrl, defaultPageIcon, recordMap, components } =

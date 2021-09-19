@@ -26,7 +26,7 @@
     "types": ["node"],
     "paths": {
       "@icons": ["icons"],
-      "@types": ["types.ts"],
+      "@types": ["types"],
       "@components": ["components"],
       "@components/*": ["components/*"],
       "@utils": ["utils.ts"],
