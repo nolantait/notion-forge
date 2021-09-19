@@ -22,7 +22,7 @@ export type CoverType =
 
 export type CollectionMap = NotionMap<Collection>;
 
-export type ViewMap = NotionMap<View>;
+export type ViewMap = NotionMap<BaseView>;
 
 export type CardCoverSize = "small" | "medium" | "large";
 
@@ -46,64 +46,68 @@ export interface BaseView {
   };
 }
 
+export type Property = {
+  property: PropertyID;
+  visible: boolean;
+}
+
 export interface TableView extends BaseView {
   type: "table";
   page_sort: ID[];
   format: {
     table_wrap: boolean;
-    table_properties: Array<{
-      property: PropertyID;
-      visible: boolean;
+    table_properties: Array<Property & {
       width: number;
     }>;
   };
 }
 
+export interface BaseCoverFormat {
+  cover: CardCover;
+  cover_size: CardCoverSize;
+  cover_aspect: CardCoverAspect;
+}
+
+
+export type BasePropertiesFormat = {
+  properties: Property[]
+}
+
+export type Prefix<T, S extends ViewType> = {
+  [K in keyof T as `${S}_${K & string}`]: T[K]
+}
+export type CoverFormat<S extends ViewType> = Prefix<BaseCoverFormat, S>
+export type PropertiesFormat<S extends ViewType> = Prefix<BasePropertiesFormat, S>
+
+export interface GeneratedView<S extends ViewType> {
+  type: S;
+  format: CoverFormat<S> & PropertiesFormat<S>
+}
+
+
 export interface GalleryView extends BaseView {
   type: "gallery";
-  format: {
-    gallery_cover: CardCover;
-
-    gallery_cover_size: CardCoverSize;
-
-    gallery_cover_aspect: CardCoverAspect;
-
-    gallery_properties: Array<{
-      property: PropertyID;
-
-      visible: boolean;
-    }>;
+  format: CoverFormat<"gallery"> & {
+    gallery_properties: Property[]
   };
 }
 
 export interface ListView extends BaseView {
   type: "list";
-  format: {
-    list_properties: Array<{
-      property: PropertyID;
-
-      visible: boolean;
-    }>;
+  format: CoverFormat<"list"> & {
+    list_properties: Property[]
   };
 }
 
 export interface CardCover {
-  type: CardCoverType;
-
+  type: CoverType;
   property?: PropertyID;
 }
 
 export interface BoardView extends BaseView {
   type: "board";
-
-  format: {
-    board_cover: CardCover;
-    board_cover_size: CardCoverSize;
-    board_cover_aspect: CardCoverAspect;
-    board_properties: Array<{
-      property: PropertyID;
-      visible: boolean;
-    }>;
+  format: CoverFormat<"board"> & {
+    board_properties: Property[];
 
     board_groups2: Array<{
       property: PropertyID;

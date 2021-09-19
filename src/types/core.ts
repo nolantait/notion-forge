@@ -1,7 +1,8 @@
-import type { Block, BaseBlock, BlockType, ExtendedRecordMap } from "./";
+import type {Block, BaseBlock, BlockType, ExtendedRecordMap} from "./";
 
-export type MapPageUrl = (
-  pageId: string,
+export type Intersection<T, U> = T extends U ? T : never;
+
+export type MapPageUrl = (pageId: string,
   recordMap: ExtendedRecordMap
 ) => string;
 export type MapImageUrl = (url: string, block: Block) => string;
@@ -61,16 +62,16 @@ export interface NotionMap<T> {
 export type UserMap = NotionMap<User>;
 
 export interface PageMap {
-  [pageId: string]: ExtendedRecordMap | null;
+  [pageId: ID]: ExtendedRecordMap | null;
 }
 
 export type Lookup<
   T,
   Key extends keyof T,
   Prop extends string
-> = Prop extends keyof T[Key] ? T[Key][Prop] : never;
+  > = Prop extends keyof T[Key] ? T[Key][Prop] : never;
 
-type BlockForType<T extends BlockType, B> = B extends { type: T } ? B : never;
+type BlockForType<T extends BlockType, B> = B extends {type: T} ? B : never;
 
 type DTO<T extends BlockType, B> = BlockForType<T, B>;
 

@@ -1,4 +1,4 @@
-import { BlockMap, Collections, UserMap, ID, PropertyType } from "./";
+import {BlockMap, Collections, UserMap, ID, PropertyType} from "./";
 // API types
 // ----------------------------------------------------------------------------
 
@@ -9,7 +9,6 @@ export interface APIError {
 }
 
 // Aggregate API types
-
 // ----------------------------------------------------------------------------
 
 export interface RecordMap {
@@ -20,7 +19,6 @@ export interface RecordMap {
 }
 
 // NOTE: This is not a native Notion type, but rather a convenience type that
-
 // extends Notion's native RecordMap with data for collection instances.
 
 export interface ExtendedRecordMap extends RecordMap {
@@ -44,7 +42,7 @@ export interface ExtendedRecordMap extends RecordMap {
 export interface PageChunk {
   recordMap: RecordMap;
   cursor: {
-    stack: any[];
+    stack: never;
   };
 }
 
@@ -58,7 +56,10 @@ export interface CollectionQueryResult {
   total: number;
   blockIds: ID[];
   aggregationResults: Array<AggregationResult>;
-  // only used for board collection views
+}
+
+export interface CollectionBoardQueryResult extends CollectionQueryResult {
+  type: 'board';
   groupResults?: Array<{
     value: AggregationResult;
     blockIds: ID[];

@@ -1,11 +1,10 @@
-import type { ConditionalKeys } from "type-fest";
-import type { ID, Role, NotionMap } from "./";
+import type {Intersection, ID, Role, NotionMap} from "./";
 import type * as Format from "./blocks/formats";
 import type * as Properties from "./blocks/properties";
 
 export type BlockMap = NotionMap<Any>;
 
-type BlockType =
+export type BlockType =
   | "page"
   | "text"
   | "bookmark"
@@ -85,11 +84,8 @@ export type Any =
   | SyncPointer
   | Alias;
 
-type Intersection<T, U> = T extends U ? T : never;
-
 export type AnyContent = Intersection<Any, BaseContentBlock>;
 export type AnyText = Intersection<Any, BaseTextBlock>;
-
 export type AnyAsset =
   | Video
   | Image
@@ -317,6 +313,5 @@ export interface Sync extends BaseBlock {
 
 export interface SyncPointer extends BaseBlock {
   type: "transclusion_reference";
-
   format: Format.TransclusionReference;
 }
