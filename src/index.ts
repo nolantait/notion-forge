@@ -6,4 +6,4 @@ export * from "./third-party";
 export * from "./components";
 
 export { NotionRenderer } from "./renderer";
-export type { NotionRendererProps } from "@types";
+export type { NotionRendererProps } from "./types/components";

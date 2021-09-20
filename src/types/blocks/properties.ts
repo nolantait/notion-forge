@@ -1,4 +1,4 @@
-import * as Formats from "../formats";
+import { Formats, Core } from "../";
 
 export type Any =
   | Title
@@ -9,12 +9,14 @@ export type Any =
   | Language
   | Checked;
 
+type URL = string[];
+
 export type Title = {
   title: Formats.Decoration[];
 };
 
 export type Source = {
-  source: string[][];
+  source: URL[];
 };
 
 export type Caption = {
@@ -36,4 +38,8 @@ export type Language = {
 
 export type Checked = {
   checked: (["Yes"] | ["No"])[];
+};
+
+export type Identity = {
+  id: Core.PropertyID;
 };

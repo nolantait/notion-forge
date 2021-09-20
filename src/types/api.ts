@@ -1,4 +1,4 @@
-import {BlockMap, Collections, UserMap, ID, PropertyType} from "./";
+import { BlockMap, Collections, UserMap, ID, PropertyType } from "./";
 // API types
 // ----------------------------------------------------------------------------
 
@@ -59,7 +59,7 @@ export interface CollectionQueryResult {
 }
 
 export interface CollectionBoardQueryResult extends CollectionQueryResult {
-  type: 'board';
+  type: "board";
   groupResults?: Array<{
     value: AggregationResult;
     blockIds: ID[];

@@ -1,7 +1,8 @@
-export * from "./formats";
-export * from "./core";
-export * from "./blocks";
-export * from "./api";
+export * as Core from "./core";
+export * as Blocks from "./blocks";
+export * as Properties from "./properties";
+export * as Formats from "./formats";
 export * as Formulas from "./formulas";
-export * from "./properties";
 export * as Collections from "./collections";
+export * as Components from "./components";
+export * as API from "./api";

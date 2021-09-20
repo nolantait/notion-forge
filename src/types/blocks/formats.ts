@@ -1,5 +1,4 @@
-import { ID } from "../core";
-import * as Formats from "../formats";
+import { Formats, Core } from "../";
 
 export type Any =
   | Page
@@ -45,7 +44,7 @@ export type Block = {
 };
 
 export type Source = {
-  display_source: string;
+  display_source: URL;
 };
 
 export type Bookmark = {
@@ -81,8 +80,8 @@ export type DriveProperties = {
 };
 
 export type Pointer = {
-  id: ID;
-  spaceid: ID;
+  id: Core.PropertyID;
+  spaceid: Core.PropertyID;
 };
 
 export type AliasPointer = Pointer & {

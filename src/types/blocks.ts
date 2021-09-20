@@ -1,8 +1,13 @@
-import type {Intersection, ID, Role, NotionMap} from "./";
 import type * as Format from "./blocks/formats";
 import type * as Properties from "./blocks/properties";
 
-export type BlockMap = NotionMap<Any>;
+import { Core, Collections } from "./";
+
+export { Properties };
+export { Format };
+
+export type ID = Core.ID;
+export type BlockMap = Core.NotionMap<Any>;
 
 export type BlockType =
   | "page"
@@ -84,8 +89,8 @@ export type Any =
   | SyncPointer
   | Alias;
 
-export type AnyContent = Intersection<Any, BaseContentBlock>;
-export type AnyText = Intersection<Any, BaseTextBlock>;
+export type AnyContent = Core.Intersection<Any, BaseContentBlock>;
+export type AnyText = Core.Intersection<Any, BaseTextBlock>;
 export type AnyAsset =
   | Video
   | Image
@@ -104,60 +109,39 @@ export type AnyAsset =
  * Base properties shared by all blocks.
  */
 
-type ParentType = string | "space" | "block" | "table";
+type WithProperties<T> = { properties?: T };
+type WithFormat<T> = { format?: T };
+type WithContent = { content?: ID[] };
+type As<T extends BlockType> = { type: T };
+type Block<P, F> = Core.Identity &
+  Core.Creatable &
+  Core.Editable &
+  WithContent &
+  As<BlockType> &
+  WithFormat<F> &
+  WithProperties<P>;
 
-export interface BaseBlock {
-  id: ID;
-  type: BlockType;
-  properties?: Properties.Any;
-  format?: Format.Any;
-  content?: ID[];
-  space_id?: ID;
-  parent_id: ID;
-  parent_table: ParentType;
-  version: number;
-  created_time: number;
-  last_edited_time: number;
-  alive: boolean;
-  created_by_table: string;
-  created_by_id: ID;
-  last_edited_by_table: string;
-  last_edited_by_id: ID;
-}
+type BaseBlock = Block<Properties.Any, Format.Any>;
+type BaseText = Block<Properties.Title, Format.Color>;
+type BaseContent = Block<
+  Properties.Source & Properties.Caption,
+  Format.Source & Format.Block
+>;
+type BasePage = Block<
+  Properties.Title,
+  Format.Page & Format.Access & Format.Color
+> &
+  Core.Attachable & {
+    permissions: Core.Permission[];
+  };
 
-export interface BaseTextBlock extends BaseBlock {
-  // some text blocks occasionally have children
-  content?: ID[];
-  properties?: Properties.Title;
-  format?: Format.Color;
-}
+type BlockFrom<B, T> = B & { type: T };
 
-export interface BaseContentBlock extends BaseBlock {
-  properties: Properties.Source & Properties.Caption;
-  format?: Format.Source & Format.Block;
-  file_ids?: string[];
-}
+export type Page = BlockFrom<BasePage, "page">;
 
-type Permission = {
-  role: Role;
-  type: string;
-};
-
-export interface BasePageBlock extends BaseBlock {
-  properties?: Properties.Title;
-  format: Format.Page & Format.Access & Format.Color;
-  permissions: Permission[];
-  file_ids?: string[];
-}
-
-export interface Page extends BasePageBlock {
-  type: "page";
-}
-
-export interface Alias extends BaseBlock {
-  type: "alias";
+export type Alias = BlockFrom<BaseBlock, "alias"> & {
   format: Format.Alias;
-}
+};
 
 export interface Bookmark extends BaseBlock {
   type: "bookmark";
@@ -278,6 +262,7 @@ export interface Pdf extends BaseContentBlock {
 export interface Audio extends BaseContentBlock {
   type: "audio";
 }
+
 export interface File extends BaseBlock {
   type: "file";
   properties: Properties.FileSize & Properties.Title & Properties.Source;
@@ -297,14 +282,14 @@ export interface Code extends BaseBlock {
 
 export interface CollectionView extends BaseContentBlock {
   type: "collection_view";
-  collection_id: ID;
-  view_ids: ID[];
+  collection_id: Collections.ID;
+  view_ids: Collections.ViewID[];
 }
 
 export interface CollectionViewPage extends BasePageBlock {
   type: "collection_view_page";
-  collection_id: ID;
-  view_ids: ID[];
+  collection_id: Collections.ID;
+  view_ids: Collections.ViewID[];
 }
 
 export interface Sync extends BaseBlock {

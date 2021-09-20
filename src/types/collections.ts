@@ -1,143 +1,71 @@
-import {
-  ID,
-  Decoration,
-  Color,
-  NumberFormat,
-  PropertyID,
-  PropertyType,
-  Formulas,
-  NotionMap,
-} from "./";
+import { Core, Formats, Formulas } from "./";
+
+import * as Card from "./collections/cards";
+import * as Properties from "./collections/properties";
+import * as Query from "./collections/queries";
+
+export { Properties };
+export { Card };
+
+export type ID = Core.ID;
+export type ViewID = Core.ID;
 
 /** Types of collection views supported by Notion */
 
 export type ViewType = "table" | "gallery" | "list" | "board" | "calendar";
 
-export type CoverType =
-  | "page_cover"
-  | "page_content"
-  | "property"
-  | "none"
-  | "file";
+export type CollectionMap = Core.NotionMap<Collection>;
 
-export type CollectionMap = NotionMap<Collection>;
+export type ViewMap = Core.NotionMap<View>;
 
-export type ViewMap = NotionMap<BaseView>;
-
-export type CardCoverSize = "small" | "medium" | "large";
-
-export type CardCoverAspect = "cover" | "contain";
-
-export interface BaseView {
-  id: ID;
+export type View = Core.Identity & {
   type: ViewType;
   name: string;
-  format: any;
-  version: number;
-  alive: boolean;
-  parent_id: ID;
-  parent_table: string;
-  query?: any;
-  query2: {
-    // TODO
-    filter?: any;
-    aggregations?: object[];
-    group_by: PropertyID;
-  };
-}
+  format: unknown;
+  query?: unknown;
+  query2: Query.ViewQuery;
+};
 
-export type Property = {
-  property: PropertyID;
-  visible: boolean;
-}
+type GalleryView = ViewTemplates["gallery"];
 
-export interface TableView extends BaseView {
-  type: "table";
+type ListView = ViewTemplates["list"];
+
+type CalendarView = ViewTemplates["calendar"];
+
+type TableView = ViewTemplates["table"] & {
   page_sort: ID[];
   format: {
     table_wrap: boolean;
-    table_properties: Array<Property & {
-      width: number;
-    }>;
+    table_properties: Properties.Identity & Properties.Width;
   };
-}
+};
 
-export interface BaseCoverFormat {
-  cover: CardCover;
-  cover_size: CardCoverSize;
-  cover_aspect: CardCoverAspect;
-}
+type BoardGroupValue = {
+  type: Core.PropertyType;
+  value: string;
+  // TODO: needs testing for more cases
+};
 
+type BoardGroup = {
+  value: BoardGroupValue;
+} & Properties.Identity &
+  Properties.Hidden;
 
-export type BasePropertiesFormat = {
-  properties: Property[]
-}
+type BoardColumn = {
+  property: Core.PropertyID;
+  hidden: boolean;
+  value: BoardGroupValue;
+};
 
-export type Prefix<T, S extends ViewType> = {
-  [K in keyof T as `${S}_${K & string}`]: T[K]
-}
-export type CoverFormat<S extends ViewType> = Prefix<BaseCoverFormat, S>
-export type PropertiesFormat<S extends ViewType> = Prefix<BasePropertiesFormat, S>
-
-export interface GeneratedView<S extends ViewType> {
-  type: S;
-  format: CoverFormat<S> & PropertiesFormat<S>
-}
-
-
-export interface GalleryView extends BaseView {
-  type: "gallery";
-  format: CoverFormat<"gallery"> & {
-    gallery_properties: Property[]
+type BoardView = ViewTemplates["board"] & {
+  format: {
+    board_properties: Properties.Default[];
+    board_groups2: BoardGroup[];
+    board_columns: BoardColumn[];
   };
-}
+};
 
-export interface ListView extends BaseView {
-  type: "list";
-  format: CoverFormat<"list"> & {
-    list_properties: Property[]
-  };
-}
-
-export interface CardCover {
-  type: CoverType;
-  property?: PropertyID;
-}
-
-export interface BoardView extends BaseView {
-  type: "board";
-  format: CoverFormat<"board"> & {
-    board_properties: Property[];
-
-    board_groups2: Array<{
-      property: PropertyID;
-      hidden: boolean;
-      value: {
-        type: PropertyType;
-        value: string;
-        // TODO: needs testing for more cases
-      };
-    }>;
-
-    board_columns: Array<{
-      property: PropertyID;
-      hidden: boolean;
-      value: {
-        type: PropertyType;
-        value: string;
-        // TODO: needs testing for more cases
-      };
-    }>;
-  };
-}
-
-export interface CalendarView extends BaseView {
-  type: "calendar";
-
-  // TODO
-}
-
-export type View =
+export type AnyView =
   | TableView
   | GalleryView
   | ListView
@@ -146,41 +74,56 @@ export type View =
 
 export interface SelectOption {
   id: ID;
-  color: Color;
+  color: Formats.Color;
   value: string;
 }
 
-export interface PropertySchema {
+export type PropertySchema = {
   name: string;
-  type: PropertyType;
+  type: Core.PropertyType;
   options?: SelectOption[];
-  number_format?: NumberFormat;
+  number_format?: Formats.NumberFormat;
   formula?: Formulas.Formula;
-}
+};
 
-export interface PropertySchemaMap {
+export type PropertySchemaMap = {
   [key: string]: PropertySchema;
-}
+};
 
-export interface Collection {
-  id: ID;
-  version: number;
-  name: Decoration[];
+export type Collection = Core.Identity & {
+  name: Formats.Decoration[];
   schema: PropertySchemaMap;
   icon: string;
-  parent_id: ID;
-  parent_table: string;
-  alive: boolean;
-  copied_from: string;
-  template_pages?: Array<ID>;
+  copied_from: ID;
+  template_pages?: ID[];
   format?: {
-    collection_page_properties?: Array<{
-      property: PropertyID;
-      visible: boolean;
-    }>;
-    property_visibility?: Array<{
-      property: PropertyID;
-      visibility: "show" | "hide";
-    }>;
+    collection_page_properties?: Properties.Default[];
+    property_visibility?: Properties.Identity & Properties.Visible[];
   };
-}
+};
+
+// Generics
+type PropertiesTemplate = {
+  properties: Properties.Default[];
+};
+
+export type Prefix<T, S extends ViewType> = {
+  [K in keyof T as `${S}_${string & K}`]: T[K];
+};
+export type GenerateCoverFormat<S extends ViewType> = Prefix<
+  Card.CoverFormatTemplate,
+  S
+>;
+export type GeneratePropertiesFormat<S extends ViewType> = Prefix<
+  PropertiesTemplate,
+  S
+>;
+
+type GenerateView<S extends ViewType> = View & {
+  type: S;
+  format: GenerateCoverFormat<S> & GeneratePropertiesFormat<S>;
+};
+
+type ViewTemplates = {
+  [Key in ViewType]: GenerateView<Key>;
+};
