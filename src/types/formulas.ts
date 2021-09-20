@@ -1,4 +1,4 @@
-import { PropertyID } from "./";
+import type { Core } from "./";
 
 // @see https://www.notion.vip/formulas/
 
@@ -97,40 +97,47 @@ type FunctionType =
   | "timestamp"
   | "year";
 
-interface BaseFormula {
-  type: FormulaType;
+type FormulaWith<T, U> = U & {
+  type: T;
   result_type: ResultType;
-}
+};
 
-interface ConstantFormula extends BaseFormula {
-  type: "constant";
-  value: any; // TODO
-  value_type: ValueType;
-}
+type ConstantFormula = FormulaWith<
+  "constant",
+  { value_type: ValueType; value: unknown }
+>;
 
-interface PropertyFormula extends BaseFormula {
-  type: "property";
-  id: PropertyID;
-  name: string;
-}
+type PropertyFormula = FormulaWith<
+  "property",
+  {
+    id: Core.PropertyID;
+    name: string;
+  }
+>;
 
-interface SymbolFormula extends BaseFormula {
-  type: "symbol";
-  name: string;
-}
+type SymbolFormula = FormulaWith<
+  "symbol",
+  {
+    name: string;
+  }
+>;
 
-interface FunctionFormula extends BaseFormula {
-  type: "function";
-  name: FunctionType;
-  args: Array<Formula>;
-}
+type FunctionFormula = FormulaWith<
+  "function",
+  {
+    name: FunctionType;
+    args: Formula[];
+  }
+>;
 
-interface OperatorFormula extends BaseFormula {
-  type: "operator";
-  operator: OperatorType;
-  name: FunctionType;
-  args: Array<Formula>;
-}
+type OperatorFormula = FormulaWith<
+  "operator",
+  {
+    operator: OperatorType;
+    name: FunctionType;
+    args: Formula[];
+  }
+>;
 
 export type Formula =
   | FunctionFormula

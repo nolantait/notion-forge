@@ -1,8 +1,9 @@
-export * as Core from "./core";
-export * as Blocks from "./blocks";
-export * as Properties from "./properties";
-export * as Formats from "./formats";
-export * as Formulas from "./formulas";
-export * as Collections from "./collections";
-export * as Components from "./components";
-export * as API from "./api";
+import type * as Core from "./core";
+import type * as Blocks from "./blocks";
+import type * as Formats from "./formats";
+import type * as Formulas from "./formulas";
+import type * as Collections from "./collections";
+import type * as Components from "./components";
+import type * as API from "./api";
+
+export type { Core, Blocks, Formats, Formulas, Collections, Components, API };

@@ -31,7 +31,7 @@ export type Access = {
 };
 
 export type Color = {
-  block_color: Formats.Color;
+  block_color?: Formats.Color;
 };
 
 export type Block = {

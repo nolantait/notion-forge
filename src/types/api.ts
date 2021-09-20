@@ -1,74 +1,81 @@
-import { BlockMap, Collections, UserMap, ID, PropertyType } from "./";
+import type { Core, Blocks, Collections } from "./";
+
+export type ErrorID = Core.ID;
+
 // API types
 // ----------------------------------------------------------------------------
 
-export interface APIError {
-  errorId: string;
+export type APIError = {
+  errorId: ErrorID;
   name: string;
   message: string;
-}
+};
 
 // Aggregate API types
 // ----------------------------------------------------------------------------
 
-export interface RecordMap {
-  block: BlockMap;
+export type RecordMap = {
+  block: Blocks.BlockMap;
   collection?: Collections.CollectionMap;
   collection_view?: Collections.ViewMap;
-  notion_user?: UserMap;
-}
+  notion_user?: Core.UserMap;
+};
 
 // NOTE: This is not a native Notion type, but rather a convenience type that
 // extends Notion's native RecordMap with data for collection instances.
 
-export interface ExtendedRecordMap extends RecordMap {
+type CollectionQuery = {
+  [collectionId: string]: {
+    [collectionViewId: string]: CollectionQueryResult;
+  };
+};
+
+type SignedUrlMap = {
+  [blockId: Blocks.ID]: Core.URL;
+};
+
+export type ExtendedRecordMap = RecordMap & {
   collection: Collections.CollectionMap;
   collection_view: Collections.ViewMap;
-  notion_user: UserMap;
-
+  notion_user: Core.UserMap;
   // added for convenience
-  collection_query: {
-    [collectionId: string]: {
-      [collectionViewId: string]: CollectionQueryResult;
-    };
-  };
-
+  collection_query: CollectionQuery;
   // added for convenience
-  signed_urls: {
-    [blockId: string]: string;
-  };
-}
+  signed_urls: SignedUrlMap;
+};
 
-export interface PageChunk {
+export type PageChunk = {
   recordMap: RecordMap;
   cursor: {
     stack: never;
   };
-}
+};
 
-export interface CollectionInstance {
+export type CollectionInstance = {
   recordMap: RecordMap;
   result: CollectionQueryResult;
-}
+};
 
-export interface CollectionQueryResult {
+export type CollectionQueryResult = {
   type: Collections.ViewType;
   total: number;
-  blockIds: ID[];
+  blockIds: Blocks.ID[];
   aggregationResults: Array<AggregationResult>;
-}
+};
 
-export interface CollectionBoardQueryResult extends CollectionQueryResult {
+type GroupResult = {
+  value: AggregationResult;
+  blockIds: Blocks.ID[];
+  total: number;
+  aggregationResult: AggregationResult;
+};
+
+export type CollectionBoardQueryResult = CollectionQueryResult & {
   type: "board";
-  groupResults?: Array<{
-    value: AggregationResult;
-    blockIds: ID[];
-    total: number;
-    aggregationResult: AggregationResult;
-  }>;
-}
+  groupResults: GroupResult[];
+};
 
 export interface AggregationResult {
-  type: PropertyType;
-  value: any;
+  type: Core.PropertyType;
+  value: unknown;
 }

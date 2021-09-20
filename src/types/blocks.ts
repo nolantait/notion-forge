@@ -1,10 +1,10 @@
 import type * as Format from "./blocks/formats";
 import type * as Properties from "./blocks/properties";
 
-import { Core, Collections } from "./";
+import type { Core, Collections } from "./";
 
-export { Properties };
-export { Format };
+export type { Properties };
+export type { Format };
 
 export type ID = Core.ID;
 export type BlockMap = Core.NotionMap<Any>;
@@ -89,8 +89,8 @@ export type Any =
   | SyncPointer
   | Alias;
 
-export type AnyContent = Core.Intersection<Any, BaseContentBlock>;
-export type AnyText = Core.Intersection<Any, BaseTextBlock>;
+export type AnyContent = Core.Intersection<Any, BaseContent>;
+export type AnyText = Core.Intersection<Any, BaseText>;
 export type AnyAsset =
   | Video
   | Image
@@ -113,9 +113,8 @@ type WithProperties<T> = { properties?: T };
 type WithFormat<T> = { format?: T };
 type WithContent = { content?: ID[] };
 type As<T extends BlockType> = { type: T };
-type Block<P, F> = Core.Identity &
-  Core.Creatable &
-  Core.Editable &
+type Recordable = Core.Identity & Core.Creatable & Core.Editable;
+type Block<P, F> = Recordable &
   WithContent &
   As<BlockType> &
   WithFormat<F> &
@@ -135,168 +134,118 @@ type BasePage = Block<
     permissions: Core.Permission[];
   };
 
-type BlockFrom<B, T> = B & { type: T };
+type Empty = Record<string, unknown>;
+type Templates = BaseText | BaseContent | BasePage | BaseBlock;
+type BlockFrom<B extends Templates, T extends BlockType, U = Empty> = B & {
+  type: T;
+} & U;
 
 export type Page = BlockFrom<BasePage, "page">;
 
-export type Alias = BlockFrom<BaseBlock, "alias"> & {
-  format: Format.Alias;
-};
+export type Alias = BlockFrom<
+  BaseBlock,
+  "alias",
+  {
+    format: Format.Alias;
+  }
+>;
 
-export interface Bookmark extends BaseBlock {
-  type: "bookmark";
-  properties: Properties.Link & Properties.Title;
-  format: Format.Color & Format.Bookmark;
-}
+export type Bookmark = BlockFrom<
+  BaseText,
+  "bookmark",
+  {
+    properties: Properties.Link & Properties.Title;
+    format: Format.Color & Format.Bookmark;
+  }
+>;
 
-export interface Text extends BaseTextBlock {
-  type: "text";
-}
+export type Text = BlockFrom<BaseText, "text">;
+export type BulletedList = BlockFrom<BaseText, "bulleted_list">;
+export type NumberedList = BlockFrom<BaseText, "numbered_list">;
+export type Header = BlockFrom<BaseText, "header">;
+export type SubHeader = BlockFrom<BaseText, "sub_header">;
+export type SubSubHeader = BlockFrom<BaseText, "sub_sub_header">;
+export type Quote = BlockFrom<BaseText, "quote">;
+export type Equation = BlockFrom<BaseText, "equation">;
+export type Todo = BlockFrom<
+  BaseText,
+  "to_do",
+  { properties: Properties.Checked }
+>;
+export type TableOfContents = BlockFrom<BaseText, "table_of_contents">;
+export type Divider = BlockFrom<BaseBlock, "divider">;
+export type ColumnList = BlockFrom<BaseBlock, "column_list">;
 
-export interface BulletedList extends BaseTextBlock {
-  type: "bulleted_list";
-}
+export type Column = BlockFrom<BaseBlock, "column", { format: Format.Column }>;
 
-export interface NumberedList extends BaseTextBlock {
-  type: "numbered_list";
-}
+export type Callout = BlockFrom<
+  BaseBlock,
+  "callout",
+  {
+    format: Format.Icon & Format.Color;
+    properties: Properties.Title;
+  }
+>;
 
-export interface Header extends BaseTextBlock {
-  type: "header";
-}
+export type Toggle = BlockFrom<
+  BaseBlock,
+  "toggle",
+  { properties: Properties.Title }
+>;
 
-export interface SubHeader extends BaseTextBlock {
-  type: "sub_header";
-}
+export type Image = BlockFrom<BaseContent, "image">;
+export type Embed = BlockFrom<BaseContent, "embed">;
+export type Gist = BlockFrom<BaseContent, "gist">;
+export type Video = BlockFrom<BaseContent, "video">;
+export type Figma = BlockFrom<BaseContent, "figma">;
+export type Typeform = BlockFrom<BaseContent, "typeform">;
+export type Codepen = BlockFrom<BaseContent, "codepen">;
+export type Excalidraw = BlockFrom<BaseContent, "excalidraw">;
+export type Tweet = BlockFrom<BaseContent, "tweet">;
+export type Maps = BlockFrom<BaseContent, "maps">;
+export type Pdf = BlockFrom<BaseContent, "pdf">;
+export type Audio = BlockFrom<BaseContent, "audio">;
 
-export interface SubSubHeader extends BaseTextBlock {
-  type: "sub_sub_header";
-}
+export type File = Core.Attachable &
+  BlockFrom<
+    BaseBlock,
+    "file",
+    { properties: Properties.FileSize & Properties.Title & Properties.Source }
+  >;
 
-export interface Quote extends BaseTextBlock {
-  type: "quote";
-}
+export type GoogleDrive = Core.Attachable &
+  BlockFrom<BaseContent, "drive", { format: Format.Block & Format.Drive }>;
 
-export interface Equation extends BaseTextBlock {
-  type: "equation";
-}
+export type Code = BlockFrom<
+  BaseBlock,
+  "code",
+  { properties: Properties.Caption & Properties.Title & Properties.Language }
+>;
 
-export interface Todo extends BaseTextBlock {
-  type: "to_do";
-  properties: Properties.Checked & Properties.Title;
-}
+export type CollectionView = BlockFrom<
+  BaseContent,
+  "collection_view",
+  {
+    collection_id: Collections.ID;
+    view_ids: Collections.ViewID[];
+  }
+>;
 
-export interface TableOfContents extends BaseBlock {
-  type: "table_of_contents";
-  format?: Format.Color;
-}
+export type CollectionViewPage = BlockFrom<
+  BasePage,
+  "collection_view_page",
+  {
+    collection_id: Collections.ID;
+    view_ids: Collections.ViewID[];
+  }
+>;
 
-export interface Divider extends BaseBlock {
-  type: "divider";
-}
+export type Sync = BlockFrom<BaseBlock, "transclusion_container">;
 
-export interface ColumnList extends BaseBlock {
-  type: "column_list";
-}
-
-export interface Column extends BaseBlock {
-  type: "column";
-  format: Format.Column;
-}
-
-export interface Callout extends BaseBlock {
-  type: "callout";
-  format: Format.Icon & Format.Color;
-  properties: Properties.Title;
-}
-
-export interface Toggle extends BaseBlock {
-  type: "toggle";
-  properties: Properties.Title;
-}
-
-export interface Image extends BaseContentBlock {
-  type: "image";
-}
-
-export interface Embed extends BaseContentBlock {
-  type: "embed";
-}
-
-export interface Gist extends BaseContentBlock {
-  type: "gist";
-}
-
-export interface Video extends BaseContentBlock {
-  type: "video";
-}
-
-export interface Figma extends BaseContentBlock {
-  type: "figma";
-}
-
-export interface Typeform extends BaseContentBlock {
-  type: "typeform";
-}
-
-export interface Codepen extends BaseContentBlock {
-  type: "codepen";
-}
-
-export interface Excalidraw extends BaseContentBlock {
-  type: "excalidraw";
-}
-
-export interface Tweet extends BaseContentBlock {
-  type: "tweet";
-}
-
-export interface Maps extends BaseContentBlock {
-  type: "maps";
-}
-
-export interface Pdf extends BaseContentBlock {
-  type: "pdf";
-}
-
-export interface Audio extends BaseContentBlock {
-  type: "audio";
-}
-
-export interface File extends BaseBlock {
-  type: "file";
-  properties: Properties.FileSize & Properties.Title & Properties.Source;
-  file_ids?: string[];
-}
-
-export interface GoogleDrive extends BaseContentBlock {
-  type: "drive";
-  format: Format.Block & Format.Drive;
-  file_ids?: string[];
-}
-
-export interface Code extends BaseBlock {
-  type: "code";
-  properties: Properties.Caption & Properties.Title & Properties.Language;
-}
-
-export interface CollectionView extends BaseContentBlock {
-  type: "collection_view";
-  collection_id: Collections.ID;
-  view_ids: Collections.ViewID[];
-}
-
-export interface CollectionViewPage extends BasePageBlock {
-  type: "collection_view_page";
-  collection_id: Collections.ID;
-  view_ids: Collections.ViewID[];
-}
-
-export interface Sync extends BaseBlock {
-  type: "transclusion_container";
-}
-
-export interface SyncPointer extends BaseBlock {
-  type: "transclusion_reference";
-  format: Format.TransclusionReference;
-}
+export type SyncPointer = BlockFrom<
+  BaseBlock,
+  "transclusion_reference",
+  {
+    format: Format.TransclusionReference;
+  }
+>;

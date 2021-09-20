@@ -59,12 +59,12 @@ export type ExternalLinkFormat = ["‣", [string, string]];
 
 export type DateFormat = ["d", FormattedDate];
 
-export interface FormattedDate {
+export type FormattedDate = {
   type: "date" | "daterange";
   start_date: string;
   end_date?: string;
   date_format?: string;
-}
+};
 
 export type SubDecoration =
   | BoldFormat

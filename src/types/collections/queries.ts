@@ -1,26 +1,25 @@
-import * as Properties from "./properties";
-import { ViewType } from "../collections";
-import { ID } from "../";
+import type { Core, Collections } from "../";
+import type { Identity } from "./properties";
 
 type SortDirection = "ascending" | "descending";
 
-type Sort = Properties.Identity & {
+type Sort = Identity & {
   direction: SortDirection;
 };
 
 type AggregationType = "count";
 
-type AggregateID = ID;
+type AggregateID = Core.PropertyID;
 
-type Aggregate = Properties.Identity & {
+type Aggregate = Identity & {
   type: AggregateID;
   aggregation_type: AggregationType;
-  property: Properties.ID;
-  view_type: ViewType;
+  property: Core.PropertyID;
+  view_type: Collections.ViewType;
 };
 
 type Aggregation = {
-  property: Properties.ID;
+  property: Core.PropertyID;
   aggregator: AggregateID;
 };
 
@@ -28,6 +27,6 @@ export type ViewQuery = {
   filter?: unknown;
   aggregate?: Aggregate;
   aggregations?: Aggregation[];
-  group_by?: Properties.ID;
+  group_by?: Core.PropertyID;
   sort?: Sort[];
 };

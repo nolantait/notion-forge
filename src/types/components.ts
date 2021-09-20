@@ -1,4 +1,4 @@
-import { Core, API, Collections, Formats, Blocks } from "./";
+import type { Core, API, Collections, Formats, Blocks } from "./";
 
 import type { ImgProps } from "react-image";
 
