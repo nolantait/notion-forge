@@ -14,27 +14,25 @@ export type APIError = {
 // Aggregate API types
 // ----------------------------------------------------------------------------
 
-export type RecordMap = {
+export interface RecordMap {
   block: Blocks.BlockMap;
   collection?: Collections.CollectionMap;
   collection_view?: Collections.ViewMap;
   notion_user?: Core.UserMap;
-};
+}
 
 // NOTE: This is not a native Notion type, but rather a convenience type that
 // extends Notion's native RecordMap with data for collection instances.
 
-type CollectionQuery = {
-  [collectionId: string]: {
-    [collectionViewId: string]: CollectionQueryResult;
-  };
+type CollectionViewMap = {
+  [collectionViewId: Collections.ViewID]: CollectionQueryResult;
 };
-
+type CollectionQuery = { [collectionId: Collections.ID]: CollectionViewMap };
 type SignedUrlMap = {
   [blockId: Blocks.ID]: Core.URL;
 };
 
-export type ExtendedRecordMap = RecordMap & {
+export interface ExtendedRecordMap extends RecordMap {
   collection: Collections.CollectionMap;
   collection_view: Collections.ViewMap;
   notion_user: Core.UserMap;
@@ -42,7 +40,7 @@ export type ExtendedRecordMap = RecordMap & {
   collection_query: CollectionQuery;
   // added for convenience
   signed_urls: SignedUrlMap;
-};
+}
 
 export type PageChunk = {
   recordMap: RecordMap;
@@ -56,12 +54,16 @@ export type CollectionInstance = {
   result: CollectionQueryResult;
 };
 
-export type CollectionQueryResult = {
+export type CollectionQueryResult =
+  | BaseCollectionQueryResult
+  | BoardCollectionQueryResult;
+
+export interface BaseCollectionQueryResult {
   type: Collections.ViewType;
   total: number;
   blockIds: Blocks.ID[];
-  aggregationResults: Array<AggregationResult>;
-};
+  aggregationResults: AggregationResult[];
+}
 
 type GroupResult = {
   value: AggregationResult;
@@ -70,10 +72,10 @@ type GroupResult = {
   aggregationResult: AggregationResult;
 };
 
-export type CollectionBoardQueryResult = CollectionQueryResult & {
+export interface BoardCollectionQueryResult extends BaseCollectionQueryResult {
   type: "board";
   groupResults: GroupResult[];
-};
+}
 
 export interface AggregationResult {
   type: Core.PropertyType;

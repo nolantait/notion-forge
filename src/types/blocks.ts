@@ -140,25 +140,26 @@ type BlockFrom<B extends Templates, T extends BlockType, U = Empty> = B & {
   type: T;
 } & U;
 
+// Page Blocks
 export type Page = BlockFrom<BasePage, "page">;
-
-export type Alias = BlockFrom<
-  BaseBlock,
-  "alias",
+export type CollectionView = BlockFrom<
+  BaseContent,
+  "collection_view",
   {
-    format: Format.Alias;
+    collection_id: Collections.ID;
+    view_ids: Collections.ViewID[];
+  }
+>;
+export type CollectionViewPage = BlockFrom<
+  BasePage,
+  "collection_view_page",
+  {
+    collection_id: Collections.ID;
+    view_ids: Collections.ViewID[];
   }
 >;
 
-export type Bookmark = BlockFrom<
-  BaseText,
-  "bookmark",
-  {
-    properties: Properties.Link & Properties.Title;
-    format: Format.Color & Format.Bookmark;
-  }
->;
-
+// Text Blocks
 export type Text = BlockFrom<BaseText, "text">;
 export type BulletedList = BlockFrom<BaseText, "bulleted_list">;
 export type NumberedList = BlockFrom<BaseText, "numbered_list">;
@@ -167,32 +168,44 @@ export type SubHeader = BlockFrom<BaseText, "sub_header">;
 export type SubSubHeader = BlockFrom<BaseText, "sub_sub_header">;
 export type Quote = BlockFrom<BaseText, "quote">;
 export type Equation = BlockFrom<BaseText, "equation">;
+export type TableOfContents = BlockFrom<BaseText, "table_of_contents">;
 export type Todo = BlockFrom<
   BaseText,
   "to_do",
   { properties: Properties.Checked }
 >;
-export type TableOfContents = BlockFrom<BaseText, "table_of_contents">;
-export type Divider = BlockFrom<BaseBlock, "divider">;
-export type ColumnList = BlockFrom<BaseBlock, "column_list">;
-
-export type Column = BlockFrom<BaseBlock, "column", { format: Format.Column }>;
-
-export type Callout = BlockFrom<
-  BaseBlock,
-  "callout",
+export type Bookmark = BlockFrom<
+  BaseText,
+  "bookmark",
   {
-    format: Format.Icon & Format.Color;
-    properties: Properties.Title;
+    properties: Properties.Link & Properties.Title;
+    format: Format.Color & Format.Bookmark;
   }
 >;
-
+export type Callout = BlockFrom<
+  BaseText,
+  "callout",
+  {
+    format: Format.Icon;
+  }
+>;
 export type Toggle = BlockFrom<
-  BaseBlock,
+  BaseText,
   "toggle",
   { properties: Properties.Title }
 >;
+export type Code = BlockFrom<
+  BaseText,
+  "code",
+  { properties: Properties.Caption & Properties.Title & Properties.Language }
+>;
 
+// Misc Blocks
+export type Divider = BlockFrom<BaseBlock, "divider">;
+export type ColumnList = BlockFrom<BaseBlock, "column_list">;
+export type Column = BlockFrom<BaseBlock, "column", { format: Format.Column }>;
+
+// Asset Blocks
 export type Image = BlockFrom<BaseContent, "image">;
 export type Embed = BlockFrom<BaseContent, "embed">;
 export type Gist = BlockFrom<BaseContent, "gist">;
@@ -205,47 +218,30 @@ export type Tweet = BlockFrom<BaseContent, "tweet">;
 export type Maps = BlockFrom<BaseContent, "maps">;
 export type Pdf = BlockFrom<BaseContent, "pdf">;
 export type Audio = BlockFrom<BaseContent, "audio">;
-
-export type File = Core.Attachable &
-  BlockFrom<
-    BaseBlock,
-    "file",
-    { properties: Properties.FileSize & Properties.Title & Properties.Source }
-  >;
-
-export type GoogleDrive = Core.Attachable &
-  BlockFrom<BaseContent, "drive", { format: Format.Block & Format.Drive }>;
-
-export type Code = BlockFrom<
-  BaseBlock,
-  "code",
-  { properties: Properties.Caption & Properties.Title & Properties.Language }
+export type File = BlockFrom<
+  BaseBlock & Core.Attachable,
+  "file",
+  { properties: Properties.FileSize & Properties.Title & Properties.Source }
+>;
+export type GoogleDrive = BlockFrom<
+  BaseContent & Core.Attachable,
+  "drive",
+  { format: Format.Block & Format.Drive }
 >;
 
-export type CollectionView = BlockFrom<
-  BaseContent,
-  "collection_view",
-  {
-    collection_id: Collections.ID;
-    view_ids: Collections.ViewID[];
-  }
->;
-
-export type CollectionViewPage = BlockFrom<
-  BasePage,
-  "collection_view_page",
-  {
-    collection_id: Collections.ID;
-    view_ids: Collections.ViewID[];
-  }
->;
-
+// Sync Blocks
 export type Sync = BlockFrom<BaseBlock, "transclusion_container">;
-
 export type SyncPointer = BlockFrom<
   BaseBlock,
   "transclusion_reference",
   {
     format: Format.TransclusionReference;
+  }
+>;
+export type Alias = BlockFrom<
+  BaseBlock,
+  "alias",
+  {
+    format: Format.Alias;
   }
 >;
