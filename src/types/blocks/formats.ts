@@ -44,7 +44,7 @@ export type Block = {
 };
 
 export type Source = {
-  display_source: URL;
+  display_source: string;
 };
 
 export type Bookmark = {

@@ -2,6 +2,7 @@
   "compilerOptions": {
     "noErrorTruncation": true,
     "allowSyntheticDefaultImports": true,
+    "target": "es5",
     "baseUrl": "src",
     "declaration": true,
     "esModuleInterop": true,
@@ -28,6 +29,7 @@
     "paths": {
       "@icons": ["icons"],
       "@types": ["types"],
+      "@types/*": ["types/*"],
       "@components": ["components"],
       "@components/*": ["components/*"],
       "@utils": ["utils.ts"],

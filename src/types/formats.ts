@@ -1,6 +1,7 @@
 /** Block colors supported by Notion */
 
 export type Color =
+  | "transparent"
   | "gray"
   | "brown"
   | "orange"
