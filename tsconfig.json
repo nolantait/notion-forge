@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "noErrorTruncation": true,
     "allowSyntheticDefaultImports": true,
     "baseUrl": "src",
     "declaration": true,
