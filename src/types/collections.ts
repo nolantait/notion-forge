@@ -4,7 +4,7 @@ import type * as Card from "./collections/cards";
 import type * as Properties from "./collections/properties";
 import type * as Query from "./collections/queries";
 
-import type { Merge } from "type-fest";
+import { Collections, Utils } from "@types";
 
 export type { Properties };
 export type { Card };
@@ -53,23 +53,6 @@ export type BoardView = ViewTemplate<"board"> & {
   };
 };
 
-type BoardGroupValue = {
-  type: Core.PropertyType;
-  value: string;
-  // TODO: needs testing for more cases
-};
-
-type BoardGroup = {
-  value: BoardGroupValue;
-} & Properties.Identity &
-  Properties.Hidden;
-
-type BoardColumn = {
-  property: Core.PropertyID;
-  hidden: boolean;
-  value: BoardGroupValue;
-};
-
 export interface SelectOption {
   id: Core.PropertyID;
   color: Formats.Color;
@@ -100,20 +83,40 @@ export type Collection = Core.Identity & {
   };
 };
 
+type BoardGroupValue = {
+  type: Core.PropertyType;
+  value: string;
+  // TODO: needs testing for more cases
+};
+
+type BoardGroup = {
+  value: BoardGroupValue;
+} & Properties.Identity &
+  Properties.Hidden;
+
+type BoardColumn = {
+  property: Core.PropertyID;
+  hidden: boolean;
+  value: BoardGroupValue;
+};
+
 // Generics
-type PropertiesTemplate = {
-  properties: Properties.Default[];
-};
-type Prefix<T, S extends ViewType> = {
-  [K in keyof T as `${S}_${string & K}`]: T[K];
-};
-type Cover<S extends ViewType> = Prefix<Card.CoverFormatTemplate, S>;
-type GenerateProperties<S extends ViewType> = Prefix<PropertiesTemplate, S>;
-type GenerateFormat<S extends ViewType> = GenerateProperties<S> & Cover<S>;
-type ViewTemplate<S extends ViewType> = Merge<
+type ViewTemplate<T extends ViewType> = Utils.Merge<
   View,
   {
-    type: S;
-    format: GenerateFormat<S>;
+    type: T;
+    format: TFormat<T>;
   }
 >;
+
+// Private Generics
+type TFormat<T extends ViewType> = Utils.Prefix<TCoverFormat, T> &
+  Utils.Prefix<TProperties, T>;
+type TCoverFormat = {
+  cover: Collections.Card.Cover;
+  cover_size: Collections.Card.CoverSize;
+  cover_aspect: Collections.Card.CoverAspect;
+};
+type TProperties = {
+  properties: Properties.Default[];
+};

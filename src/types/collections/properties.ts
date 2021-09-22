@@ -1,6 +1,6 @@
-import { PropertyID } from "../";
+import { Core } from "../";
 
-export type ID = PropertyID;
+export type ID = Core.PropertyID;
 
 export type Visible = {
   visible: boolean;

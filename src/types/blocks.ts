@@ -1,9 +1,7 @@
 import type * as Format from "./blocks/formats";
 import type * as Properties from "./blocks/properties";
 
-import type { Core, Collections } from "./";
-
-import type { Merge, Simplify } from "type-fest";
+import type { Utils, Core, Collections } from "./";
 
 export type { Properties };
 export type { Format };
@@ -14,7 +12,8 @@ export type BlockType =
   | PageTypes
   | TextTypes
   | ContentTypes
-  | BaseTypes
+  | PointerTypes
+  | PositionTypes
   | CollectionViewTypes;
 export type Any =
   | Page
@@ -55,11 +54,13 @@ export type Any =
   | SyncPointer
   | Alias;
 
-type MapTypes<T> = {
+// Generate types from concrete block implementations instead of type map lookup
+// to handle overrides
+type MapOverrides<T> = {
   [Key in BlockType]: T extends { type: Key } ? T : never;
 };
 
-export type Container = MapTypes<Any>;
+export type Container = MapOverrides<Any>;
 
 // Page Blocks
 export type Page = Default["page"];
@@ -153,50 +154,32 @@ export type Alias = Override<
 /**
  * Base properties shared by all blocks.
  */
-type PageBlocks = BuildBlocks<PageTypes, PageBlock>;
-type CollectionViewBlocks = BuildBlocks<CollectionViewTypes, CollectionBlock>;
-type ContentBlocks = BuildBlocks<ContentTypes, ContentBlock>;
-type TextBlocks = BuildBlocks<TextTypes, TextBlock>;
-type BaseBlocks = BuildBlocks<BaseTypes>;
-type Default = PageBlocks &
-  ContentBlocks &
-  BaseBlocks &
-  TextBlocks &
-  CollectionViewBlocks;
-type Renderable = Core.Identity & Core.Creatable & Core.Editable;
 
-interface Block extends Renderable {
+interface TBlock extends Renderable {
   type: never;
   properties?: never;
   format?: never;
   content?: never;
 }
-interface TextBlock {
+interface TTextBlock {
   properties: Properties.Title;
   format: Format.Color;
 }
-interface ContentBlock {
+interface TContentBlock {
   properties: Properties.Source & Properties.Caption;
   format: Format.Source & Format.Block;
 }
-interface PageBlock extends Core.Attachable {
+interface TPageBlock extends Core.Attachable {
   content?: ID[];
   properties: Properties.Title;
   format: Format.Page & Format.Access & Format.Color;
   permissions: Core.Permission[];
 }
-interface CollectionBlock {
+interface TCollectionBlock {
   type: Collections.ViewType;
   name: string;
   query2: Collections.Query.ViewQuery;
 }
-
-// Type Factory
-type Build<T> = Merge<Block, T>;
-type BuildBlocks<K extends string, T = Record<string, unknown>> = {
-  [Key in K]: Merge<Build<T>, { type: Key }>;
-};
-type Override<T extends keyof Default, U> = Simplify<Default[T] & U>;
 
 type PageTypes = "page" | "collection_view_page";
 type TextTypes =
@@ -233,9 +216,22 @@ type ContentTypes =
 
 type CollectionViewTypes = "collection_view";
 
-type BaseTypes = PointerTypes | PositionTypes;
 type PointerTypes =
   | "alias"
   | "transclusion_container"
   | "transclusion_reference";
 type PositionTypes = "column" | "column_list" | "divider";
+
+// Generic Mappings
+type Default = TypeMap;
+type Override<T extends keyof Default, U> = Default[T] & U;
+type TypeMap = { [Key in PositionTypes]: MapType<TBlock, Key> } &
+  { [Key in PointerTypes]: MapType<TBlock, Key> } &
+  { [Key in CollectionViewTypes]: MapType<TCollectionBlock, Key> } &
+  { [Key in ContentTypes]: MapType<TContentBlock, Key> } &
+  { [Key in TextTypes]: MapType<TTextBlock, Key> } &
+  { [Key in PageTypes]: MapType<TPageBlock, Key> };
+
+type MapType<T, Key> = Utils.Merge<Build<T>, { type: Key }>;
+type Build<T = void> = T extends void ? TBlock : Utils.Merge<TBlock, T>;
+type Renderable = Core.Identity & Core.Creatable & Core.Editable;

@@ -17,9 +17,3 @@ export interface Cover {
   type: CoverType;
   property?: Core.PropertyID;
 }
-
-export interface CoverFormatTemplate {
-  cover: Cover;
-  cover_size: CoverSize;
-  cover_aspect: CoverAspect;
-}

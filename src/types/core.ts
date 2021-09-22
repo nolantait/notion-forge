@@ -1,7 +1,5 @@
 import type { Formats, Components, Blocks, API } from "./";
 
-export type Intersection<T, U> = T extends U ? T : never;
-
 // Base Types
 // ----------------------------------------------------------------------------
 
