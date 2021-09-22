@@ -22,9 +22,10 @@ export type ID = string;
 export type URL = string;
 export type Timestamp = number;
 export type Author = ParentType & "notion_user";
-export type ParentType = "space" | "block" | "table";
+export type ParentType = "space" | "block" | "table" | "collection";
 export type Role = "editor" | "reader" | "none" | "read_and_write";
 export type PermissionType = "user_permission";
+export type LinkProtocol = "https" | "http" | "mailto" | "tel";
 
 export type Permission = {
   role: Role;

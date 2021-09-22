@@ -1,7 +1,5 @@
-export * from "./board/view";
-export * from "./card";
-export * from "./gallery/view";
-export * from "./list/view";
-export * from "./table/column-title";
-export * from "./table/row";
-export * from "./table/view";
+export { View as BoardView } from "./board/view";
+export { View as GalleryView } from "./gallery/view";
+export { View as ListView } from "./list/view";
+export { View as TableView } from "./table/view";
+export { Cover as CardCover } from "./card/cover";

@@ -1,16 +1,23 @@
 import React from "react";
 
 import { useNotionContext } from "@context";
-import { DecoratedLinkProps } from "@types";
+import { Core, Components } from "@types";
 import { parsePageId } from "@utils";
 
+export type Props = {
+  decoration: ["a", string];
+  linkProps: React.HTMLProps<HTMLAnchorElement>;
+  linkProtocol?: Core.LinkProtocol;
+  element: React.ReactElement;
+};
+
 // ["a", external_or_relative_path]
-export const DecoratedLink = ({
+export const Decorator: Components.Presenter<Props> = ({
   decoration,
   linkProps,
   linkProtocol,
   element,
-}: DecoratedLinkProps): React.ReactElement => {
+}) => {
   const { components, mapPageUrl } = useNotionContext();
   const path = decoration[1];
   const pathname = path.substr(1);

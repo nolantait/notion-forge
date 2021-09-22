@@ -1,9 +1,8 @@
 import React from "react";
 
-import { Checkbox } from "@components";
 import { useNotionContext } from "@context";
 import { cs } from "@utils";
-import { Notion, PropertyProps, NumberPropertySchema } from "@types";
+import { Collections, Blocks, Components } from "@types";
 import {
   DateProperty,
   NumberProperty,
@@ -12,6 +11,7 @@ import {
   SelectTagProperty,
   UrlProperty,
 } from "./properties";
+import { Decorated } from "@entities";
 
 /**
  * Renders a single value of structured Notion data according to its schema.
@@ -20,36 +20,51 @@ import {
  * Property rendering is re-used across all the different types of collection views.
  */
 
-interface PropertyContentProps
-  extends Pick<PropertyProps, "block" | "schema" | "data" | "collection"> {
-  inline: boolean;
-}
+export type Props = {
+  collection: Collections.Collection;
+  data: Decorated;
+  schema?: Collections.PropertySchema;
+  inline?: boolean;
+  block?: Blocks.Any;
+};
 
-export const Property = ({
-  schema,
+export const Component: Components.Presenter<Props> = ({
   data,
+  schema,
   block,
   collection,
   inline = false,
-}: PropertyProps): React.ReactElement => {
+}) => {
+  if (!schema) return <></>;
+
+  const { type } = schema;
+  const style = cs("notion-property", `notion-property-${type}`);
+
   return (
-    <span className={`notion-property notion-property-${schema.type}`}>
+    <span className={style}>
       <PropertyContent {...{ block, schema, data, inline, collection }} />
     </span>
   );
 };
 
-const PropertyContent = ({
+type PropertyContentProps = Pick<
+  Props,
+  "block" | "data" | "collection" | "schema"
+> & {
+  inline: boolean;
+};
+
+const PropertyContent: Components.Presenter<PropertyContentProps> = ({
   block,
-  schema,
   inline,
+  schema,
   collection,
-  data = [[""]],
-}: PropertyContentProps): React.ReactElement => {
+  data = new Decorated(),
+}) => {
   const { components, mapPageUrl } = useNotionContext();
   const properties = block?.properties ?? {};
 
-  if (!block) {
+  if (!block || !schema) {
     return <components.text value={data} />;
   }
 
@@ -66,7 +81,7 @@ const PropertyContent = ({
           className={cs("notion-page-link")}
           href={mapPageUrl(block.id)}
         >
-          <components.pageTitle block={block as Notion.PageBlock} />
+          <components.pageTitle block={block} />
         </components.pageLink>
       );
     }
@@ -82,10 +97,16 @@ const PropertyContent = ({
     case "file":
       return <FileProperty data={data} block={block} />;
 
-    case "checkbox":
-      const isChecked = data && data[0][0] === "Yes";
+    case "checkbox": {
+      const isChecked = data.asString === "Yes";
 
-      return <Checkbox isChecked={isChecked ?? false} blockId={block.id} />;
+      return (
+        <components.checkbox
+          isChecked={isChecked ?? false}
+          blockId={block.id}
+        />
+      );
+    }
 
     case "url":
       return <UrlProperty block={block} data={data} inline={inline} />;
@@ -100,13 +121,7 @@ const PropertyContent = ({
 
     case "number":
       // TODO: Retype property schemas to use type inference
-      return (
-        <NumberProperty
-          schema={schema as NumberPropertySchema}
-          block={block}
-          data={data}
-        />
-      );
+      return <NumberProperty schema={schema} block={block} data={data} />;
 
     case "created_time": {
       const createdAt = block.created_time ?? Date.now();

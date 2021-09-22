@@ -10,10 +10,16 @@ export type { Format };
 
 export type ID = Core.ID;
 export type BlockMap = Core.NotionMap<Any>;
-export type BlockType = PageTypes | TextTypes | ContentTypes | BaseTypes;
+export type BlockType =
+  | PageTypes
+  | TextTypes
+  | ContentTypes
+  | BaseTypes
+  | CollectionViewTypes;
 export type Any =
   | Page
   | CollectionViewPage
+  | CollectionView
   | Text
   | BulletedList
   | NumberedList
@@ -148,10 +154,15 @@ export type Alias = Override<
  * Base properties shared by all blocks.
  */
 type PageBlocks = BuildBlocks<PageTypes, PageBlock>;
+type CollectionViewBlocks = BuildBlocks<CollectionViewTypes, CollectionBlock>;
 type ContentBlocks = BuildBlocks<ContentTypes, ContentBlock>;
 type TextBlocks = BuildBlocks<TextTypes, TextBlock>;
 type BaseBlocks = BuildBlocks<BaseTypes>;
-type Default = PageBlocks & ContentBlocks & BaseBlocks & TextBlocks;
+type Default = PageBlocks &
+  ContentBlocks &
+  BaseBlocks &
+  TextBlocks &
+  CollectionViewBlocks;
 type Renderable = Core.Identity & Core.Creatable & Core.Editable;
 
 interface Block extends Renderable {
@@ -173,6 +184,11 @@ interface PageBlock extends Core.Attachable {
   properties: Properties.Title;
   format: Format.Page & Format.Access & Format.Color;
   permissions: Core.Permission[];
+}
+interface CollectionBlock {
+  type: Collections.ViewType;
+  name: string;
+  query2: Collections.Query.ViewQuery;
 }
 
 // Type Factory
@@ -200,7 +216,6 @@ type TextTypes =
   | "code";
 
 type ContentTypes =
-  | "collection_view"
   | "image"
   | "embed"
   | "gist"
@@ -215,6 +230,8 @@ type ContentTypes =
   | "audio"
   | "drive"
   | "file";
+
+type CollectionViewTypes = "collection_view";
 
 type BaseTypes = PointerTypes | PositionTypes;
 type PointerTypes =

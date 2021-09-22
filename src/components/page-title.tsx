@@ -1,16 +1,25 @@
 import React from "react";
 
-import { cs, getBlockTitle, decorate } from "@utils";
+import { cs } from "@utils";
 import { useNotionContext } from "@context";
-import { PageTitlePresenter } from "@types";
+import { Components } from "@types";
+import { PageBlock } from "@entities";
 
-export const PageTitle: PageTitlePresenter = ({ block, className }) => {
-  const { recordMap, components, defaultPageIcon } = useNotionContext();
+export type Props = {
+  block: PageBlock;
+  className?: string;
+};
 
-  const title = getBlockTitle(block, recordMap);
+export const Component: Components.Presenter<Props> = ({
+  block,
+  className,
+}) => {
+  const { components, defaultPageIcon } = useNotionContext();
+  const { title } = block;
+  const style = cs("notion-page-title", className);
 
   return (
-    <span className={cs("notion-page-title", className)}>
+    <span className={style}>
       <components.pageIcon
         block={block}
         defaultIcon={defaultPageIcon}
@@ -18,7 +27,7 @@ export const PageTitle: PageTitlePresenter = ({ block, className }) => {
       />
 
       <span className="notion-page-title-text">
-        <components.text value={decorate(title)} block={block} />
+        <components.text value={title} block={block} />
       </span>
     </span>
   );

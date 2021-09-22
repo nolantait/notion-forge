@@ -2,22 +2,22 @@ import React from "react";
 
 import { cs } from "@utils";
 import { useNotionContext } from "@context";
-import { Notion, QuotePresenter } from "@types";
+import { Components } from "@types";
+import { QuoteBlock } from "@entities";
 
-const defaultTitle: Notion.Decoration[] = [[""]];
-const defaultProperties = { title: defaultTitle };
+export type Props = {
+  block: QuoteBlock;
+  className?: string;
+};
 
-export const Quote: QuotePresenter = ({ block, blockId }) => {
+export const Component: Components.Presenter<Props> = ({
+  block,
+  className,
+}) => {
   const { components } = useNotionContext();
-  const { properties = defaultProperties } = block;
-  const blockColor = block.format?.block_color;
-  const title = properties.title;
+  const { blockColor, title } = block;
 
-  const style = cs(
-    "notion-quote",
-    blockColor && `notion-${blockColor}`,
-    blockId
-  );
+  const style = cs("notion-quote", `notion-${blockColor}`, className);
 
   return (
     <blockquote className={style}>

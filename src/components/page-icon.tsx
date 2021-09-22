@@ -1,22 +1,19 @@
 import React from "react";
 
-import { cs, isUrl, getBlockIcon, getBlockTitle } from "@utils";
+import { cs, isUrl } from "@utils";
 import { DefaultPageIcon } from "@icons";
 import { useNotionContext } from "@context";
-import { Presenter, PageIconProps, PageIconPresenter } from "@types";
+import { Components } from "@types";
+import { Decorated, PageBlock } from "@entities";
 
-interface ImageIconProps extends Pick<PageIconProps, "block"> {
-  title: string | null;
-  iconUrl: string;
+export type Props = {
+  block: PageBlock;
   className?: string;
-}
+  defaultIcon?: string | null;
+  hideDefaultIcon?: boolean;
+};
 
-interface TextIconProps {
-  icon: string;
-  className?: string;
-}
-
-export const PageIcon: PageIconPresenter = ({
+export const Component: Components.Presenter<Props> = ({
   block,
   className,
   defaultIcon = null,
@@ -24,12 +21,11 @@ export const PageIcon: PageIconPresenter = ({
 }) => {
   if (hideDefaultIcon) return <EmptyIcon />;
 
-  const { recordMap } = useNotionContext();
-  const icon = getBlockIcon(block, recordMap) ?? defaultIcon;
+  const icon = block.pageIcon.length ? block.pageIcon : defaultIcon;
 
   if (!icon) return <EmptyIcon />;
 
-  const title = getBlockTitle(block, recordMap);
+  const { title } = block;
   const iconStyle = cs(className, "notion-page-icon");
 
   if (isUrl(icon)) {
@@ -49,7 +45,13 @@ export const PageIcon: PageIconPresenter = ({
   }
 };
 
-const ImageIcon: Presenter<ImageIconProps> = ({
+type ImageIconProps = Pick<Props, "block"> & {
+  title: Decorated;
+  iconUrl: string;
+  className?: string;
+};
+
+const ImageIcon: Components.Presenter<ImageIconProps> = ({
   block,
   iconUrl,
   title,
@@ -73,7 +75,12 @@ const EmptyIcon = (): React.ReactElement => {
   return <></>;
 };
 
-const TextIcon: Presenter<TextIconProps> = ({ icon, className }) => {
+type TextIconProps = {
+  icon: string;
+  className?: string;
+};
+
+const TextIcon: Components.Presenter<TextIconProps> = ({ icon, className }) => {
   return (
     <span className={className} role="img" aria-label={icon}>
       {icon}

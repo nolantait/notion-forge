@@ -1,16 +1,26 @@
 import React from "react";
 import mediumZoom from "medium-zoom";
 
-import { NotionRendererProps, NotionBlockRendererProps } from "@types";
+import { Blocks, Components, Core } from "@types";
 import { useNotionContext, NotionContextProvider } from "@context";
 import { Block } from "./block";
 
-export const NotionRenderer = ({
+export type Props = Core.NotionContext & {
+  rootPageId?: string;
+  hideBlockId?: boolean;
+  className?: string;
+  footer?: React.ReactNode;
+  pageHeader?: React.ReactNode;
+  pageFooter?: React.ReactNode;
+  pageAside?: React.ReactNode;
+  pageCover?: React.ReactNode;
+};
+
+export const Renderer: Components.Presenter<Props> = ({
   components,
   recordMap,
   mapPageUrl,
   mapImageUrl,
-  searchNotion,
   fullPage,
   rootPageId,
   previewImages,
@@ -19,7 +29,7 @@ export const NotionRenderer = ({
   defaultPageCover,
   defaultPageCoverPosition,
   ...rest
-}: NotionRendererProps): React.ReactElement => {
+}) => {
   const zoom =
     typeof window !== "undefined" &&
     mediumZoom({
@@ -34,7 +44,6 @@ export const NotionRenderer = ({
       recordMap={recordMap}
       mapPageUrl={mapPageUrl}
       mapImageUrl={mapImageUrl}
-      searchNotion={searchNotion}
       fullPage={fullPage}
       rootPageId={rootPageId}
       previewImages={previewImages}
@@ -44,32 +53,38 @@ export const NotionRenderer = ({
       defaultPageCoverPosition={defaultPageCoverPosition}
       zoom={zoom}
     >
-      <NotionBlockRenderer {...rest} />
+      <BlockRenderer level={0} {...rest} />
     </NotionContextProvider>
   );
 };
 
-export const NotionBlockRenderer = ({
+export type BlockRendererProps = {
+  level: number;
+  blockId?: Blocks.ID;
+  rest?: any[];
+};
+
+export const BlockRenderer: Components.Presenter<BlockRendererProps> = ({
   level = 0,
   blockId,
-  ...props
-}: NotionBlockRendererProps): React.ReactElement => {
+  ...rest
+}) => {
   const { recordMap } = useNotionContext();
   const id = blockId || Object.keys(recordMap.block)[0];
   const block = recordMap.block[id]?.value;
 
   if (!block) {
-    throw new Error(`Missing block ${blockId}`);
+    throw new Error(`Missing block ${id}`);
   }
 
   return (
-    <Block key={id} level={level} block={block} {...props}>
-      {block?.content?.map((contentBlockId) => (
-        <NotionBlockRenderer
+    <Block key={id} level={level} block={block} {...rest}>
+      {block?.content?.map((contentBlockId: Blocks.ID) => (
+        <BlockRenderer
           key={contentBlockId}
           blockId={contentBlockId}
           level={level + 1}
-          {...props}
+          {...rest}
         />
       ))}
     </Block>

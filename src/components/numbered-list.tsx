@@ -1,30 +1,28 @@
 import React from "react";
+
 import { useNotionContext } from "@context";
-import { NumberedListPresenter, NumberedListProps } from "@types";
+import { Components } from "@types";
 import { cs, getListNumber } from "@utils";
+import { NumberedListBlock } from "@entities";
 
-interface NestedListProps
-  extends Pick<NumberedListProps, "block" | "children"> {
-  startingIndex?: number;
+export type Props = {
+  block: NumberedListBlock;
   className?: string;
-}
-interface ListContainerProps
-  extends Pick<NestedListProps, "startingIndex" | "className" | "children"> {}
+  children?: React.ReactNode;
+};
 
-interface ListItemProps extends Pick<NumberedListProps, "block"> {}
-
-export const NumberedList: NumberedListPresenter = ({
+export const Component: Components.Presenter<Props> = ({
   block,
-  blockId,
+  className,
   children,
 }) => {
   const { recordMap } = useNotionContext();
-  const { content, properties } = block;
-  const parentBlockType = recordMap.block[block.parent_id]?.value?.type;
-  const isTopLevel = block.type !== parentBlockType;
-  const hasChildren = content;
+  const { content, parentId, type } = block;
+  const parentBlockType = recordMap.block[parentId]?.value?.type;
+  const isTopLevel = type !== parentBlockType;
+  const hasChildren = content.length > 0;
   const startingIndex = getListNumber(block.id, recordMap.block);
-  const listStyle = cs("notion-list", "notion-list-numbered", blockId);
+  const listStyle = cs("notion-list", "notion-list-numbered", className);
 
   let output = <></>;
 
@@ -35,7 +33,7 @@ export const NumberedList: NumberedListPresenter = ({
       </NestedList>
     );
   } else {
-    output = properties ? <ListItem block={block} /> : output;
+    output = block.title.isEmpty ? output : <ListItem block={block} />;
   }
 
   return isTopLevel ? (
@@ -47,16 +45,20 @@ export const NumberedList: NumberedListPresenter = ({
   );
 };
 
+interface NestedListProps extends Pick<Props, "block" | "children"> {
+  startingIndex?: number;
+  className?: string;
+}
+
 const NestedList = ({
   block,
   className,
   startingIndex = 1,
   children,
 }: NestedListProps): React.ReactElement => {
-  const { properties } = block;
   return (
     <>
-      {properties && <ListItem block={block} />}
+      {!block.title.isEmpty && <ListItem block={block} />}
       <ListContainer {...{ className, startingIndex }}>
         {children}
       </ListContainer>
@@ -64,9 +66,11 @@ const NestedList = ({
   );
 };
 
+type ListItemProps = Pick<Props, "block">;
+
 const ListItem = ({ block }: ListItemProps): React.ReactElement => {
   const { components } = useNotionContext();
-  const { title } = block.properties ?? { title: [[""]] };
+  const { title } = block;
 
   return (
     <li>
@@ -74,6 +78,11 @@ const ListItem = ({ block }: ListItemProps): React.ReactElement => {
     </li>
   );
 };
+
+type ListContainerProps = Pick<
+  NestedListProps,
+  "startingIndex" | "className" | "children"
+>;
 
 const ListContainer = ({
   children,

@@ -2,32 +2,30 @@ import React from "react";
 
 import { cs } from "@utils";
 import { useNotionContext } from "@context";
-import { EquationPresenter } from "@types";
+import { Components } from "@types";
+import { EquationBlock } from "@entities";
 
 const katexSettings = {
   throwOnError: true,
   strict: false,
 };
 
-export const Equation: EquationPresenter = ({
-  math,
+export type Props = {
+  block: EquationBlock;
+  className?: string;
+};
+
+export const Component: Components.Presenter<Props> = ({
   className,
   block,
-  ...rest
 }) => {
   const { components } = useNotionContext();
+  const math = block.title.asString;
+  const style = cs("notion-equation", "notion-equation-block", className);
 
   return (
-    <span
-      role="button"
-      tabIndex={0}
-      className={cs(
-        "notion-equation",
-        block ? "notion-equation-block" : "notion-equation-inline",
-        className
-      )}
-    >
-      <components.equation math={math} settings={katexSettings} {...rest} />
+    <span role="button" tabIndex={0} className={style}>
+      <components.equation math={math} settings={katexSettings} />
     </span>
   );
 };

@@ -1,23 +1,34 @@
 import React from "react";
 
 import { useNotionContext } from "@context";
-import { cs, getTextContent } from "@utils";
-import { Notion, BookmarkBlockProps, BookmarkPresenter } from "@types";
+import { cs } from "@utils";
+import { Components } from "@types";
+import { Decorated, BookmarkBlock } from "@entities";
 
-export const Bookmark: BookmarkPresenter = ({ block, blockId }) => {
+export type Props = {
+  block: BookmarkBlock;
+  className?: string;
+};
+
+export const Component: Components.Presenter<Props> = ({
+  block,
+  className,
+}) => {
   const { components } = useNotionContext();
-  const { properties, format } = block;
-  const { caption } = properties;
-
-  const { hasTitle, title, decoratedTitle } = getBookmarkTitle(properties);
-  const link = properties.link[0][0];
-
-  const captionText = caption ? properties.caption : null;
+  const { blockColor, description, caption, link, title } = block;
+  const blockTitle = block.title.asString;
+  const titleText = blockTitle.length
+    ? blockTitle
+    : link.asString.length
+    ? link.asString
+    : caption.asString;
+  const bookmarkTitle = new Decorated([[formatLinkTitle(titleText)]]);
+  const { bookmarkCover, bookmarkIcon } = block;
 
   const containerStyle = cs(
     "notion-bookmark",
-    block.format?.block_color && `notion-${block.format.block_color}`,
-    blockId
+    `notion-${blockColor}`,
+    className
   );
 
   return (
@@ -29,67 +40,47 @@ export const Bookmark: BookmarkPresenter = ({ block, blockId }) => {
         href={link}
       >
         <div>
-          {hasTitle && (
+          {bookmarkTitle.asString.length && (
             <div className="notion-bookmark-title">
-              <components.text value={decoratedTitle} block={block} />
+              <components.text
+                value={bookmarkTitle.asDecoration}
+                block={block}
+              />
             </div>
           )}
 
-          {block.properties?.description && (
+          {description.asString.length && (
             <div className="notion-bookmark-description">
-              <components.text value={properties.description} block={block} />
+              <components.text value={description.asDecoration} block={block} />
             </div>
           )}
 
           <div className="notion-bookmark-link">
-            {format.bookmark_icon && (
-              <components.image
-                src={format.bookmark_icon}
-                alt={title}
-                loading="lazy"
-              />
+            {bookmarkIcon.length && (
+              <components.image src={bookmarkIcon} alt={title} loading="lazy" />
             )}
 
             <div>
-              <components.text value={properties.link} block={block} />
+              <components.text value={link.asDecoration} block={block} />
             </div>
           </div>
         </div>
 
-        {format.bookmark_cover && (
+        {bookmarkCover.length && (
           <div className="notion-bookmark-image">
-            <components.image
-              src={format.bookmark_cover}
-              alt={title}
-              loading="lazy"
-            />
+            <components.image src={bookmarkCover} alt={title} loading="lazy" />
           </div>
         )}
       </components.link>
 
-      {captionText && (
+      {caption.asString.length && (
         <div className="notion-bookmark-caption">
-          <components.text value={captionText} block={block} />
+          <components.text value={caption.asDecoration} block={block} />
         </div>
       )}
     </>
   );
 };
-
-function getBookmarkTitle(properties: BookmarkBlockProps): {
-  decoratedTitle: Notion.Decoration[];
-  title: string;
-  hasTitle: boolean;
-} {
-  const linkProperty = getTextContent(properties.link);
-  const titleProperty = getTextContent(properties.title);
-  const rawTitle = titleProperty ?? linkProperty ?? "";
-  const title = formatLinkTitle(rawTitle);
-  const decoratedTitle: Notion.Decoration[] = [[title]];
-  const hasTitle = title.length > 0;
-
-  return { decoratedTitle, title, hasTitle };
-}
 
 const formatLinkTitle = (title: string): string => {
   if (title.startsWith("http")) {

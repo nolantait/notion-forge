@@ -2,24 +2,24 @@ import React from "react";
 
 import { cs, getBlockTitle, getBlockIcon, getBlockParentPage } from "@utils";
 import { useNotionContext } from "@context";
-import { Notion } from "@types";
+import { Blocks } from "@types";
 
 type PageLinkProps = React.ComponentProps<"a"> & React.ComponentProps<"div">;
 
-interface Breadcrumb {
-  block: Notion.PageBlock;
+type Breadcrumb = {
+  block: Blocks.Page;
   active: boolean;
   pageId: string;
   title: string | null;
   icon: string | null;
-}
+};
 
-interface BreadcrumbProps {
+type BreadcrumbProps = {
   breadcrumb: Breadcrumb;
   isMoreBreadcrumbs: boolean;
-}
+};
 
-export const PageHeader = (): React.ReactElement => {
+export const Component = (): React.ReactElement => {
   const { recordMap } = useNotionContext();
 
   const blockMap = recordMap.block;
@@ -34,12 +34,12 @@ export const PageHeader = (): React.ReactElement => {
   let currentPageId = activePageId;
 
   do {
-    const block = blockMap[currentPageId]?.value as Notion.PageBlock;
+    const block = blockMap[currentPageId]?.value as Blocks.Page;
 
     if (!block) break;
 
-    const title = getBlockTitle(block, recordMap);
-    const icon = getBlockIcon(block, recordMap);
+    const title = getBlockTitle(block as any, recordMap);
+    const icon = getBlockIcon(block as any, recordMap);
     const hasValidTitle = title || icon;
 
     if (!hasValidTitle) break;
@@ -59,7 +59,7 @@ export const PageHeader = (): React.ReactElement => {
 
     if (!parentId) break;
 
-    currentPageId = parentId;
+    currentPageId = parentId as string;
   } while (true);
 
   breadcrumbs.reverse();
@@ -70,7 +70,9 @@ export const PageHeader = (): React.ReactElement => {
         <div className="breadcrumbs">
           {breadcrumbs.map((breadcrumb, index) => {
             const isMoreBreadcrumbs = index < breadcrumbs.length - 1;
-            return <Breadcrumb {...{ breadcrumb, isMoreBreadcrumbs }} />;
+            return (
+              <Breadcrumb key={index} {...{ breadcrumb, isMoreBreadcrumbs }} />
+            );
           })}
         </div>
       </div>

@@ -1,13 +1,18 @@
 import React from "react";
 
-import { SyncContainerPresenter } from "@types";
+import { Components } from "@types";
 import { cs } from "@utils";
 
-export const SyncContainer: SyncContainerPresenter = ({
+export type Props = {
+  children?: React.ReactNode;
+  className?: string;
+};
+
+export const Component: Components.Presenter<Props> = ({
   children,
-  blockId,
+  className,
 }) => {
-  const style = cs("notion-sync-block", blockId);
+  const style = cs("notion-sync-block", className);
 
   return <div className={style}>{children}</div>;
 };

@@ -1,14 +1,12 @@
 import React from "react";
 
-import { Notion } from "@types";
+import { Formats, Components } from "@types";
 
-interface DecoratedDateProps {
-  decoration: [string, Notion.FormattedDate];
-}
+export type Props = {
+  decoration: [string, Formats.FormattedDate];
+};
 
-export const DecoratedDate = ({
-  decoration,
-}: DecoratedDateProps): React.ReactElement => {
+export const Decorator: Components.Presenter<Props> = ({ decoration }) => {
   const dateDetails = decoration[1];
   const [startDate, endDate, formattedDate] = getDateStrings(dateDetails);
 
@@ -20,7 +18,7 @@ export const DecoratedDate = ({
 };
 
 const getDateStrings = (
-  dateDetails: Notion.FormattedDate
+  dateDetails: Formats.FormattedDate
 ): [string, string | undefined, string] => {
   const startDate = dateDetails.start_date;
   const endDate = dateDetails.end_date;

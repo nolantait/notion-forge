@@ -1,7 +1,7 @@
 import React from "react";
 
 import { useNotionContext } from "@context";
-import { Presenter, TableOfContentsPresenter } from "@types";
+import { Components } from "@types";
 import {
   cs,
   getBlockParentPage,
@@ -9,17 +9,19 @@ import {
   TableOfContentsEntry,
   uuidToId,
 } from "@utils";
+import { TableOfContentsBlock } from "@entities";
 
-interface TableOfContentsItemProps {
-  item: TableOfContentsEntry;
-}
+export type Props = {
+  block: TableOfContentsBlock;
+  className?: string;
+};
 
-export const TableOfContents: TableOfContentsPresenter = ({
+export const Component: Components.Presenter<Props> = ({
   block,
-  blockId,
+  className,
 }) => {
   const { recordMap } = useNotionContext();
-  const page = getBlockParentPage(block, recordMap);
+  const page = getBlockParentPage(block._dto, recordMap);
 
   if (!page) {
     throw new Error(
@@ -27,24 +29,30 @@ export const TableOfContents: TableOfContentsPresenter = ({
     );
   }
 
-  const tableOfContents = getPageTableOfContents(page, recordMap);
-  const blockColor = block.format?.block_color;
+  const tableOfContents = getPageTableOfContents(page as any, recordMap);
+  const { blockColor } = block;
   const style = cs(
     "notion-table-of-contents",
-    blockId,
-    blockColor && `notion-${blockColor}`
+    className,
+    `notion-${blockColor}`
   );
 
   return (
     <div className={style}>
-      {tableOfContents.map((item) => (
-        <TableOfContentsItem item={item} />
+      {tableOfContents.map((item, index) => (
+        <TableOfContentsItem key={index} item={item} />
       ))}
     </div>
   );
 };
 
-const TableOfContentsItem: Presenter<TableOfContentsItemProps> = ({ item }) => {
+type TableOfContentsItemProps = {
+  item: TableOfContentsEntry;
+};
+
+const TableOfContentsItem: Components.Presenter<TableOfContentsItemProps> = ({
+  item,
+}) => {
   const { id, indentLevel, text } = item;
   const href = `#${uuidToId(id)}`;
   const itemStyle = {

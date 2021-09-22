@@ -1,12 +1,16 @@
 import React from "react";
 
 import { useNotionContext } from "@context";
-import { AssetProps, Presenter, AssetPresenter, BlockFormat } from "@types";
-import { getTextContent } from "@utils";
+import { Components } from "@types";
+import { AnyAsset } from "@entities";
 
-export const Asset: AssetPresenter = ({ block }) => {
-  const { format, type } = block;
-  const { containerStyle, assetStyle } = getAssetStyle(format, type);
+export type Props = {
+  block: AnyAsset;
+  className?: string;
+};
+
+export const Component: Components.Presenter<Props> = ({ block }) => {
+  const { containerStyle, assetStyle } = getAssetStyle(block);
 
   return (
     <div style={containerStyle}>
@@ -15,23 +19,22 @@ export const Asset: AssetPresenter = ({ block }) => {
   );
 };
 
-interface PolymorphicAssetProps extends Pick<AssetProps, "block"> {
+interface PolymorphicAssetProps extends Pick<Props, "block"> {
   style: React.CSSProperties;
 }
 
-const PolymorphicAsset: Presenter<PolymorphicAssetProps> = ({
+const PolymorphicAsset: Components.Presenter<PolymorphicAssetProps> = ({
   block,
   style,
 }) => {
   const { recordMap, mapImageUrl, components } = useNotionContext();
   const { type } = block;
-  const source = block.properties.source?.[0]?.[0];
   const signedUrl = recordMap.signed_urls?.[block.id];
 
   switch (type) {
     case "tweet": {
-      //if (!source) throw new Error(`Could not parse source for ${source}`);
-      //const id = source.split("?")[0].split("/").pop();
+      //if (!sourceUrl) throw new Error(`Could not parse sourceUrl for ${sourceUrl}`);
+      //const id = sourceUrl.split("?")[0].split("/").pop();
 
       //TODO: Add
       return <></>;
@@ -62,9 +65,10 @@ const PolymorphicAsset: Presenter<PolymorphicAssetProps> = ({
       return <div />;
     }
     case "gist": {
-      let src = block.format?.display_source ?? source;
+      let src = block.displaySource;
 
-      if (!src) throw new Error(`Could not parse github gist src ${src}`);
+      if (!src.length)
+        throw new Error(`Could not parse github gist src ${src}`);
 
       if (!src.endsWith(".pibb")) {
         src = `${src}.pibb`;
@@ -113,12 +117,9 @@ const PolymorphicAsset: Presenter<PolymorphicAssetProps> = ({
       );
     }
     case "image": {
-      if (!source)
-        throw new Error(`Could not load image from source ${source}`);
-
-      const src = mapImageUrl(source, block);
-      const caption = getTextContent(block.properties?.caption);
-      const alt = caption || "notion image";
+      const src = mapImageUrl(block.source.asString, block);
+      const caption = block.caption.asString;
+      const alt = caption.length ? caption : "notion image";
 
       return (
         <components.lazyImage
@@ -136,7 +137,7 @@ const PolymorphicAsset: Presenter<PolymorphicAssetProps> = ({
   }
 };
 
-const getAssetStyle = (format: BlockFormat | undefined, type: string) => {
+const getAssetStyle = (block: AnyAsset) => {
   const containerStyle: React.CSSProperties = {
     position: "relative",
     display: "flex",
@@ -147,22 +148,17 @@ const getAssetStyle = (format: BlockFormat | undefined, type: string) => {
 
   const assetStyle: React.CSSProperties = {};
 
-  if (!format) return { containerStyle, assetStyle };
-
-  const {
-    block_aspect_ratio: aspectRatio,
-    block_height: height,
-    block_width: width,
-    block_full_width: fullWidth,
-    block_page_width: pageWidth,
-    block_preserve_scale: preserveScale,
-  } = format;
-
   const classes = [];
-
-  const isImage = type !== "image";
-
-  const hasContainerWidth = fullWidth || pageWidth;
+  const isImage = block.type !== "image";
+  const {
+    blockFullWidth: fullWidth,
+    blockPageWidth: pageWidth,
+    blockPreserveScale: preserveScale,
+    blockAspectRatio: aspectRatio,
+    blockWidth: width,
+    blockHeight: height,
+  } = block;
+  const hasContainerWidth = block.blockFullWidth || block.blockPageWidth;
 
   if (fullWidth) classes.push("notion-asset--full-width");
   if (pageWidth) classes.push("notion-asset--page-width");

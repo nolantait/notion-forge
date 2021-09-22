@@ -1,13 +1,19 @@
 import React from "react";
 
-import { DecoratedUserProps } from "@types";
+import { Formats, Components } from "@types";
 import { useNotionContext } from "@context";
+import { Block } from "@entities";
+
+export type Props = {
+  decoration: Formats.UserFormat;
+  block: Block;
+};
 
 // ['u', 'user-uuid']
-export const DecoratedUser = ({
+export const Decorator: Components.Presenter<Props> = ({
   decoration,
   block,
-}: DecoratedUserProps): React.ReactElement => {
+}) => {
   const { components, recordMap, mapImageUrl } = useNotionContext();
   const userId = decoration[1];
   const user = recordMap.notion_user[userId]?.value;

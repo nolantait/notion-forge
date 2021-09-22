@@ -1,36 +1,40 @@
 import React from "react";
 
-import { getTextContent } from "@utils";
-import { Notion, CardCoverProps, Presenter } from "@types";
+import { Formats, API, Collections, Components } from "@types";
 import { useNotionContext } from "@context";
-import { Property } from "@components/property";
+import { PageBlock, ImageBlock } from "@entities";
 
-interface CardCoverImageProps
-  extends Pick<CardCoverWithContentProps, "coverAspect"> {
-  block: Notion.ImageBlock;
-}
+type CoverImageProps = Pick<WithContentProps, "coverAspect"> & {
+  block: ImageBlock;
+};
 
-interface CardCoverWithContentProps
-  extends Pick<CardCoverProps, "block" | "coverAspect"> {}
+type WithContentProps = Pick<Props, "block" | "coverAspect">;
 
-interface CardCoverWithImageProps
-  extends Pick<
-    CardCoverProps,
-    "block" | "coverAspect" | "coverUrl" | "coverPosition"
-  > {}
+type WithImageProps = Pick<
+  Props,
+  "block" | "coverAspect" | "coverUrl" | "coverPosition"
+>;
 
-interface CardCoverWithPropertyProps
-  extends Pick<
-    CardCoverProps,
-    | "block"
-    | "cover"
-    | "coverAspect"
-    | "coverUrl"
-    | "coverPosition"
-    | "collection"
-  > {}
+type WithPropertyProps = Pick<
+  Props,
+  | "block"
+  | "cover"
+  | "coverAspect"
+  | "coverUrl"
+  | "coverPosition"
+  | "collection"
+>;
 
-export const CardCover: Presenter<CardCoverProps> = (props) => {
+export type Props = {
+  block: PageBlock;
+  collection: Collections.Collection;
+  cover: Collections.Card.Cover;
+  coverAspect: Collections.Card.CoverAspect;
+  coverPosition: number;
+  coverUrl: string;
+};
+
+export const Cover: Components.Presenter<Props> = (props) => {
   const { cover } = props;
   const { type } = cover;
 
@@ -41,36 +45,38 @@ export const CardCover: Presenter<CardCoverProps> = (props) => {
       return <CardCoverWithImage {...props} />;
     case "property":
       return <CardCoverWithProperty {...props} />;
+    case "file":
+      // TODO
+      return <></>;
     default:
       throw new Error(`Missing cover presenter for ${type}`);
   }
 };
 
-const CardCoverWithContent: Presenter<CardCoverWithContentProps> = ({
+const CardCoverWithContent: Components.Presenter<WithContentProps> = ({
   block,
   coverAspect,
 }) => {
   const { recordMap } = useNotionContext();
-  const contentBlockId = findFirstImage(block);
+  const contentBlockId = findFirstImage(block, recordMap);
 
   if (!contentBlockId) return <CardCoverEmpty />;
 
-  const contentBlock = recordMap.block[contentBlockId]
-    .value as Notion.ImageBlock;
+  const contentBlock = new ImageBlock(recordMap.block[contentBlockId].value);
 
   return <CardCoverImage block={contentBlock} coverAspect={coverAspect} />;
 };
 
-const CardCoverWithImage: Presenter<CardCoverWithImageProps> = ({
+const CardCoverWithImage: Components.Presenter<WithImageProps> = ({
   block,
   coverAspect,
   coverUrl,
   coverPosition,
 }) => {
   const { mapImageUrl, components } = useNotionContext();
-  const blockTitleProperty = block.properties?.title;
-  const title =
-    getTextContent(blockTitleProperty) ?? "Background cover image for card";
+  const title = block.title.isEmpty
+    ? "Background cover image for card"
+    : block.title.asString;
 
   if (!coverUrl) return <></>;
 
@@ -86,7 +92,7 @@ const CardCoverWithImage: Presenter<CardCoverWithImageProps> = ({
   );
 };
 
-const CardCoverWithProperty: Presenter<CardCoverWithPropertyProps> = ({
+const CardCoverWithProperty: Components.Presenter<WithPropertyProps> = ({
   block,
   collection,
   cover,
@@ -98,13 +104,19 @@ const CardCoverWithProperty: Presenter<CardCoverWithPropertyProps> = ({
 
   if (!property) return <></>;
   const schema = collection.schema[property];
-  const data = (block as any).properties?.[property];
+  const data = block.fetchProperty(property);
 
-  if (schema && data) {
+  if (!data) return <></>;
+
+  function isFile(d: unknown): d is Formats.Decoration[] {
+    return Array.isArray(d) && d.length > 1;
+  }
+
+  if (schema && isFile(data)) {
     if (schema.type === "file") {
       const files = data
-        .filter((v: any) => v.length === 2)
-        .map((f: any) => f.flat().flat());
+        .filter((v) => v.length === 2)
+        .map((f) => f.flat().flat());
       const file = files[0];
 
       if (file) {
@@ -122,7 +134,7 @@ const CardCoverWithProperty: Presenter<CardCoverWithPropertyProps> = ({
         );
       }
     } else {
-      return <Property {...{ block, collection, schema, data }} />;
+      return <components.property {...{ block, collection, schema, data }} />;
     }
   }
 
@@ -133,30 +145,28 @@ const CardCoverEmpty = (): React.ReactElement => {
   return <div className="notion-collection-card-cover-empty" />;
 };
 
-const CardCoverImage: Presenter<CardCoverImageProps> = ({
+const CardCoverImage: Components.Presenter<CoverImageProps> = ({
   block,
   coverAspect,
 }) => {
   const { components, mapImageUrl } = useNotionContext();
-  const { format, properties } = block;
-  const source = format?.display_source;
+  const { displaySource: source } = block;
 
-  if (!source) return <CardCoverEmpty />;
+  if (source.length === 0) return <CardCoverEmpty />;
 
   const src = mapImageUrl(source, block);
-  const caption = properties.caption ?? [["Background cover image for card"]];
+  const caption = block.caption.isEmpty
+    ? [["Background cover image for card"]]
+    : block.caption.asString;
   const style = coverAspect ? { objectFit: coverAspect } : {};
 
   return <components.lazyImage src={src} alt={caption[0][0]} style={style} />;
 };
 
-const findFirstImage = (block: Notion.PageBlock) => {
-  const { recordMap } = useNotionContext();
-  const { content } = block;
+const findFirstImage = (block: PageBlock, recordMap: API.ExtendedRecordMap) => {
+  if (!block.content.length) return null;
 
-  if (!content) return null;
-
-  return content.find((blockId: string) => {
+  return block.content.find((blockId: string) => {
     const foundBlock = recordMap.block[blockId]?.value;
 
     if (foundBlock?.type === "image") {

@@ -1,7 +1,8 @@
 import React from "react";
 
-import { TextPresenter } from "@types";
-import { DecoratedText } from "./decorators";
+import { Components } from "@types";
+import { TextDecorator } from "./decorators";
+import { Block, Decorated } from "@entities";
 
 /**
  * Renders a single piece of Notion text, including basic rich text formatting.
@@ -12,15 +13,22 @@ import { DecoratedText } from "./decorators";
  * attributes to the final element's style.
  */
 
-export const Text: TextPresenter = ({
+export type Props = {
+  value: Decorated;
+  block: Block;
+  linkProps?: React.HTMLProps<HTMLAnchorElement>;
+  linkProtocol?: "https" | "http" | "mailto" | "tel";
+};
+
+export const Component: Components.Presenter<Props> = ({
   value,
   block,
-  linkProps,
+  linkProps = {},
   linkProtocol,
 }) => {
   return (
     <React.Fragment>
-      {value.map((decoration, index) => {
+      {value.asDecoration.map((decoration, index) => {
         const [text, decorations] = decoration;
         // TODO: sometimes notion shows a max of N items to prevent overflow
         // if (trim && index > 18) {
@@ -38,7 +46,8 @@ export const Text: TextPresenter = ({
         }
 
         return (
-          <DecoratedText
+          <TextDecorator
+            key={index}
             {...{ text, decorations, block, index, linkProps, linkProtocol }}
           />
         );

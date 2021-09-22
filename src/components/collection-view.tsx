@@ -1,30 +1,33 @@
 import React from "react";
 
-import { CollectionViewPresenter } from "@types";
-import {
-  CollectionViewList,
-  CollectionViewBoard,
-  CollectionViewGallery,
-  CollectionViewTable,
-} from "@components";
+import { ListView, BoardView, TableView, GalleryView } from "./collections";
 
-export const CollectionView: CollectionViewPresenter = (props) => {
+import { Collections, API, Components } from "@types";
+
+export type Props = {
+  collection: Collections.Collection;
+  collectionView: Collections.AnyView;
+  collectionData: API.CollectionQueryResult;
+};
+
+// Rendered as a child of a Collection "collection.tsx"
+export const Component: Components.Presenter<Props> = (props) => {
   const { collectionView } = props;
 
   switch (collectionView.type) {
     case "table":
-      return <CollectionViewTable {...props} />;
+      return <TableView {...props} />;
 
     case "gallery":
-      return <CollectionViewGallery {...props} />;
+      return <GalleryView {...props} />;
 
     case "list":
-      return <CollectionViewList {...props} />;
+      return <ListView {...props} />;
 
     case "board":
-      return <CollectionViewBoard {...props} />;
+      return <BoardView {...props} />;
 
     default:
-      throw new Error(`Unsupported collection view ${collectionView}`);
+      throw new Error(`Unsupported collection view ${collectionView.type}`);
   }
 };

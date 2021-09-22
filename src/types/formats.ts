@@ -1,3 +1,5 @@
+import { Decorated } from "@entities";
+
 /** Block colors supported by Notion */
 
 export type Color =
@@ -56,7 +58,7 @@ export type InlineEquationFormat = ["e", string];
 
 export type DiscussionFormat = ["m", string];
 
-export type ExternalLinkFormat = ["‣", [string, string]];
+export type ExternalLinkFormat = ["‣", UserFormat | PageFormat];
 
 export type DateFormat = ["d", FormattedDate];
 

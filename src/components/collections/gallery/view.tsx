@@ -1,10 +1,15 @@
 import React from "react";
 
-import { Notion, CollectionViewPresenter } from "@types";
+import { Components, Collections } from "@types";
 import { cs, getPagesFromQuery } from "@utils";
 import { useNotionContext } from "@context";
+import { Props as ViewProps } from "../../collection-view";
 
-export const CollectionViewGallery: CollectionViewPresenter = ({
+export type Props = Omit<ViewProps, "collectionView"> & {
+  collectionView: Collections.GalleryView;
+};
+
+export const View: Components.Presenter<Props> = ({
   collection,
   collectionView,
   collectionData,
@@ -27,7 +32,7 @@ export const CollectionViewGallery: CollectionViewPresenter = ({
     <article className="notion-gallery">
       <div className="notion-gallery-view">
         <div className={galleryStyle}>
-          {blocks.map((block: Notion.PageBlock): JSX.Element => {
+          {blocks.map((block): JSX.Element => {
             if (!block) return <></>;
 
             return (

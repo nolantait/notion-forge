@@ -4,8 +4,11 @@ import type * as Card from "./collections/cards";
 import type * as Properties from "./collections/properties";
 import type * as Query from "./collections/queries";
 
+import type { Merge } from "type-fest";
+
 export type { Properties };
 export type { Card };
+export type { Query };
 
 export type ID = Core.ID;
 export type ViewID = Core.ID;
@@ -32,17 +35,17 @@ export type AnyView =
   | BoardView
   | CalendarView;
 
-type GalleryView = ViewTemplate<"gallery">;
-type ListView = ViewTemplate<"list">;
-type CalendarView = ViewTemplate<"calendar">;
-type TableView = ViewTemplate<"table"> & {
+export type GalleryView = ViewTemplate<"gallery">;
+export type ListView = ViewTemplate<"list">;
+export type CalendarView = ViewTemplate<"calendar">;
+export type TableView = ViewTemplate<"table"> & {
   page_sort: Blocks.ID[];
   format: {
     table_wrap: boolean;
     table_properties: Properties.Identity & Properties.Width;
   };
 };
-type BoardView = ViewTemplate<"board"> & {
+export type BoardView = ViewTemplate<"board"> & {
   format: {
     board_properties: Properties.Default[];
     board_groups2: BoardGroup[];
@@ -105,9 +108,12 @@ type Prefix<T, S extends ViewType> = {
   [K in keyof T as `${S}_${string & K}`]: T[K];
 };
 type Cover<S extends ViewType> = Prefix<Card.CoverFormatTemplate, S>;
-type Properties<S extends ViewType> = Prefix<PropertiesTemplate, S>;
-type Format<S extends ViewType> = Properties<S> & Cover<S>;
-type ViewTemplate<S extends ViewType> = View & {
-  type: S;
-  format: Format<S>;
-};
+type GenerateProperties<S extends ViewType> = Prefix<PropertiesTemplate, S>;
+type GenerateFormat<S extends ViewType> = GenerateProperties<S> & Cover<S>;
+type ViewTemplate<S extends ViewType> = Merge<
+  View,
+  {
+    type: S;
+    format: GenerateFormat<S>;
+  }
+>;

@@ -3,7 +3,14 @@ import React, { useContext } from "react";
 import { Components, NotionContext } from "@types";
 import { defaultMapPageUrl, defaultMapImageUrl } from "@utils";
 
-// All Supported Components
+interface dummyLinkProps {
+  href?: string;
+  rel?: string;
+  target?: string;
+  title?: string;
+}
+export const dummyLink = (props: dummyLinkProps) => <span {...props} />;
+
 import {
   Alias as DefaultAlias,
   AssetWrapper as DefaultAssetWrapper,
@@ -15,25 +22,21 @@ import {
   Checkbox as DefaultCheckbox,
   Code as DefaultCode,
   CollectionCard as DefaultCollectionCard,
-  CollectionColumnTitle as DefaultCollectionColumnTitle,
   CollectionRow as DefaultCollectionRow,
-  Page as DefaultCollectionViewPage,
+  CollectionViewPage as DefaultCollectionViewPage,
   CollectionViewBoard as DefaultCollectionViewBoard,
   CollectionViewGallery as DefaultCollectionViewGallery,
   CollectionViewList as DefaultCollectionViewList,
   CollectionViewTable as DefaultCollectionViewTable,
   CollectionView as DefaultCollectionView,
-  Collection as DefaultCollection,
-  ColumnList as DefaultColumnList,
-  Column as DefaultColumn,
   Divider as DefaultDivider,
   Equation as DefaultEquation,
   File as DefaultFile,
   GoogleDrive as DefaultGoogleDrive,
   Header as DefaultHeader,
-  GracefulImage as DefaultImage,
-  LazyImage as DefaultLazyImage,
+  Image as DefaultImage,
   Link as DefaultLink,
+  LazyImage as DefaultLazyImage,
   NumberedList as DefaultNumberedList,
   Page as DefaultPage,
   PageHeader as DefaultPageHeader,
@@ -49,18 +52,9 @@ import {
   Title as DefaultTitle,
   Todo as DefaultTodo,
   Toggle as DefaultToggle,
-  WrappedText as DefaultWrappedText,
 } from "@components";
 
-interface dummyLinkProps {
-  href?: string;
-  rel?: string;
-  target?: string;
-  title?: string;
-}
-export const dummyLink = (props: dummyLinkProps) => <span {...props} />;
-
-const defaultComponents: Components = {
+const defaultComponents: Components.Any = {
   alias: DefaultAlias,
   assetWrapper: DefaultAssetWrapper,
   asset: DefaultAsset,
@@ -71,7 +65,6 @@ const defaultComponents: Components = {
   checkbox: DefaultCheckbox,
   code: DefaultCode,
   collectionCard: DefaultCollectionCard,
-  collectionColumnTitle: DefaultCollectionColumnTitle,
   collectionRow: DefaultCollectionRow,
   collectionViewPage: DefaultCollectionViewPage,
   collectionViewBoard: DefaultCollectionViewBoard,
@@ -79,9 +72,6 @@ const defaultComponents: Components = {
   collectionViewList: DefaultCollectionViewList,
   collectionViewTable: DefaultCollectionViewTable,
   collectionView: DefaultCollectionView,
-  collection: DefaultCollection,
-  columnList: DefaultColumnList,
-  column: DefaultColumn,
   divider: DefaultDivider,
   equation: DefaultEquation,
   file: DefaultFile,
@@ -105,7 +95,6 @@ const defaultComponents: Components = {
   title: DefaultTitle,
   todo: DefaultTodo,
   toggle: DefaultToggle,
-  wrappedText: DefaultWrappedText,
 };
 
 const defaultNotionContext: NotionContext = {
@@ -133,7 +122,7 @@ const defaultNotionContext: NotionContext = {
 
 const ctx = React.createContext<NotionContext>(defaultNotionContext);
 
-export const NotionContextProvider: React.FC<NotionContext> = ({
+export const ContextProvider: Components.Presenter<NotionContext> = ({
   components: themeComponents = {},
   children,
   mapPageUrl,

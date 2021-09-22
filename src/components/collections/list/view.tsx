@@ -3,31 +3,21 @@ import React from "react";
 import { Property } from "@components/property";
 import { useNotionContext } from "@context";
 import { getPagesFromQuery } from "@utils";
-import {
-  Notion,
-  Presenter,
-  CollectionViewProps,
-  CollectionViewPresenter,
-} from "@types";
+import { Blocks, Core, Collections, Components } from "@types";
+import { Props as ViewProps } from "../../collection-view";
 
-interface ListItemProps
-  extends Pick<CollectionViewProps, "collection" | "collectionView"> {
-  block: Notion.PageBlock;
-}
+export type Props = Omit<ViewProps, "collectionView"> & {
+  collectionView: Collections.ListView;
+};
 
-interface ListProperty {
-  property: Notion.PropertyID;
-  visible: boolean;
-}
-
-export const CollectionViewList: CollectionViewPresenter = ({
+export const View: Components.Presenter<Props> = ({
   collection,
   collectionView,
   collectionData,
 }) => {
   const blocks = getPagesFromQuery(collectionData);
 
-  const mapItemProps = (block: Notion.PageBlock): ListItemProps => {
+  const mapItemProps = (block: Blocks.Page): ListItemProps => {
     return { collection, collectionView, block };
   };
 
@@ -37,8 +27,8 @@ export const CollectionViewList: CollectionViewPresenter = ({
         <div className="notion-list-body">
           {blocks
             .map((block) => mapItemProps(block))
-            .map((prop) => (
-              <ListItem {...prop} />
+            .map((prop, index) => (
+              <ListItem key={index} {...prop} />
             ))}
         </div>
       </div>
@@ -46,7 +36,16 @@ export const CollectionViewList: CollectionViewPresenter = ({
   );
 };
 
-const ListItem: Presenter<ListItemProps> = ({
+type ListItemProps = Pick<Props, "collection" | "collectionView"> & {
+  block: Blocks.Page;
+};
+
+type ListProperty = {
+  property: Core.PropertyID;
+  visible: boolean;
+};
+
+const ListItem: Components.Presenter<ListItemProps> = ({
   block,
   collection,
   collectionView,
@@ -67,7 +66,7 @@ const ListItem: Presenter<ListItemProps> = ({
       key={block.id}
     >
       <div className="notion-list-item-title">
-        <Property
+        <components.property
           schema={titleSchema}
           data={titleData}
           block={block}

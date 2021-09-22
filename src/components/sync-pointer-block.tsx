@@ -1,17 +1,22 @@
 import React from "react";
 
-import { NotionBlockRenderer } from "../renderer";
-import { SyncPointerPresenter } from "@types";
+import { BlockRenderer } from "../renderer";
+import { Components } from "@types";
+import { TransclusionReferenceBlock } from "@entities";
 
-export const SyncPointer: SyncPointerPresenter = ({ block, level }) => {
-  const { format } = block;
-  const referencePointerId = format.transclusion_reference_pointer.id;
+export type Props = {
+  block: TransclusionReferenceBlock;
+  level: number;
+};
+
+export const Component: Components.Presenter<Props> = ({ block, level }) => {
+  const referencePointer = block.transclusionReferencePointer;
 
   return (
-    <NotionBlockRenderer
-      key={referencePointerId}
+    <BlockRenderer
+      key={referencePointer.id}
       level={level}
-      blockId={referencePointerId}
+      blockId={referencePointer.id}
     />
   );
 };

@@ -28,6 +28,7 @@
     "types": ["node"],
     "paths": {
       "@icons": ["icons"],
+      "@entities": ["entities"],
       "@types": ["types"],
       "@types/*": ["types/*"],
       "@components": ["components"],

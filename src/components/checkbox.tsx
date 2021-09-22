@@ -1,13 +1,23 @@
 import React from "react";
 
 import CheckIcon from "../icons/check";
-import { CheckboxPresenter } from "@types";
+import { Components } from "@types";
 import { cs } from "@utils";
 
-export const Checkbox: CheckboxPresenter = ({ isChecked, blockId }) => {
-  const content = isChecked ? <CheckedCheckbox /> : <UncheckedCheckbox />;
+export type Props = {
+  isChecked: boolean;
+  className?: string;
+};
 
-  const checkboxStyle = cs("notion-property notion-property-checkbox", blockId);
+export const Component: Components.Presenter<Props> = ({
+  isChecked,
+  className,
+}) => {
+  const content = isChecked ? <CheckedCheckbox /> : <UncheckedCheckbox />;
+  const checkboxStyle = cs(
+    "notion-property notion-property-checkbox",
+    className
+  );
 
   return <span className={checkboxStyle}>{content}</span>;
 };

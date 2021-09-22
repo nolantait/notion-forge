@@ -1,19 +1,23 @@
 import React from "react";
 
-import { Property } from "@components/property";
+import { Collections, Formats, Components, Collections } from "@components";
+import { PageBlock } from "@entities";
 import { useNotionContext, dummyLink, NotionContextProvider } from "@context";
-import { CardCover } from "@components/collections/card/cover";
-import {
-  Notion,
-  CollectionCardProps,
-  CollectionCardProperty,
-  CollectionCardPresenter,
-  Presenter,
-} from "@types";
-
+import { CardCover } from "./card/cover";
 import { cs } from "@utils";
 
-export const CollectionCard: CollectionCardPresenter = (props) => {
+export type Props = {
+  collection: Collections.Collection;
+  block: PageBlock;
+  cover: Collections.Card.Cover;
+  coverSize: Collections.Card.CoverSize;
+  coverAspect: Collections.Card.CoverAspect;
+  children?: React.ReactNode;
+  properties?: Collections.Properties.Visible & Collections.Properties.Identity;
+  rest?: any[];
+};
+
+export const Component: Components.Presenter<Props> = (props) => {
   const context = useNotionContext();
   const { components, mapPageUrl } = context;
 
@@ -97,9 +101,9 @@ export const CollectionCard: CollectionCardPresenter = (props) => {
 
 interface CardTitleProps
   extends Pick<CollectionCardProps, "collection" | "block"> {
-  value?: Notion.Decoration[];
+  value?: Formats.Decoration[];
   propertyTitle?: string;
-  schema: Notion.CollectionPropertySchema;
+  schema: Collections.PropertySchema;
 }
 
 const CardTitle: Presenter<CardTitleProps> = ({
@@ -110,7 +114,7 @@ const CardTitle: Presenter<CardTitleProps> = ({
 }) => {
   return (
     <CardPropertyWrapper>
-      <Property
+      <components.property
         schema={schema}
         data={value}
         block={block}

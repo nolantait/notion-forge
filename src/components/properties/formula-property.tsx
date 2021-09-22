@@ -2,30 +2,32 @@ import React from "react";
 import { format } from "date-fns";
 
 import { evalFormula } from "@utils";
-import { Notion, Presenter, PropertyProps } from "@types";
+import { Formulas, Core, Components } from "@types";
+import { Props as PropertyProps } from "../property";
 
-interface FormulaPropertyProps
-  extends Pick<PropertyProps, "schema" | "collection"> {
-  properties: Notion.PropertyMap;
-}
+export type Props = Pick<PropertyProps, "schema" | "collection"> & {
+  properties: Core.PropertyMap;
+};
 
-export const FormulaProperty: Presenter<FormulaPropertyProps> = ({
+export const Property: Components.Presenter<Props> = ({
   schema,
   properties,
   collection,
 }) => {
+  if (!schema) return <></>;
+
   const { schema: collectionSchema } = collection;
   const { formula } = schema;
 
-  const formulaResult = evalFormula(formula as Notion.Formula, {
-    schema: collectionSchema,
-    properties: properties,
+  const formulaResult = evalFormula(formula as Formulas.Formula, {
+    schema: collectionSchema as any,
+    properties: properties as any,
   });
 
   return <>{parseResult(formulaResult)}</>;
 };
 
-const parseResult = (formulaResult: Notion.FormulaResult): string => {
+const parseResult = (formulaResult: Formulas.Result): string => {
   switch (typeof formulaResult) {
     case "string":
       return formulaResult;

@@ -1,16 +1,16 @@
 import React from "react";
 
-import { Presenter, PropertyProps } from "@types";
+import { Components } from "@types";
+import { Props as PropertyProps } from "../property";
 import { useNotionContext } from "@context";
 
-interface FilePropertyProps
-  extends Required<Pick<PropertyProps, "data" | "block">> {}
+export type Props = Required<Pick<PropertyProps, "data" | "block">>;
 
-export const FileProperty: Presenter<FilePropertyProps> = ({ data, block }) => {
+export const Property: Components.Presenter<Props> = ({ data, block }) => {
   // TODO: assets should be previewable via image-zoom
   const { components, mapImageUrl } = useNotionContext();
   const files =
-    data
+    data.asDecoration
       .filter((decoration) => decoration.length === 2)
       .map((filename) => filename.flat().flat()) ?? [];
 

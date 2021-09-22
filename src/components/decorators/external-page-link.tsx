@@ -1,15 +1,23 @@
 import React from "react";
 
-import { Notion, DecoratedExternalPageProps } from "@types";
+import { Formats, Components } from "@types";
 import { useNotionContext } from "@context";
+import { Block } from "@entities";
 
-import { DecoratedUser, DecoratedPageLink } from "./";
+import { Decorator as DecoratedUser } from "./user";
+import { Decorator as DecoratedPageLink } from "./page-link";
 
-export const DecoratedExternalPageLink = ({
+export type Props = {
+  decoration: Formats.ExternalLinkFormat;
+  block: Block;
+  linkProps: React.HTMLProps<HTMLAnchorElement>;
+};
+
+export const Decorator: Components.Presenter<Props> = ({
   decoration,
   block,
-  linkProps,
-}: DecoratedExternalPageProps): React.ReactElement => {
+  linkProps = {},
+}) => {
   const { recordMap } = useNotionContext();
   // link to an external block (outside of the current workspace)
   const linkType = decoration[1][0];
@@ -19,12 +27,7 @@ export const DecoratedExternalPageLink = ({
     case "u": {
       if (!block) return <></>;
 
-      return (
-        <DecoratedUser
-          decoration={decoration[1] as Notion.UserFormat}
-          block={block}
-        />
-      );
+      return <DecoratedUser decoration={decoration[1]} block={block} />;
     }
     default: {
       const linkedBlock = recordMap.block[id]?.value;
@@ -33,7 +36,7 @@ export const DecoratedExternalPageLink = ({
         throw new Error(`Missing block ${linkType} ${id}`);
       }
 
-      const format: Notion.PageFormat = ["p", id];
+      const format: Formats.PageFormat = ["p", id];
 
       return <DecoratedPageLink decoration={format} linkProps={linkProps} />;
     }

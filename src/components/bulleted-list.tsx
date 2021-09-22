@@ -1,24 +1,31 @@
 import React from "react";
 
 import { useNotionContext } from "@context";
-import { BulletedListPresenter, BulletedListProps, Presenter } from "@types";
+import { Components } from "@types";
 import { cs } from "@utils";
+import { BulletedListBlock } from "@entities";
 
-export const BulletedList: BulletedListPresenter = ({
+export type Props = {
+  block: BulletedListBlock;
+  className?: string;
+  children?: React.ReactNode;
+};
+
+export const Component: Components.Presenter<Props> = ({
   block,
-  blockId,
+  className,
   children,
 }) => {
   const { recordMap } = useNotionContext();
   const { content } = block;
   const { type } = block;
 
-  const parentBlock = recordMap.block[block.parent_id];
+  const parentBlock = recordMap.block[block.parentId];
 
   const isTopLevel = type !== parentBlock?.value?.type;
   const hasChildren = content;
 
-  const listStyle = cs("notion-list", "notion-list-disc", blockId);
+  const listStyle = cs("notion-list", "notion-list-disc", className);
 
   const output = hasChildren ? (
     <NestedList block={block} className={listStyle}>
@@ -35,39 +42,41 @@ export const BulletedList: BulletedListPresenter = ({
   );
 };
 
-interface WrapListProps extends Pick<BulletedListProps, "children"> {
+interface WrapListProps extends Pick<Props, "children"> {
   className: string;
 }
 
-const WrapList: Presenter<WrapListProps> = ({ children, className }) => {
+const WrapList: Components.Presenter<WrapListProps> = ({
+  children,
+  className,
+}) => {
   return <ul className={className}>{children}</ul>;
 };
 
-interface NestedListProps extends Pick<BulletedListProps, "block"> {
+interface NestedListProps extends Pick<Props, "block"> {
   className: string;
   children?: React.ReactNode;
 }
 
-const NestedList: Presenter<NestedListProps> = ({
+const NestedList: Components.Presenter<NestedListProps> = ({
   block,
   className,
   children,
 }) => {
-  const { properties } = block;
+  const { title } = block;
   return (
     <>
-      {properties && <ListItem block={block} />}
+      {!title.isEmpty && <ListItem block={block} />}
       {<WrapList className={className}>{children}</WrapList>}
     </>
   );
 };
 
-interface ListItemProps extends Pick<BulletedListProps, "block"> {}
+type ListItemProps = Pick<Props, "block">;
 
-const ListItem: Presenter<ListItemProps> = ({ block }) => {
+const ListItem: Components.Presenter<ListItemProps> = ({ block }) => {
   const { components } = useNotionContext();
-  const { properties } = block;
-  const title = properties?.title ?? [[""]];
+  const { title } = block;
 
   return (
     <li>

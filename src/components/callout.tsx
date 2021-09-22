@@ -1,20 +1,25 @@
 import React from "react";
 
-import { CalloutPresenter } from "@types";
+import { Components } from "@types";
 import { cs } from "@utils";
 import { useNotionContext } from "@context";
+import { CalloutBlock } from "@entities";
 
-export const Callout: CalloutPresenter = ({ block, blockId, children }) => {
+export type Props = {
+  block: CalloutBlock;
+  className?: string;
+  children?: React.ReactNode;
+};
+
+export const Component: Components.Presenter<Props> = ({
+  block,
+  className,
+  children,
+}) => {
   const { components } = useNotionContext();
-  const { properties } = block;
+  const { blockColor, title } = block;
 
-  const style = cs(
-    "notion-callout",
-    blockId,
-    block.format?.block_color && `notion-${block.format?.block_color}_co`
-  );
-
-  const title = properties.title;
+  const style = cs("notion-callout", className, `notion-${blockColor}_co`);
 
   return (
     <div className={style}>

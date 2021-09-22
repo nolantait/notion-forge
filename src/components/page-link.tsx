@@ -1,5 +1,9 @@
 import React from "react";
 
-import { PageLinkPresenter } from "@types";
+import { Components } from "@types";
 
-export const PageLink: PageLinkPresenter = (props) => <a {...props} />;
+export type Props = React.HTMLProps<HTMLAnchorElement>;
+
+export const Component: Components.Presenter<Props> = (props) => (
+  <a {...props} />
+);

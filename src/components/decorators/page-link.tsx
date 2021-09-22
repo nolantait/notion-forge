@@ -1,17 +1,17 @@
 import React from "react";
 
-import { Notion } from "@types";
+import { Components, Formats } from "@types";
 import { useNotionContext } from "@context";
 
-interface DecoratedPageLinkProps {
-  decoration: Notion.PageFormat;
-  linkProps?: any;
-}
+export type Props = {
+  decoration: Formats.PageFormat;
+  linkProps?: React.HTMLProps<HTMLAnchorElement>;
+};
 
-export const DecoratedPageLink = ({
+export const Decorator: Components.Presenter<Props> = ({
   decoration,
   linkProps,
-}: DecoratedPageLinkProps): React.ReactElement => {
+}) => {
   const { components, recordMap, mapPageUrl } = useNotionContext();
   const blockId = decoration[1];
   const linkType = decoration[0];
@@ -21,8 +21,6 @@ export const DecoratedPageLink = ({
     throw new Error(`Missing block ${linkType} ${blockId}`);
   }
 
-  const pageBlock = linkedBlock as Notion.PageBlock;
-
   return (
     <components.pageLink
       className="notion-link"
@@ -31,7 +29,7 @@ export const DecoratedPageLink = ({
       target="_blank"
       rel="noopener noreferrer"
     >
-      <components.pageTitle block={pageBlock} />
+      <components.pageTitle block={linkedBlock} />
     </components.pageLink>
   );
 };

@@ -9,14 +9,12 @@ export type Any =
   | Language
   | Checked;
 
-type URL = string[];
-
 export type Title = {
   title: Formats.Decoration[];
 };
 
 export type Source = {
-  source: URL[];
+  source: Formats.Decoration[];
 };
 
 export type Caption = {

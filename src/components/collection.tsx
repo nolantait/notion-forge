@@ -11,46 +11,34 @@ import Menu, { Item as MenuItem } from "rc-menu";
 
 import { CollectionViewIcon, ChevronDownIcon } from "@icons";
 import { useNotionContext } from "@context";
-import { cs, getTextContent } from "@utils";
-import { CollectionPresenter } from "@types";
+import { cs } from "@utils";
+import { Collections, Core, Components } from "@types";
+import { CollectionViewBlock } from "@entities";
 
-import { Notion } from "@types";
-
-const triggers = ["click"];
-
-type CollectionBlock =
-  | Notion.CollectionViewBlock
-  | Notion.CollectionViewPageBlock;
-
-interface CollectionState {
-  collectionViewId: string;
-}
-
-interface CollectionActions {
-  collectionState?: CollectionState;
-  setCollectionState?: Dispatch<SetStateAction<CollectionState | undefined>>;
-}
-
-interface CollectionViewDropdown {
-  viewIds: Array<string>;
-  currentViewId: string;
-}
+export type Props = {
+  block: CollectionViewBlock;
+  className?: string;
+};
 
 export const CollectionActionContext = createContext<CollectionActions>({});
 
-export const Collection: CollectionPresenter = ({ block, className }) => {
+export const Component: Components.Presenter<Props> = ({
+  block,
+  className,
+}) => {
   const { recordMap, components } = useNotionContext();
-  const { collection_id: collectionId, view_ids: viewIds } = block;
+  const { collectionId, viewIds } = block;
   const defaultViewId: string | undefined = viewIds[0];
+
+  if (!defaultViewId) throw new Error(`Invalid view id for ${block.id}`);
 
   const [collectionState, setCollectionState] = useLocalStorage(block.id, {
     collectionViewId: defaultViewId,
   });
 
   const currentViewId =
-    viewIds.find(
-      (id: string | undefined) => id === collectionState?.collectionViewId
-    ) || viewIds[0];
+    viewIds.find((id) => id === collectionState?.collectionViewId) ||
+    defaultViewId;
 
   const collection = recordMap.collection[collectionId]?.value;
   const currentView = recordMap.collection_view[currentViewId]?.value;
@@ -63,17 +51,12 @@ export const Collection: CollectionPresenter = ({ block, className }) => {
     throw new Error(`Invalid collection ${collection}`);
   }
 
-  const title = getTextContent(collection.name).trim();
   if (collection.icon) {
-    block.format = {
-      ...block.format,
-      page_icon: collection.icon,
-    };
+    block.pageIcon = collection.icon;
   }
 
   const containerStyle = cs("notion-collection", className);
   const collectionHeaderProps: CollectionHeaderProps = {
-    title,
     block,
     viewIds,
     currentViewId,
@@ -96,20 +79,30 @@ export const Collection: CollectionPresenter = ({ block, className }) => {
   );
 };
 
-interface CollectionHeaderProps {
-  title?: string;
-  block: CollectionBlock;
-  viewIds: Array<string>;
-  currentViewId: string;
+interface CollectionState {
+  collectionViewId: string;
+}
+interface CollectionActions {
+  collectionState?: CollectionState;
+  setCollectionState?: Dispatch<SetStateAction<CollectionState | undefined>>;
 }
 
-const CollectionHeader = (props: CollectionHeaderProps) => {
+type CollectionHeaderProps = Pick<Props, "block"> & {
+  viewIds: Core.ID[];
+  currentViewId: Core.ID;
+};
+
+const CollectionHeader: Components.Presenter<CollectionHeaderProps> = ({
+  viewIds,
+  currentViewId,
+  block,
+}) => {
   const { components, showCollectionViewDropdown } = useNotionContext();
-  const { title, block, viewIds, currentViewId } = props;
+  const { title } = block;
 
   return (
     <div className="notion-collection-header">
-      {title && (
+      {!title.isEmpty && (
         <div className="notion-collection-header-title">
           <>
             <components.pageIcon
@@ -117,48 +110,53 @@ const CollectionHeader = (props: CollectionHeaderProps) => {
               className="notion-page-title-icon"
               hideDefaultIcon
             />
-            {title}
+            {title.asString}
           </>
         </div>
       )}
 
       {viewIds.length > 1 && showCollectionViewDropdown && (
-        <CollectionViewDropdown {...{ viewIds, currentViewId }} />
+        <CollectionViewDropdown {...{ block, viewIds, currentViewId }} />
       )}
     </div>
   );
 };
 
-const CollectionViewDropdown = (props: CollectionViewDropdown): JSX.Element => {
-  const { recordMap } = useNotionContext();
-  const { viewIds, currentViewId } = props;
-  const collectionView = recordMap.collection_view[currentViewId]?.value;
+const triggers = ["click"];
 
-  const collectionViewMenuProps = { viewIds };
-  const collectionMenu = <CollectionViewMenu {...collectionViewMenuProps} />;
+type CollectionViewDropdownProps = Omit<CollectionHeaderProps, "block">;
 
-  return (
-    <Dropdown trigger={triggers} overlay={collectionMenu} animation="slide-up">
-      <CollectionViewColumnDesc
-        className="notion-collection-view-dropdown"
-        collectionView={collectionView}
+const CollectionViewDropdown: Components.Presenter<CollectionViewDropdownProps> =
+  ({ viewIds, currentViewId }) => {
+    const { recordMap } = useNotionContext();
+    const collectionView = recordMap.collection_view[currentViewId]?.value;
+    const collectionMenu = <CollectionViewMenu viewIds={viewIds} />;
+
+    return (
+      <Dropdown
+        trigger={triggers}
+        overlay={collectionMenu}
+        animation="slide-up"
       >
-        <ChevronDownIcon className="notion-collection-view-dropdown-icon" />
-      </CollectionViewColumnDesc>
-    </Dropdown>
-  );
-};
+        <CollectionViewColumnDesc
+          className="notion-collection-view-dropdown"
+          collectionView={collectionView}
+        >
+          <ChevronDownIcon className="notion-collection-view-dropdown-icon" />
+        </CollectionViewColumnDesc>
+      </Dropdown>
+    );
+  };
 
-interface CollectionViewMenuProps {
-  viewIds: Array<string>;
-}
+type CollectionViewMenuProps = Pick<CollectionHeaderProps, "viewIds">;
 
-const CollectionViewMenu = (props: CollectionViewMenuProps) => {
+const CollectionViewMenu: Components.Presenter<CollectionViewMenuProps> = ({
+  viewIds,
+}) => {
+  const { recordMap } = useNotionContext();
   const { collectionState, setCollectionState } = useContext(
     CollectionActionContext
   );
-  const { recordMap } = useNotionContext();
-  const { viewIds } = props;
 
   // Changing the view from a collection dropdown
   const onChangeView = useCallback(
@@ -172,7 +170,7 @@ const CollectionViewMenu = (props: CollectionViewMenuProps) => {
         collectionViewId,
       });
     },
-    [collectionState]
+    [collectionState, setCollectionState]
   );
 
   return (
@@ -191,25 +189,29 @@ const CollectionViewMenu = (props: CollectionViewMenuProps) => {
   );
 };
 
-const CollectionViewColumnDesc: React.FC<{
-  collectionView: Notion.CollectionView;
+type CollectionViewColumnDescProps = {
+  collectionView: Collections.View;
   className?: string;
   children?: React.ReactNode;
-}> = ({ collectionView, className, children, ...rest }) => {
-  const { type } = collectionView;
-  const name =
-    collectionView.name || `${type[0].toUpperCase()}${type.slice(1)} view`;
-
-  return (
-    <div className={cs("notion-collection-view-type", className)} {...rest}>
-      <CollectionViewIcon
-        className="notion-collection-view-type-icon"
-        type={type}
-      />
-
-      <span className="notion-collection-view-type-title">{name}</span>
-
-      {children}
-    </div>
-  );
+  rest?: React.HTMLProps<HTMLDivElement>;
 };
+
+const CollectionViewColumnDesc: Components.Presenter<CollectionViewColumnDescProps> =
+  ({ collectionView, className, children, rest }) => {
+    const { type } = collectionView;
+    const derrivedTitle = `${type[0].toUpperCase()}${type.slice(1)} view`;
+    const name = collectionView.name || derrivedTitle;
+
+    return (
+      <div className={cs("notion-collection-view-type", className)} {...rest}>
+        <CollectionViewIcon
+          className="notion-collection-view-type-icon"
+          type={type}
+        />
+
+        <span className="notion-collection-view-type-title">{name}</span>
+
+        {children}
+      </div>
+    );
+  };

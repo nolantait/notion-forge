@@ -3,16 +3,26 @@ import React from "react";
 import { FileIcon } from "@icons";
 import { useNotionContext } from "@context";
 import { cs } from "@utils";
-import { FilePresenter } from "@types";
+import { Components } from "@types";
+import { FileBlock } from "@entities";
 
-export const File: FilePresenter = ({ block, className }) => {
+export type Props = {
+  block: FileBlock;
+  className?: string;
+};
+
+export const Component: Components.Presenter<Props> = ({
+  block,
+  className,
+}) => {
   const { components, recordMap } = useNotionContext();
   const signedUrl = recordMap.signed_urls[block.id];
-  const size = block.properties?.size;
-  const title = block.properties?.title || [["File"]];
+  const size = block.size;
+  const title = block.title.isEmpty ? block.title.asDecoration : [["File"]];
+  const style = cs("notion-file", className);
 
   return (
-    <div className={cs("notion-file", className)}>
+    <div className={style}>
       <components.link
         className="notion-file-link"
         href={signedUrl}

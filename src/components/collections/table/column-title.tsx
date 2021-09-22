@@ -1,11 +1,16 @@
 import React from "react";
 
-import { CollectionColumnTitlePresenter } from "@types";
+import { Components } from "@types";
 import { PropertyIcon } from "@icons";
 
-export const CollectionColumnTitle: CollectionColumnTitlePresenter = ({
-  schema,
-}) => {
+export type Props = {
+  schema: {
+    type: string;
+    name: string;
+  };
+};
+
+export const Component: Components.Presenter<Props> = ({ schema }) => {
   return (
     <div className="notion-collection-column-title">
       <PropertyIcon

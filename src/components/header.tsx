@@ -1,38 +1,47 @@
 import React from "react";
 
-import { HeaderPresenter } from "@types";
+import { Components } from "@types";
 import { LinkIcon } from "@icons";
 import { useNotionContext } from "@context";
 import {
   cs,
-  getTextContent,
   getPageTableOfContents,
   getBlockParentPage,
   uuidToId,
 } from "@utils";
+import { PageBlock, HeaderBlock } from "@entities";
 
 const tocIndentLevelCache: {
   [blockId: string]: number;
 } = {};
 
-export const Header: HeaderPresenter = ({ block, blockId }) => {
+export type Props = {
+  block: HeaderBlock;
+  className?: string;
+};
+
+export const Component: Components.Presenter<Props> = ({
+  block,
+  className,
+}) => {
   const { recordMap, components } = useNotionContext();
 
-  if (!block.properties) return <></>;
-
-  const blockColor = block.format?.block_color;
+  const { blockColor } = block;
   const id = uuidToId(block.id);
-  const title = getTextContent(block.properties.title) || `Notion Header ${id}`;
+  const title = block.title.isEmpty
+    ? `Notion Header ${id}`
+    : block.title.asString;
 
   // we use a cache here because constructing the ToC is non-trivial
   let indentLevel = tocIndentLevelCache[block.id];
-  let indentLevelClass: string = "";
+  let indentLevelClass = "";
 
   if (indentLevel === undefined) {
-    const page = getBlockParentPage(block, recordMap);
+    const dto = getBlockParentPage(block._dto, recordMap);
 
-    if (page) {
-      const toc = getPageTableOfContents(page, recordMap);
+    if (dto) {
+      const page = new PageBlock(dto);
+      const toc = getPageTableOfContents(page._dto as any, recordMap);
       const tocItem = toc.find((tocItem) => tocItem.id === block.id);
 
       if (tocItem) {
@@ -56,7 +65,7 @@ export const Header: HeaderPresenter = ({ block, blockId }) => {
     isH3 && "notion-h notion-h3",
     blockColor && `notion-${blockColor}`,
     indentLevelClass,
-    blockId
+    className
   );
 
   const innerHeader = (
@@ -68,7 +77,7 @@ export const Header: HeaderPresenter = ({ block, blockId }) => {
       </a>
 
       <span className="notion-h-title">
-        <components.text value={block.properties.title} block={block} />
+        <components.text value={block.title.asDecoration} block={block} />
       </span>
     </span>
   );

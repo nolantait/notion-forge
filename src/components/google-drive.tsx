@@ -3,11 +3,20 @@ import { formatDistance } from "date-fns";
 
 import { useNotionContext } from "@context";
 import { cs } from "@utils";
-import { GoogleDrivePresenter } from "@types";
+import { Components } from "@types";
+import { GoogleDriveBlock } from "@entities";
 
-export const GoogleDrive: GoogleDrivePresenter = ({ block, className }) => {
+export type Props = {
+  block: GoogleDriveBlock;
+  className?: string;
+};
+
+export const Component: Components.Presenter<Props> = ({
+  block,
+  className,
+}) => {
   const { components, mapImageUrl } = useNotionContext();
-  const properties = block.format?.drive_properties;
+  const properties = block.driveProperties;
 
   if (!properties) throw new Error(`Missing drive_properties for ${block.id}`);
 
@@ -17,9 +26,10 @@ export const GoogleDrive: GoogleDrivePresenter = ({ block, className }) => {
     new Date(properties.modified_time),
     new Date()
   );
+  const style = cs("notion-google-drive", className);
 
   return (
-    <div className={cs("notion-google-drive", className)}>
+    <div className={style}>
       <components.link
         className="notion-google-drive-link"
         href={url}

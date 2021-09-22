@@ -1,9 +1,15 @@
 import React from "react";
 
-import { TitlePresenter } from "@types";
+import { Components } from "@types";
 import { useNotionContext } from "@context";
+import { PageBlock, CollectionViewPageBlock, Decorated } from "@entities";
 
-export const Title: TitlePresenter = ({ value, block }) => {
+export type Props = {
+  block: PageBlock | CollectionViewPageBlock;
+  value: Decorated;
+};
+
+export const Component: Components.Presenter<Props> = ({ value, block }) => {
   const { components } = useNotionContext();
 
   return (

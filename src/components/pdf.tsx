@@ -1,13 +1,14 @@
 import React from "react";
+
 import { Page, Document } from "react-pdf";
-import Modal from "react-modal";
+import { Components } from "@types";
 
-interface PdfProps {
+export type Props = {
   file: string;
-  children: React.ReactNode;
-}
+  rest: any[];
+};
 
-const Pdf: React.FC<PdfProps> = ({ file, children, ...rest }) => {
+export const Component: Components.Presenter<Props> = ({ file, ...rest }) => {
   const [numPages, setNumPages] = React.useState(0);
 
   function onDocumentLoadSuccess({ numPages }: { numPages: number }) {
@@ -22,5 +23,3 @@ const Pdf: React.FC<PdfProps> = ({ file, children, ...rest }) => {
     </Document>
   );
 };
-
-export { Pdf, Modal };

@@ -3,8 +3,7 @@ export * from "./types";
 export * from "./utils";
 export * from "./context";
 
-export * from "./third-party";
 export * from "./components";
 
-export { NotionRenderer } from "./renderer";
-export type { NotionRendererProps } from "./types/components";
+export { Renderer as NotionRenderer } from "./renderer";
+export type { Props as NotionRendererProps } from "./renderer";

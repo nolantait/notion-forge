@@ -1,22 +1,24 @@
 import React from "react";
 import formatNumber from "format-number";
 
-import { Notion, Presenter, PropertyProps, NumberPropertySchema } from "@types";
+import { Components, Formats } from "@types";
 import { useNotionContext } from "@context";
 import { decorate } from "@utils";
+import { Props as PropertyProps } from "../property";
 
-interface NumberPropertyProps
-  extends Required<Pick<PropertyProps, "data" | "block">> {
-  schema: NumberPropertySchema;
-}
+export type Props = Required<Pick<PropertyProps, "data" | "block">> & {
+  schema: {
+    number_format: Formats.NumberFormat;
+  };
+};
 
-export const NumberProperty: Presenter<NumberPropertyProps> = ({
+export const Property: Components.Presenter<Props> = ({
   data,
   block,
   schema,
 }) => {
   const { components } = useNotionContext();
-  const dataText = data[0][0] ?? "0";
+  const dataText = data.isEmpty ? "0" : data.asString;
   const parsableNumberFormat = /^[a-fA-F0-9]+$/;
   if (!parsableNumberFormat.test(dataText)) {
     throw new Error(
@@ -37,7 +39,7 @@ export const NumberProperty: Presenter<NumberPropertyProps> = ({
 };
 
 const formattedNumber = (
-  format: Notion.NumberFormat,
+  format: Formats.NumberFormat,
   value: number
 ): string => {
   switch (format) {

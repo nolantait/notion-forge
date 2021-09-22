@@ -1,24 +1,23 @@
 import React from "react";
 
-import { Notion, PropertyProps, Presenter } from "@types";
+import { Components } from "@types";
 import { useNotionContext } from "@context";
+import { Props as PropertyProps } from "../property";
 
-interface UrlPropertyProps
-  extends Pick<PropertyProps, "data" | "inline" | "block"> {}
+export type Props = Pick<PropertyProps, "data" | "inline" | "block">;
 
-export const UrlProperty: Presenter<UrlPropertyProps> = ({
+export const UrlProperty: Components.Presenter<Props> = ({
   data,
   inline,
   block,
 }) => {
   const { components } = useNotionContext();
-  const decoration: Notion.Decoration[] = data ?? [];
-  let dataText = decoration[0][0] ?? "";
+  let value = data.asString;
 
   if (inline) {
     try {
-      const url = new URL(dataText);
-      dataText = url.hostname.replace(/^www\./, "");
+      const url = new URL(value);
+      value = url.hostname.replace(/^www\./, "");
     } catch (err) {
       // ignore invalid urls
     }
@@ -26,7 +25,7 @@ export const UrlProperty: Presenter<UrlPropertyProps> = ({
 
   return (
     <components.text
-      value={decoration}
+      value={value}
       block={block}
       inline={inline}
       linkProps={{

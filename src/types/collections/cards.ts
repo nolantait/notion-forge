@@ -1,4 +1,4 @@
-import { PropertyID } from "../";
+import { Core } from "@types";
 
 export type CoverType =
   | "page_cover"
@@ -15,7 +15,7 @@ export type CoverPosition = number;
 
 export interface Cover {
   type: CoverType;
-  property?: PropertyID;
+  property?: Core.PropertyID;
 }
 
 export interface CoverFormatTemplate {

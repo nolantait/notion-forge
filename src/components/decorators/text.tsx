@@ -1,24 +1,30 @@
 import React from "react";
 
-import { DecoratedTextProps, DecoratedElementProps } from "@types";
+import { Formats, Components } from "@types";
 import { useNotionContext } from "@context";
 
-import {
-  DecoratedDate,
-  DecoratedExternalPageLink,
-  DecoratedPageLink,
-  DecoratedUser,
-  DecoratedLink,
-} from "./";
+import { Decorator as DecoratedDate } from "./date";
+import { Decorator as DecoratedExternalPageLink } from "./external-page-link";
+import { Decorator as DecoratedPageLink } from "./page-link";
+import { Decorator as DecoratedUser } from "./user";
+import { Decorator as DecoratedLink } from "./link";
+import { Props as TextProps } from "../text";
 
-export const DecoratedText = ({
+export type Props = Pick<TextProps, "block" | "linkProps" | "linkProtocol"> & {
+  linkProps: React.HTMLProps<HTMLAnchorElement>;
+  decorations: Formats.SubDecoration[];
+  text: string;
+  index: number;
+};
+
+export const Decorator: Components.Presenter<Props> = ({
   decorations,
   text,
   index,
   block,
   linkProps = {},
   linkProtocol,
-}: DecoratedTextProps): React.ReactElement => {
+}) => {
   const initialElement = <>{text}</>;
 
   const decorated = decorations.reduce(
@@ -33,13 +39,18 @@ export const DecoratedText = ({
   return <React.Fragment key={index}>{decorated}</React.Fragment>;
 };
 
-const DecoratedElement = ({
+export type ElementProps = Omit<Props, "decorations" | "text" | "index"> & {
+  decoration: Formats.SubDecoration;
+  element: React.ReactElement;
+};
+
+const DecoratedElement: Components.Presenter<ElementProps> = ({
   element,
   decoration,
   block,
   linkProps,
   linkProtocol,
-}: DecoratedElementProps) => {
+}) => {
   const { components } = useNotionContext();
   const decorationSymbol = decoration[0];
 

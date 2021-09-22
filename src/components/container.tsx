@@ -1,10 +1,11 @@
 import React from "react";
 
-import { PageBlock, CollectionViewPageBlock } from "@types";
+import { Components } from "@types";
+import { PageBlock, CollectionViewPageBlock } from "@entities";
 import { useNotionContext } from "@context";
-import { cs, isUrl, getBlockIcon, getTextContent } from "@utils";
+import { cs, isUrl, getBlockIcon } from "@utils";
 
-interface NotionContainerProps {
+export type Props = {
   block: PageBlock | CollectionViewPageBlock;
   blockId: string;
   className?: string;
@@ -12,9 +13,9 @@ interface NotionContainerProps {
   pageCoverPosition?: number;
   footer?: React.ReactNode;
   children: React.ReactNode;
-}
+};
 
-export const NotionContainer = (props: NotionContainerProps) => {
+export const Component: Components.Presenter<Props> = (props) => {
   const { mapImageUrl, defaultPageIcon, recordMap, components } =
     useNotionContext();
 
@@ -28,12 +29,12 @@ export const NotionContainer = (props: NotionContainerProps) => {
     children,
   } = props;
 
-  const { properties } = block;
   const hasPageCover = pageCover;
   const coverPosition = (1 - pageCoverPosition) * 100;
-  const pageIcon = getBlockIcon(block, recordMap) ?? defaultPageIcon;
+  const pageIcon =
+    getBlockIcon(block._dto as any, recordMap) ?? defaultPageIcon;
   const isPageIconUrl = pageIcon && isUrl(pageIcon);
-  const { page_full_width: pageFullWidth = false } = block?.format ?? {};
+  const { pageFullWidth } = block;
 
   const outerContainerStyle = cs("notion", "notion-app", blockId, className);
 
@@ -51,7 +52,7 @@ export const NotionContainer = (props: NotionContainerProps) => {
     ) : (
       <components.lazyImage
         src={mapImageUrl(pageCover, block)}
-        alt={getTextContent(properties?.title)}
+        alt={block.title.asString}
         className="notion-page-cover"
         style={{
           objectPosition: `center ${coverPosition}%`,

@@ -3,12 +3,22 @@ import { LazyImageFull, ImageState } from "react-lazy-images";
 
 import { useNotionContext } from "@context";
 import { cs } from "@utils";
-import { LazyImagePresenter } from "@types";
+import { Components } from "@types";
 
 /**
  * Progressive, lazy images modeled after Medium's LQIP technique.
  */
-export const LazyImage: LazyImagePresenter = ({
+
+export type Props = {
+  src: string;
+  alt?: string;
+  className?: string;
+  style: React.CSSProperties;
+  zoomable: boolean;
+  height: string;
+};
+
+export const Component: Components.Presenter<Props> = ({
   src,
   alt,
   className,
@@ -20,13 +30,11 @@ export const LazyImage: LazyImagePresenter = ({
   const { recordMap, zoom, previewImages } = useNotionContext();
 
   const zoomRef = React.useRef(zoom ? zoom.clone() : null);
-  const previewImage = previewImages
-    ? (recordMap as any)?.preview_images?.[src]
-    : null;
+  const previewImage = previewImages ? recordMap.preview_images?.[src] : null;
 
-  function attachZoom(image: any) {
+  function attachZoom(image: React.LegacyRef<HTMLImageElement>) {
     if (zoomRef.current) {
-      (zoomRef.current as any).attach(image);
+      zoomRef.current.attach(image);
     }
   }
 
@@ -76,7 +84,7 @@ export const LazyImage: LazyImagePresenter = ({
               <img
                 src={src}
                 alt={alt}
-                ref={attachZoomRef}
+                ref={attachZoomRef as any}
                 className="lazy-image-real"
                 style={{
                   ...style,
@@ -100,7 +108,7 @@ export const LazyImage: LazyImagePresenter = ({
         className={className}
         style={style}
         src={src}
-        ref={attachZoomRef}
+        ref={attachZoomRef as any}
         loading="lazy"
         alt={alt}
         decoding="async"
