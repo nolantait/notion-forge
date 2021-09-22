@@ -1,7 +1,5 @@
-import type { Blocks, Formats } from "./";
-import type { Decorated } from "../entities";
-
-import type { Utils } from "@types";
+import type { Decorated } from "@entities";
+import type { Blocks, Formats, Utils } from "@types";
 
 export type Factory<T extends Blocks.BlockType> = Fetch<T, "factory">;
 

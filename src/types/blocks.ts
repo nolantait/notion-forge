@@ -155,27 +155,27 @@ export type Alias = Override<
  * Base properties shared by all blocks.
  */
 
-interface TBlock extends Renderable {
+export interface TBlock extends Renderable {
   type: never;
   properties?: never;
   format?: never;
   content?: never;
 }
-interface TTextBlock {
+export interface TTextBlock {
   properties: Properties.Title;
   format: Format.Color;
 }
-interface TContentBlock {
+export interface TContentBlock {
   properties: Properties.Source & Properties.Caption;
   format: Format.Source & Format.Block;
 }
-interface TPageBlock extends Core.Attachable {
+export interface TPageBlock extends Core.Attachable {
   content?: ID[];
   properties: Properties.Title;
   format: Format.Page & Format.Access & Format.Color;
   permissions: Core.Permission[];
 }
-interface TCollectionBlock {
+export interface TCollectionBlock {
   type: Collections.ViewType;
   name: string;
   query2: Collections.Query.ViewQuery;
