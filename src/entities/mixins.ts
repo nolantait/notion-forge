@@ -1,9 +1,10 @@
 import { Formats } from "@types";
 import { getProperty, Block, Decorated } from "./";
 
-type Mixable = new (...args: any[]) => Block;
+type Mixin<T> = new (...args: any[]) => T;
+type Mixable = Mixin<Block>;
 
-export function Layoutable<TBase extends Mixable>(Base: TBase): Mixable {
+export function Layoutable<TBase extends Mixable>(Base: TBase) {
   return class extends Base {
     get pageFullWidth(): boolean {
       return getProperty(this._format, "page_full_width", true);
@@ -23,7 +24,7 @@ export function Layoutable<TBase extends Mixable>(Base: TBase): Mixable {
   };
 }
 
-export function Glyphable<TBase extends Mixable>(Base: TBase): Mixable {
+export function Glyphable<TBase extends Mixable>(Base: TBase) {
   return class extends Base {
     get pageIcon(): string {
       return getProperty(this._format, "page_icon", "");
@@ -35,7 +36,7 @@ export function Glyphable<TBase extends Mixable>(Base: TBase): Mixable {
   };
 }
 
-export function Colorable<TBase extends Mixable>(Base: TBase): Mixable {
+export function Colorable<TBase extends Mixable>(Base: TBase) {
   return class extends Base {
     get blockColor(): Formats.Color {
       return getProperty(this._format, "block_color", "transparent");
@@ -43,7 +44,7 @@ export function Colorable<TBase extends Mixable>(Base: TBase): Mixable {
   };
 }
 
-export function Lockable<TBase extends Mixable>(Base: TBase): Mixable {
+export function Lockable<TBase extends Mixable>(Base: TBase) {
   return class extends Base {
     get blockLocked(): boolean {
       return getProperty(this._format, "block_locked", false);
@@ -55,7 +56,7 @@ export function Lockable<TBase extends Mixable>(Base: TBase): Mixable {
   };
 }
 
-export function Titleable<TBase extends Mixable>(Base: TBase): Mixable {
+export function Titleable<TBase extends Mixable>(Base: TBase) {
   return class extends Base {
     get title(): Decorated {
       const value = getProperty(this._properties, "title", [[""]]);
@@ -64,7 +65,7 @@ export function Titleable<TBase extends Mixable>(Base: TBase): Mixable {
   };
 }
 
-export function Linkable<TBase extends Mixable>(Base: TBase): Mixable {
+export function Linkable<TBase extends Mixable>(Base: TBase) {
   return class extends Base {
     get link(): Decorated {
       const value = getProperty(this._properties, "link", [[""]]);
@@ -78,7 +79,7 @@ export function Linkable<TBase extends Mixable>(Base: TBase): Mixable {
   };
 }
 
-export function Captionable<TBase extends Mixable>(Base: TBase): Mixable {
+export function Captionable<TBase extends Mixable>(Base: TBase) {
   return class extends Base {
     get caption(): Decorated {
       const value = getProperty(this._properties, "caption", [[""]]);
@@ -87,7 +88,7 @@ export function Captionable<TBase extends Mixable>(Base: TBase): Mixable {
   };
 }
 
-export function Shapeable<TBase extends Mixable>(Base: TBase): Mixable {
+export function Shapeable<TBase extends Mixable>(Base: TBase) {
   return class extends Base {
     get blockWidth(): number {
       return getProperty(this._format, "block_width", 0);
@@ -115,7 +116,7 @@ export function Shapeable<TBase extends Mixable>(Base: TBase): Mixable {
   };
 }
 
-export function Sourceable<TBase extends Mixable>(Base: TBase): Mixable {
+export function Sourceable<TBase extends Mixable>(Base: TBase) {
   return class extends Base {
     get source(): Decorated {
       const value = getProperty(this._properties, "source", [[""]]);

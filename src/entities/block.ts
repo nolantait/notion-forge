@@ -1,5 +1,4 @@
-import { Utils, Blocks } from "@types";
-import { getProperty } from "./";
+import { Core, Utils, Blocks } from "@types";
 
 type AnyProperty = Partial<Utils.UnionToIntersection<Blocks.Properties.Any>>;
 type AnyFormat = Partial<Utils.UnionToIntersection<Blocks.Format.Any>>;
@@ -11,20 +10,12 @@ export class Block {
     this._dto = block;
   }
 
-  fetchProperty(key: string): unknown | undefined {
-    if (Object.keys(this._properties).includes(key)) {
-      return getProperty(this._properties, key as any, true);
-    }
-
-    return undefined;
-  }
-
   get type(): Blocks.BlockType {
     return this._dto.type as Blocks.BlockType;
   }
 
   get id(): Blocks.ID {
-    return this._dto.id as Blocks.ID;
+    return this._dto.id;
   }
 
   get parentId(): Blocks.ID {

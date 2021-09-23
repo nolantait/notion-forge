@@ -3,8 +3,7 @@ import type { Blocks, Formats, Utils } from "@types";
 
 export type Factory<T extends Blocks.BlockType> = Fetch<T, "factory">;
 
-// type Test = Factory<"page">;
-// type SchemaTest = BlockSchema["page"]
+// type SchemaTest = Utils.Simplify<Utils.Get<BlockSchema, "code.factory">>
 
 // Private Generics
 

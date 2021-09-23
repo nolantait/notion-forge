@@ -156,10 +156,10 @@ export type Alias = Override<
  */
 
 export interface TBlock extends Renderable {
-  type: never;
-  properties?: never;
-  format?: never;
-  content?: never;
+  type?: unknown;
+  properties?: unknown;
+  format?: unknown;
+  content?: unknown;
 }
 export interface TTextBlock {
   properties: Properties.Title;
@@ -224,7 +224,7 @@ type PositionTypes = "column" | "column_list" | "divider";
 
 // Generic Mappings
 type Default = TypeMap;
-type Override<T extends keyof Default, U> = Default[T] & U;
+type Override<T extends keyof Default, U> = Utils.Merge<Default[T], U>;
 type TypeMap = { [Key in PositionTypes]: MapType<TBlock, Key> } &
   { [Key in PointerTypes]: MapType<TBlock, Key> } &
   { [Key in CollectionViewTypes]: MapType<TCollectionBlock, Key> } &
@@ -233,5 +233,5 @@ type TypeMap = { [Key in PositionTypes]: MapType<TBlock, Key> } &
   { [Key in PageTypes]: MapType<TPageBlock, Key> };
 
 type MapType<T, Key> = Utils.Merge<Build<T>, { type: Key }>;
-type Build<T = void> = T extends void ? TBlock : Utils.Merge<TBlock, T>;
+type Build<T> = Utils.Merge<TBlock, T>;
 type Renderable = Core.Identity & Core.Creatable & Core.Editable;

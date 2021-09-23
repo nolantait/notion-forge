@@ -1,3 +1,5 @@
+import { Some, None, Option } from "excoptional";
+
 import type { Entities, Blocks } from "@types";
 import * as Mixins from "./mixins";
 
@@ -6,18 +8,24 @@ import { Decorated } from "./decorated";
 
 export { Block, Decorated };
 
-export function getProperty<T, K extends keyof T>(
+export const getProperty = <T, K extends keyof T>(
   attributes: T,
   key: K,
-  defval: T[K]
-): T[K] {
-  const entries = Object.entries(attributes);
-  if (entries.length) {
-    return attributes[key] ?? defval;
-  }
+  defval: NonNullable<T[K]>
+): NonNullable<T[K]> => {
+  const rawValue = getRawProperty(attributes, key);
+  const valueOrDefault = rawValue.getOrElse(defval);
+  return valueOrDefault ?? defval;
+};
 
-  return defval;
-}
+const getRawProperty = <T, K extends keyof T>(
+  attributes: T,
+  key: K
+): Option<T[K]> => {
+  const value = attributes[key];
+
+  return value ? Some(value) : None();
+};
 
 export type AnyAsset =
   | ImageBlock
@@ -68,27 +76,35 @@ export class BookmarkBlock
 export class TextBlock
   extends Typographic
   implements Entities.Factory<"text"> {}
+
 export class BulletedListBlock
   extends Typographic
   implements Entities.Factory<"bulleted_list"> {}
+
 export class NumberedListBlock
   extends Typographic
   implements Entities.Factory<"numbered_list"> {}
+
 export class HeaderBlock
   extends Typographic
   implements Entities.Factory<"header"> {}
+
 export class SubHeaderBlock
   extends Typographic
   implements Entities.Factory<"sub_header"> {}
+
 export class SubSubHeaderBlock
   extends Typographic
   implements Entities.Factory<"sub_sub_header"> {}
+
 export class QuoteBlock
   extends Typographic
   implements Entities.Factory<"quote"> {}
+
 export class EquationBlock
   extends Typographic
   implements Entities.Factory<"equation"> {}
+
 export class TodoBlock
   extends Typographic
   implements Entities.Factory<"to_do">
@@ -117,7 +133,8 @@ export class ToggleBlock
 
 export class CodeBlock extends Codeable implements Entities.Factory<"code"> {
   get code(): string {
-    return this.title.asString;
+    const value = getProperty(this._properties, "title", [[""]]);
+    return new Decorated(value).asString;
   }
 
   get language(): Decorated {

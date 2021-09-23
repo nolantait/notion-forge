@@ -4,7 +4,7 @@ import { Notion, BlockPresenter } from "@types";
 import { uuidToId } from "@utils";
 import { useNotionContext } from "@context";
 
-export const Block: BlockPresenter = (props) => {
+export const Component: BlockPresenter = (props) => {
   const { components } = useNotionContext();
   const { block, children, level, hideBlockId } = props;
   const blockMissing = !block;
