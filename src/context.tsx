@@ -1,15 +1,7 @@
 import React, { useContext } from "react";
 
-import { Components, NotionContext } from "@types";
+import { Components, Core } from "@types";
 import { defaultMapPageUrl, defaultMapImageUrl } from "@utils";
-
-interface dummyLinkProps {
-  href?: string;
-  rel?: string;
-  target?: string;
-  title?: string;
-}
-export const dummyLink = (props: dummyLinkProps) => <span {...props} />;
 
 import {
   Alias as DefaultAlias,
@@ -97,12 +89,11 @@ const defaultComponents: Components.Any = {
   toggle: DefaultToggle,
 };
 
-const defaultNotionContext: NotionContext = {
+const defaultNotionContext: Core.NotionContext = {
   rootPageId: undefined,
   components: defaultComponents,
   mapPageUrl: defaultMapPageUrl(),
   mapImageUrl: defaultMapImageUrl,
-  searchNotion: undefined,
   fullPage: false,
   previewImages: false,
   showCollectionViewDropdown: true,
@@ -120,9 +111,12 @@ const defaultNotionContext: NotionContext = {
   },
 };
 
-const ctx = React.createContext<NotionContext>(defaultNotionContext);
+const ctx = React.createContext<Core.NotionContext>(defaultNotionContext);
 
-export const ContextProvider: Components.Presenter<NotionContext> = ({
+type ProviderProps = Core.NotionContext & {
+  children: React.ReactElement;
+};
+export const ContextProvider: Components.Presenter<ProviderProps> = ({
   components: themeComponents = {},
   children,
   mapPageUrl,
@@ -150,6 +144,6 @@ export const ContextProvider: Components.Presenter<NotionContext> = ({
 
 export const NotionContextConsumer = ctx.Consumer;
 
-export const useNotionContext = (): NotionContext => {
+export const useNotionContext = (): Core.NotionContext => {
   return useContext(ctx);
 };

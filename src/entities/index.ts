@@ -6,7 +6,7 @@ import * as Mixins from "./mixins";
 import { Block } from "./block";
 import { Decorated } from "./decorated";
 
-export { Block, Decorated };
+export { Mixins, Block, Decorated };
 
 export const getProperty = <T, K extends keyof T>(
   attributes: T,
@@ -27,6 +27,29 @@ const getRawProperty = <T, K extends keyof T>(
   return value ? Some(value) : None();
 };
 
+export type AnyBlock =
+  | AliasBlock
+  | TransclusionContainerBlock
+  | TransclusionReferenceBlock
+  | PageBlock
+  | CollectionViewPageBlock
+  | BookmarkBlock
+  | TextBlock
+  | BulletedListBlock
+  | NumberedListBlock
+  | HeaderBlock
+  | SubHeaderBlock
+  | SubSubHeaderBlock
+  | QuoteBlock
+  | EquationBlock
+  | TodoBlock
+  | TableOfContentsBlock
+  | CalloutBlock
+  | ToggleBlock
+  | CodeBlock
+  | CollectionViewBlock
+  | AnyAsset;
+
 export type AnyAsset =
   | ImageBlock
   | EmbedBlock
@@ -42,26 +65,14 @@ export type AnyAsset =
   | AudioBlock
   | GoogleDriveBlock;
 
-// Concrete Mixin Classes
-const Typographic = Mixins.Colorable(Mixins.Titleable(Block));
-const Markable = Mixins.Captionable(Mixins.Linkable(Typographic));
-const Iconable = Mixins.Glyphable(Typographic);
-const Pageable = Mixins.Layoutable(Mixins.Lockable(Iconable));
-const Codeable = Mixins.Captionable(Typographic);
-const Embeddable = Mixins.Sourceable(
-  Mixins.Shapeable(Mixins.Captionable(Typographic))
-);
-const Collectable = Mixins.Glyphable(Embeddable);
-
-// Block Classes
-export class PageBlock extends Pageable implements Entities.Factory<"page"> {}
+class PageBlock extends PageMix implements Entities.Factory<"page"> {}
 
 export class CollectionViewPageBlock
-  extends Pageable
+  extends Block<"collection_view_page_block">
   implements Entities.Factory<"collection_view_page"> {}
 
 export class BookmarkBlock
-  extends Markable
+  extends Block<"bookmark">
   implements Entities.Factory<"bookmark">
 {
   get bookmarkIcon(): string {
@@ -257,6 +268,7 @@ export class AliasBlock extends Block implements Entities.Factory<"alias"> {
 }
 
 export class TransclusionContainerBlock
+  extends Block
   implements Entities.Factory<"transclusion_container"> {}
 
 export class TransclusionReferenceBlock

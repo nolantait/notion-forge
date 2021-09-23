@@ -2,8 +2,13 @@ import type { Decorated } from "@entities";
 import type { Blocks, Formats, Utils } from "@types";
 
 export type Factory<T extends Blocks.BlockType> = Fetch<T, "factory">;
+export type Container = {
+  [Key in Blocks.BlockType]: Factory<Key>;
+};
 
-// type SchemaTest = Utils.Simplify<Utils.Get<BlockSchema, "code.factory">>
+// type SchemaTest = Utils.Simplify<Utils.Get<BlockSchema, "code.factory">>;
+// type FetchTest = Utils.Simplify<Fetch<"transclusion_container", "factory">>;
+// type DTOTest = Utils.Simplify<Fetch<"transclusion_container", "dto">>;
 
 // Private Generics
 
@@ -25,20 +30,24 @@ type BlockSchema = {
 };
 
 // Decorations: [['a', 'a link']] get transformed into Decorated objects
-type RemapDecoration<T> = T extends Formats.Decoration[] ? Decorated : T;
+type RemapDecoration<T extends any> = T extends Formats.Decoration[]
+  ? Decorated
+  : T;
 // Remapping type keys to specific transformed output types
 type Remapper<T> = RemapDecoration<T>;
 
 // Convert keys to cammel case properties on an object
 type Mapping<T extends Blocks.BlockType, Path> = {
   [Key in keyof Fetch<T, Path> as `${Utils.CamelCase<string & Key>}`]: Remapper<
-    Fetch<T, Path, Key>
+    Fetch<T, Path, Utils.SnakeCase<Key>>
   >;
 };
+
 // Map properties and formats of different blocks
 type TProperties<T extends Blocks.BlockType> = Mapping<T, "dto.properties">;
 type TFormat<T extends Blocks.BlockType> = Mapping<T, "dto.format">;
-type TMap<T extends Blocks.BlockType> = TProperties<T> & TFormat<T>;
+type TMap<T extends Blocks.BlockType> = TProperties<T> &
+  TFormat<T> & { type: T };
 
 type Fetch<T extends Blocks.BlockType, K, Path = void> = Path extends void
   ? Utils.Get<BlockSchema, Utils.Join<[string & T, string & K], ".">>

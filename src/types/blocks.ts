@@ -8,13 +8,7 @@ export type { Format };
 
 export type ID = Core.ID;
 export type BlockMap = Core.NotionMap<Any>;
-export type BlockType =
-  | PageTypes
-  | TextTypes
-  | ContentTypes
-  | PointerTypes
-  | PositionTypes
-  | CollectionViewTypes;
+export type BlockType = Any["type"];
 export type Any =
   | Page
   | CollectionViewPage
@@ -50,14 +44,15 @@ export type Any =
   | Audio
   | File
   | GoogleDrive
-  | Sync
-  | SyncPointer
+  | TransclusionContainer
+  | TransclusionReference
   | Alias;
 
+//  type Test = Any["type"]
 // Generate types from concrete block implementations instead of type map lookup
 // to handle overrides
 type MapOverrides<T> = {
-  [Key in BlockType]: T extends { type: Key } ? T : never;
+  [Key in BlockType]: Extract<T, { type: Key }>;
 };
 
 export type Container = MapOverrides<Any>;
@@ -137,8 +132,8 @@ export type GoogleDrive = Core.Attachable &
   Override<"drive", { format: Format.Block & Format.Drive }>;
 
 // Sync Blocks
-export type Sync = Default["transclusion_container"];
-export type SyncPointer = Override<
+export type TransclusionContainer = Default["transclusion_container"];
+export type TransclusionReference = Override<
   "transclusion_reference",
   {
     format: Format.TransclusionReference;
@@ -150,36 +145,6 @@ export type Alias = Override<
     format: Format.Alias;
   }
 >;
-
-/**
- * Base properties shared by all blocks.
- */
-
-export interface TBlock extends Renderable {
-  type?: unknown;
-  properties?: unknown;
-  format?: unknown;
-  content?: unknown;
-}
-export interface TTextBlock {
-  properties: Properties.Title;
-  format: Format.Color;
-}
-export interface TContentBlock {
-  properties: Properties.Source & Properties.Caption;
-  format: Format.Source & Format.Block;
-}
-export interface TPageBlock extends Core.Attachable {
-  content?: ID[];
-  properties: Properties.Title;
-  format: Format.Page & Format.Access & Format.Color;
-  permissions: Core.Permission[];
-}
-export interface TCollectionBlock {
-  type: Collections.ViewType;
-  name: string;
-  query2: Collections.Query.ViewQuery;
-}
 
 type PageTypes = "page" | "collection_view_page";
 type TextTypes =
@@ -226,7 +191,7 @@ type PositionTypes = "column" | "column_list" | "divider";
 type Default = TypeMap;
 type Override<T extends keyof Default, U> = Utils.Merge<Default[T], U>;
 type TypeMap = { [Key in PositionTypes]: MapType<TBlock, Key> } &
-  { [Key in PointerTypes]: MapType<TBlock, Key> } &
+  { [Key in PointerTypes]: MapType<TPointerBlock, Key> } &
   { [Key in CollectionViewTypes]: MapType<TCollectionBlock, Key> } &
   { [Key in ContentTypes]: MapType<TContentBlock, Key> } &
   { [Key in TextTypes]: MapType<TTextBlock, Key> } &
@@ -235,3 +200,32 @@ type TypeMap = { [Key in PositionTypes]: MapType<TBlock, Key> } &
 type MapType<T, Key> = Utils.Merge<Build<T>, { type: Key }>;
 type Build<T> = Utils.Merge<TBlock, T>;
 type Renderable = Core.Identity & Core.Creatable & Core.Editable;
+
+/**
+ * Base properties shared by all blocks.
+ */
+
+export interface TBlock extends Renderable {
+  properties?: Record<string, unknown>;
+  format?: Record<string, unknown>;
+  content?: unknown[];
+}
+type TPointerBlock = TBlock;
+export interface TTextBlock {
+  properties: Properties.Title;
+  format: Format.Color;
+}
+export interface TContentBlock {
+  properties: Properties.Source & Properties.Caption;
+  format: Format.Source & Format.Block;
+}
+export interface TPageBlock extends Core.Attachable {
+  content?: ID[];
+  properties: Properties.Title;
+  format: Format.Page & Format.Access & Format.Color;
+  permissions: Core.Permission[];
+}
+export interface TCollectionBlock {
+  name: string;
+  query2: Collections.Query.ViewQuery;
+}

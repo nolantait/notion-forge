@@ -1,4 +1,4 @@
-import { Formats, Core } from "../";
+>import { Formats, Core } from "../";
 
 export type Any =
   | Page
@@ -22,7 +22,6 @@ export type Page = {
   page_small_text?: boolean;
   page_cover_position?: number;
   page_cover?: string;
-  page_icon?: string;
 };
 
 export type Access = {

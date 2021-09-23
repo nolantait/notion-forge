@@ -1,17 +1,12 @@
-import { Core, Utils, Blocks } from "@types";
+import { Core, Blocks } from "@types";
 
-type AnyProperty = Partial<Utils.UnionToIntersection<Blocks.Properties.Any>>;
-type AnyFormat = Partial<Utils.UnionToIntersection<Blocks.Format.Any>>;
+export class Block<T extends Blocks.BlockType> {
+  readonly _dto: Blocks.Container[T];
+  readonly type: T;
 
-export class Block {
-  readonly _dto: Blocks.Any;
-
-  constructor(block: Blocks.Any) {
+  constructor(block: Blocks.Container[T], type: T) {
     this._dto = block;
-  }
-
-  get type(): Blocks.BlockType {
-    return this._dto.type as Blocks.BlockType;
+    this.type = type;
   }
 
   get id(): Blocks.ID {
@@ -49,7 +44,7 @@ export class Block {
     return [];
   }
 
-  get _properties(): AnyProperty {
+  get _properties(): Blocks.Container[T]["properties"] {
     const value = this._dto.properties;
     if (value && typeof value === "object") {
       return value;
@@ -58,16 +53,12 @@ export class Block {
     throw new Error(`Missing properties for ${this.id}`);
   }
 
-  get _format(): AnyFormat {
+  get _format(): Blocks.Container[T]["format"] {
     const value = this._dto.format;
     if (value && typeof value === "object") {
       return value;
     }
 
     throw new Error(`Missing format for ${this.id}`);
-  }
-
-  set _format(value: AnyFormat) {
-    this._format = { ...this._format, ...value };
   }
 }

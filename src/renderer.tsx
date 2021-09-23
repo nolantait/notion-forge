@@ -2,8 +2,11 @@ import React from "react";
 import mediumZoom from "medium-zoom";
 
 import { Blocks, Components, Core } from "@types";
-import { useNotionContext, NotionContextProvider } from "@context";
-import { Block } from "./block";
+import {
+  useNotionContext,
+  ContextProvider as NotionContextProvider,
+} from "@context";
+import { Component as Block } from "./block";
 
 export type Props = Core.NotionContext & {
   rootPageId?: string;

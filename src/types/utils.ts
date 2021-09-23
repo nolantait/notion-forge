@@ -4,6 +4,7 @@ export type {
   Merge,
   UnionToIntersection,
   CamelCase,
+  SnakeCase,
 } from "type-fest";
 import type { Formats, Blocks } from "@types";
 import type { Decorated } from "../entities";

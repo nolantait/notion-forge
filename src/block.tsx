@@ -1,10 +1,19 @@
 import React from "react";
 
-import { Notion, BlockPresenter } from "@types";
+import { Utils, Components } from "@types";
 import { uuidToId } from "@utils";
 import { useNotionContext } from "@context";
+import { AnyBlock } from "@entities";
 
-export const Component: BlockPresenter = (props) => {
+export type Props = {
+  block: AnyBlock;
+  level: number;
+  hideBlockId: boolean;
+  className?: string;
+  children?: React.ReactNode;
+};
+
+export const Component: Components.Presenter<Props> = (props) => {
   const { components } = useNotionContext();
   const { block, children, level, hideBlockId } = props;
   const blockMissing = !block;
@@ -15,7 +24,7 @@ export const Component: BlockPresenter = (props) => {
 
   const isTopLevel = level === 0;
   const isCollectionView = block.type === "collection_view";
-  const parentIsCollection = block.parent_table === "collection";
+  const parentIsCollection = block.parentTable === "collection";
 
   const blockId = hideBlockId
     ? "notion-block"
@@ -26,16 +35,9 @@ export const Component: BlockPresenter = (props) => {
   if (isTopLevel && isCollectionView) {
     if (!block) return <></>;
 
-    // @ts-ignore
     block.type = "collection_view_page";
 
-    return (
-      <components.page
-        {...props}
-        block={block as unknown as Notion.CollectionViewPageBlock}
-        blockId={blockId}
-      />
-    );
+    return <components.page {...props} block={block} />;
   }
 
   switch (block.type) {
