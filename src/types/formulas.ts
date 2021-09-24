@@ -9,10 +9,17 @@ export type FormulaType =
   | "function"
   | "symbol";
 
+export type Formula =
+  | FunctionFormula
+  | OperatorFormula
+  | ConstantFormula
+  | PropertyFormula
+  | SymbolFormula;
+
+export type Result = string | number | boolean | Date;
+
 type ConstantType = "e" | "false" | "true" | "pi";
-
 type ValueType = "string" | "number" | "boolean" | "date" | ConstantType;
-
 type ResultType = "text" | "number" | "boolean" | "date" | "checkbox";
 
 type OperatorType =
@@ -138,12 +145,3 @@ type OperatorFormula = FormulaWith<
     args: Formula[];
   }
 >;
-
-export type Formula =
-  | FunctionFormula
-  | OperatorFormula
-  | ConstantFormula
-  | PropertyFormula
-  | SymbolFormula;
-
-export type Result = string | number | boolean | Date;

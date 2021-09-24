@@ -1,20 +1,24 @@
 import { Core, Blocks } from "@types";
 
-export class Block<T extends Blocks.BlockType> {
-  readonly _dto: Blocks.Container[T];
-  readonly type: T;
+export class Block<T extends Blocks.Any> {
+  readonly dto: T;
+  readonly format: T["format"];
+  readonly properties: T["properties"];
+  readonly type: T["type"];
 
-  constructor(block: Blocks.Container[T], type: T) {
-    this._dto = block;
-    this.type = type;
+  constructor(block: T) {
+    this.dto = block;
+    this.properties = block.properties;
+    this.format = block.format;
+    this.type = block.type;
   }
 
-  get id(): Blocks.Container[T]["id"] {
-    return this._dto.id;
+  get id() {
+    return this.dto.id;
   }
 
-  get parentId(): Blocks.Container[T]["parent_id"] {
-    const value = this._dto.parent_id;
+  get parentId() {
+    const value = this.dto.parent_id;
     if (typeof value === "string") {
       return value;
     }
@@ -22,8 +26,8 @@ export class Block<T extends Blocks.BlockType> {
     throw new Error(`Missing parent ID for block ${this.id}`);
   }
 
-  get parentTable(): Blocks.Container[T]["parent_table"] {
-    const value = this._dto.parent_table;
+  get parentTable() {
+    const value = this.dto.parent_table;
     if (typeof value === "string") {
       const validParents = ["space", "block", "table", "collection"];
       if (validParents.includes(value)) {
@@ -35,30 +39,7 @@ export class Block<T extends Blocks.BlockType> {
     throw new Error(`Parent value invalid for block ${this.id}`);
   }
 
-  get content(): Blocks.Container[T]["content"] {
-    const value = this._dto.content ?? [];
-    if (Array.isArray(value) && value.length && typeof value[0] === "string") {
-      return value;
-    }
-
-    return [];
-  }
-
-  get _properties(): Blocks.Container[T]["properties"] {
-    const value = this._dto.properties;
-    if (value && typeof value === "object") {
-      return value;
-    }
-
-    throw new Error(`Missing format for ${this.id}`);
-  }
-
-  get _format(): Blocks.Container[T]["format"] {
-    const value = this._dto.format;
-    if (value && typeof value === "object") {
-      return value;
-    }
-
-    throw new Error(`Missing format for ${this.id}`);
+  get content() {
+    return this.dto.content ?? [];
   }
 }

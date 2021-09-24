@@ -1,4 +1,4 @@
->import { Formats, Core } from "../";
+import { Formats, Core } from "../";
 
 export type Any =
   | Page

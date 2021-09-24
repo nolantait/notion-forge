@@ -1,6 +1,6 @@
 import { Some, None, Option } from "excoptional";
 
-import type { Entities, Blocks } from "@types";
+import type { Blocks } from "@types";
 import * as Mixins from "./mixins";
 
 import { Block } from "./block";

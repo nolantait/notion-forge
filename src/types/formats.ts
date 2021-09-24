@@ -1,5 +1,3 @@
-import { Decorated } from "@entities";
-
 /** Block colors supported by Notion */
 
 export type Color =

@@ -1,6 +1,14 @@
 import type { Core, Collections } from "../";
 import type { Identity } from "./properties";
 
+export type ViewQuery = {
+  filter?: unknown;
+  aggregate?: Aggregate;
+  aggregations?: Aggregation[];
+  group_by?: Core.PropertyID;
+  sort?: Sort[];
+};
+
 type SortDirection = "ascending" | "descending";
 
 type Sort = Identity & {
@@ -21,12 +29,4 @@ type Aggregate = Identity & {
 type Aggregation = {
   property: Core.PropertyID;
   aggregator: AggregateID;
-};
-
-export type ViewQuery = {
-  filter?: unknown;
-  aggregate?: Aggregate;
-  aggregations?: Aggregation[];
-  group_by?: Core.PropertyID;
-  sort?: Sort[];
 };
