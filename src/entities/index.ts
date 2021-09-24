@@ -68,7 +68,7 @@ export type AnyAsset =
 class PageBlock extends PageMix implements Entities.Factory<"page"> {}
 
 export class CollectionViewPageBlock
-  extends Block<"collection_view_page_block">
+  extends Block<"collection_view_page">
   implements Entities.Factory<"collection_view_page"> {}
 
 export class BookmarkBlock

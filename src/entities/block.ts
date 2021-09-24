@@ -9,11 +9,11 @@ export class Block<T extends Blocks.BlockType> {
     this.type = type;
   }
 
-  get id(): Blocks.ID {
+  get id(): Blocks.Container[T]["id"] {
     return this._dto.id;
   }
 
-  get parentId(): Blocks.ID {
+  get parentId(): Blocks.Container[T]["parent_id"] {
     const value = this._dto.parent_id;
     if (typeof value === "string") {
       return value;
@@ -22,7 +22,7 @@ export class Block<T extends Blocks.BlockType> {
     throw new Error(`Missing parent ID for block ${this.id}`);
   }
 
-  get parentTable(): Core.ParentType {
+  get parentTable(): Blocks.Container[T]["parent_table"] {
     const value = this._dto.parent_table;
     if (typeof value === "string") {
       const validParents = ["space", "block", "table", "collection"];
@@ -35,7 +35,7 @@ export class Block<T extends Blocks.BlockType> {
     throw new Error(`Parent value invalid for block ${this.id}`);
   }
 
-  get content(): Blocks.ID[] {
+  get content(): Blocks.Container[T]["content"] {
     const value = this._dto.content ?? [];
     if (Array.isArray(value) && value.length && typeof value[0] === "string") {
       return value;
@@ -50,7 +50,7 @@ export class Block<T extends Blocks.BlockType> {
       return value;
     }
 
-    throw new Error(`Missing properties for ${this.id}`);
+    throw new Error(`Missing format for ${this.id}`);
   }
 
   get _format(): Blocks.Container[T]["format"] {

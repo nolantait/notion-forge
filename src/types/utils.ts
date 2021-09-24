@@ -5,6 +5,10 @@ export type {
   UnionToIntersection,
   CamelCase,
   SnakeCase,
+  PartialDeep,
+  Primitive,
+  CamelCasedPropertiesDeep,
+  ValueOf,
 } from "type-fest";
 import type { Formats, Blocks } from "@types";
 import type { Decorated } from "../entities";

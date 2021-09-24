@@ -1,16 +1,35 @@
 import { Blocks, Formats } from "@types";
 import { getProperty, Block, Decorated } from "./";
 
-type Constructor<T = object, A extends any[] = any[]> = new (...a: A) => T;
-type TypesWithTrait<T extends Record<string, any>> = Pick<
-  Extract<Blocks.Any, T>,
-  "type"
->;
-type BlocksWithTrait<T extends Record<string, any>> = Block<
-  TypesWithTrait<T>["type"]
+export type Constructor<T = object, A extends any[] = any[]> = new (
+  ...a: A
+) => T;
+
+type BlocksWithTrait<T extends keyof Traits> = Block<
+  Blocks.WithTrait<Traits[T]>["type"]
 >;
 
-type WithLayout = BlocksWithTrait<{ format: Blocks.Format.Page }>;
+// type Test = BlocksWithTrait<Traits["layoutable"]>;
+
+type Traits = {
+  layoutable: { format: Blocks.Format.Page };
+  glyphable: { format: Blocks.Format.Icon };
+  colorable: { format: Blocks.Format.Color };
+  lockable: { format: Blocks.Format.Access };
+  shapeable: { format: Blocks.Format.Block };
+  titleable: { properties: Blocks.Properties.Title };
+  linkable: { properties: Blocks.Properties.Link };
+  captionable: { properties: Blocks.Properties.Caption };
+  sourceable:
+    | {
+        format: Blocks.Format.Source;
+      }
+    | {
+        properties: Blocks.Format.Source;
+      };
+};
+
+type WithLayout = BlocksWithTrait<"layoutable">;
 export function Layoutable<TBase extends Constructor<WithLayout>>(Base: TBase) {
   return class extends Base {
     get pageFullWidth(): boolean {
@@ -31,7 +50,7 @@ export function Layoutable<TBase extends Constructor<WithLayout>>(Base: TBase) {
   };
 }
 
-type WithIcon = BlocksWithTrait<{ format: Blocks.Format.Icon }>;
+type WithIcon = BlocksWithTrait<"glyphable">;
 export function Glyphable<TBase extends Constructor<WithIcon>>(Base: TBase) {
   return class extends Base {
     get pageIcon(): string {
@@ -40,7 +59,7 @@ export function Glyphable<TBase extends Constructor<WithIcon>>(Base: TBase) {
   };
 }
 
-type WithColor = BlocksWithTrait<{ format: Blocks.Format.Color }>;
+type WithColor = BlocksWithTrait<"colorable">;
 export function Colorable<TBase extends Constructor<WithColor>>(Base: TBase) {
   return class extends Base {
     get blockColor(): Formats.Color {
@@ -49,7 +68,7 @@ export function Colorable<TBase extends Constructor<WithColor>>(Base: TBase) {
   };
 }
 
-type CanLock = BlocksWithTrait<{ format: Blocks.Format.Access }>;
+type CanLock = BlocksWithTrait<"lockable">;
 export function Lockable<TBase extends Constructor<CanLock>>(Base: TBase) {
   return class extends Base {
     get blockLocked(): boolean {
@@ -62,7 +81,7 @@ export function Lockable<TBase extends Constructor<CanLock>>(Base: TBase) {
   };
 }
 
-type HasTitle = BlocksWithTrait<{ properties: Blocks.Properties.Title }>;
+type HasTitle = BlocksWithTrait<"titleable">;
 export function Titleable<TBase extends Constructor<HasTitle>>(Base: TBase) {
   return class extends Base {
     get title(): Decorated {
@@ -72,7 +91,7 @@ export function Titleable<TBase extends Constructor<HasTitle>>(Base: TBase) {
   };
 }
 
-type HasLink = BlocksWithTrait<{ properties: Blocks.Properties.Link }>;
+type HasLink = BlocksWithTrait<"linkable">;
 export function Linkable<TBase extends Constructor<HasLink>>(Base: TBase) {
   return class extends Base {
     get link(): Decorated {
@@ -87,7 +106,7 @@ export function Linkable<TBase extends Constructor<HasLink>>(Base: TBase) {
   };
 }
 
-type HasCaption = BlocksWithTrait<{ properties: Blocks.Properties.Caption }>;
+type HasCaption = BlocksWithTrait<"captionable">;
 export function Captionable<TBase extends Constructor<HasCaption>>(
   Base: TBase
 ) {
@@ -99,7 +118,7 @@ export function Captionable<TBase extends Constructor<HasCaption>>(
   };
 }
 
-type HasShape = BlocksWithTrait<{ format: Blocks.Format.Block }>;
+type HasShape = BlocksWithTrait<"shapeable">;
 export function Shapeable<TBase extends Constructor<HasShape>>(Base: TBase) {
   return class extends Base {
     get blockWidth(): number {
@@ -128,10 +147,7 @@ export function Shapeable<TBase extends Constructor<HasShape>>(Base: TBase) {
   };
 }
 
-type HasSource = BlocksWithTrait<{
-  properties: Blocks.Properties.Source;
-  format: Blocks.Format.Source;
-}>;
+type HasSource = BlocksWithTrait<"sourceable">;
 export function Sourceable<TBase extends Constructor<HasSource>>(Base: TBase) {
   return class extends Base {
     get source(): Decorated {

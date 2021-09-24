@@ -23,7 +23,7 @@ export type ViewMap = Core.NotionMap<View>;
 export type View = Core.Identity & {
   type: ViewType;
   name: string;
-  format: unknown;
+  format: Record<string, any>;
   query?: unknown;
   query2: Query.ViewQuery;
 };
