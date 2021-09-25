@@ -1,7 +1,9 @@
 import type * as Format from "./blocks/formats";
 import type * as Properties from "./blocks/properties";
 
-import type { Core, Collections } from "./";
+import { Decorated } from "@entities";
+
+import type { Formats, Utils, Core, Collections } from "./";
 
 export type { Properties };
 export type { Format };
@@ -48,6 +50,18 @@ export type Any =
   | Tweet
   | Video;
 
+type Lift<T, Key extends keyof T> = {
+  [K in keyof T[Key] as Utils.CamelCase<K>]: T[Key][K] extends Formats.Decoration[]
+    ? Decorated
+    : T[Key][K];
+};
+
+type Test = Utils.Simplify<Template<Code>>;
+
+export type Template<T extends BaseBlock> = Required<
+  Lift<T, "properties"> & Lift<T, "format">
+>;
+
 type NarrowBy<T, U> = T extends U ? T : never;
 export type WithTrait<T> = NarrowBy<Any, T>;
 
@@ -89,10 +103,13 @@ export interface CollectionViewPage extends PageBlock {
   collection_id: Collections.ID;
   view_ids: Collections.ViewID[];
 }
-export interface CollectionView extends CollectionBlock {
+
+export interface CollectionView extends ContentBlock {
   type: "collection_view";
   collection_id: Collections.ID;
   view_ids: Collections.ViewID[];
+  name: string;
+  query2: Collections.Query.ViewQuery;
 }
 export interface Divider extends BaseBlock {
   type: "divider";
@@ -112,7 +129,10 @@ export interface Equation extends TextBlock {
 }
 export interface File extends ContentBlock {
   type: "file";
-  properties: Properties.FileSize & Properties.Title & Properties.Source;
+  properties: Properties.Caption &
+    Properties.FileSize &
+    Properties.Title &
+    Properties.Source;
 }
 export interface Figma extends ContentBlock {
   type: "figma";
@@ -177,8 +197,7 @@ export interface Video extends ContentBlock {
   type: "video";
 }
 
-type Renderable = Core.Identity & Core.Creatable & Core.Editable;
-interface BaseBlock extends Renderable {
+interface BaseBlock extends Core.Identity, Core.Creatable, Core.Editable {
   properties?: Record<string, unknown>;
   format?: Record<string, unknown>;
   content?: ID[];
@@ -196,8 +215,4 @@ interface PageBlock extends BaseBlock {
   format: Format.Page & Format.Access & Format.Color;
   permissions: Core.Permission[];
   file_ids?: string[];
-}
-interface CollectionBlock extends ContentBlock {
-  name: string;
-  query2: Collections.Query.ViewQuery;
 }

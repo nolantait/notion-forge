@@ -21,5 +21,3 @@ export type Width = {
 export type Hidden = {
   hidden: boolean;
 };
-
-export type Default = Identity & Visible;

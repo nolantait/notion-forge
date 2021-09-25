@@ -65,63 +65,79 @@ export type AnyAsset =
   | AudioBlock
   | GoogleDriveBlock;
 
-class PageBlock extends PageMix implements Entities.Factory<"page"> {}
+// Mixins
+const Typographic = Mixins.Colorable(Mixins.Titleable(Block));
+const Linkable = Mixins.Linkable(Typographic);
+const Pageable = Mixins.Lockable(Mixins.Layoutable(Typographic));
+const Iconable = Mixins.Glyphable(Typographic);
+const Captionable = Mixins.Captionable(Typographic);
+const Collectable = Mixins.Sourceable(
+  Mixins.Captionable(Mixins.Shapeable(Block))
+);
+const Embeddable = Mixins.Captionable(
+  Mixins.Sourceable(Mixins.Shapeable(Block))
+);
+
+// Definitions
+export class PageBlock
+  extends Pageable<Blocks.Page>
+  implements Blocks.Template<Blocks.Page> {}
 
 export class CollectionViewPageBlock
-  extends Block<"collection_view_page">
-  implements Entities.Factory<"collection_view_page"> {}
+  extends Pageable<Blocks.CollectionViewPage>
+  implements Blocks.Template<Blocks.CollectionViewPage> {}
 
 export class BookmarkBlock
-  extends Block<"bookmark">
-  implements Entities.Factory<"bookmark">
+  extends Linkable<Blocks.Bookmark>
+  implements Blocks.Template<Blocks.Bookmark>
 {
   get bookmarkIcon(): string {
-    return getProperty(this._format, "bookmark_icon", "");
+    return getProperty(this.format, "bookmark_icon", "");
   }
 
   get bookmarkCover(): string {
-    return getProperty(this._format, "bookmark_cover", "");
+    return getProperty(this.format, "bookmark_cover", "");
   }
 }
 
 export class TextBlock
-  extends Typographic
-  implements Entities.Factory<"text"> {}
+  extends Typographic<Blocks.Text>
+  implements Blocks.Template<Blocks.Text> {}
 
 export class BulletedListBlock
-  extends Typographic
-  implements Entities.Factory<"bulleted_list"> {}
+  extends Typographic<Blocks.BulletedList>
+  implements Blocks.Template<Blocks.BulletedList> {}
 
 export class NumberedListBlock
-  extends Typographic
-  implements Entities.Factory<"numbered_list"> {}
+  extends Typographic<Blocks.NumberedList>
+  implements Blocks.Template<Blocks.NumberedList> {}
 
 export class HeaderBlock
-  extends Typographic
-  implements Entities.Factory<"header"> {}
+  extends Typographic<Blocks.Header>
+  implements Blocks.Template<Blocks.Header> {}
 
 export class SubHeaderBlock
-  extends Typographic
-  implements Entities.Factory<"sub_header"> {}
+  extends Typographic<Blocks.SubHeader>
+  implements Blocks.Template<Blocks.SubHeader> {}
 
 export class SubSubHeaderBlock
-  extends Typographic
-  implements Entities.Factory<"sub_sub_header"> {}
+  extends Typographic<Blocks.SubSubHeader>
+  implements Blocks.Template<Blocks.SubSubHeader> {}
 
 export class QuoteBlock
-  extends Typographic
-  implements Entities.Factory<"quote"> {}
+  extends Typographic<Blocks.Quote>
+  implements Blocks.Template<Blocks.Quote> {}
 
 export class EquationBlock
-  extends Typographic
-  implements Entities.Factory<"equation"> {}
+  extends Typographic<Blocks.Equation>
+  implements Blocks.Template<Blocks.Equation> {}
 
 export class TodoBlock
-  extends Typographic
-  implements Entities.Factory<"to_do">
+  extends Typographic<Blocks.Todo>
+  implements Blocks.Template<Blocks.Todo>
 {
   get checked(): Decorated {
-    const value = getProperty(this._properties, "checked", [["No"]]);
+    const value = getProperty(this.properties, "checked", [["No"]]);
     return new Decorated(value);
   }
 
@@ -131,32 +147,35 @@ export class TodoBlock
 }
 
 export class TableOfContentsBlock
-  extends Typographic
-  implements Entities.Factory<"table_of_contents"> {}
+  extends Typographic<Blocks.TableOfContents>
+  implements Blocks.Template<Blocks.TableOfContents> {}
 
 export class CalloutBlock
-  extends Iconable
-  implements Entities.Factory<"callout"> {}
+  extends Iconable<Blocks.Callout>
+  implements Blocks.Template<Blocks.Callout> {}
 
 export class ToggleBlock
-  extends Typographic
-  implements Entities.Factory<"toggle"> {}
+  extends Typographic<Blocks.Toggle>
+  implements Blocks.Template<Blocks.Toggle> {}
 
-export class CodeBlock extends Codeable implements Entities.Factory<"code"> {
+export class CodeBlock
+  extends Captionable<Blocks.Code>
+  implements Blocks.Template<Blocks.Code>
+{
   get code(): string {
-    const value = getProperty(this._properties, "title", [[""]]);
+    const value = getProperty(this.properties, "title", [[""]]);
     return new Decorated(value).asString;
   }
 
   get language(): Decorated {
-    const value = getProperty(this._properties, "language", [["javascript"]]);
+    const value = getProperty(this.properties, "language", [["javascript"]]);
     return new Decorated(value);
   }
 }
 
 export class CollectionViewBlock
-  extends Collectable
-  implements Entities.Factory<"collection_view">
+  extends Collectable<Blocks.CollectionView>
+  implements Blocks.Template<Blocks.CollectionView>
 {
   readonly _viewIds: Blocks.ID[];
   readonly _collectionId: Blocks.ID;
@@ -177,54 +196,60 @@ export class CollectionViewBlock
 }
 
 export class ImageBlock
-  extends Embeddable
-  implements Entities.Factory<"image"> {}
+  extends Embeddable<Blocks.Image>
+  implements Blocks.Template<Blocks.Image> {}
 
 export class EmbedBlock
-  extends Embeddable
-  implements Entities.Factory<"embed"> {}
+  extends Embeddable<Blocks.Embed>
+  implements Blocks.Template<Blocks.Embed> {}
 
-export class GistBlock extends Embeddable implements Entities.Factory<"gist"> {}
+export class GistBlock
+  extends Embeddable<Blocks.Gist>
+  implements Blocks.Template<Blocks.Gist> {}
 
 export class VideoBlock
-  extends Embeddable
-  implements Entities.Factory<"video"> {}
+  extends Embeddable<Blocks.Video>
+  implements Blocks.Template<Blocks.Video> {}
 
 export class FigmaBlock
-  extends Embeddable
-  implements Entities.Factory<"figma"> {}
+  extends Embeddable<Blocks.Figma>
+  implements Blocks.Template<Blocks.Figma> {}
 
 export class TypeformBlock
-  extends Embeddable
-  implements Entities.Factory<"typeform"> {}
+  extends Embeddable<Blocks.Typeform>
+  implements Blocks.Template<Blocks.Typeform> {}
 
 export class CodepenBlock
-  extends Embeddable
-  implements Entities.Factory<"codepen"> {}
+  extends Embeddable<Blocks.Codepen>
+  implements Blocks.Template<Blocks.Codepen> {}
 
 export class ExcalidrawBlock
-  extends Embeddable
-  implements Entities.Factory<"excalidraw"> {}
+  extends Embeddable<Blocks.Excalidraw>
+  implements Blocks.Template<Blocks.Excalidraw> {}
 
 export class TweetBlock
-  extends Embeddable
-  implements Entities.Factory<"tweet"> {}
+  extends Embeddable<Blocks.Tweet>
+  implements Blocks.Template<Blocks.Tweet> {}
 
-export class MapsBlock extends Embeddable implements Entities.Factory<"maps"> {}
+export class MapsBlock
+  extends Embeddable<Blocks.Maps>
+  implements Blocks.Template<Blocks.Maps> {}
 
-export class PdfBlock extends Embeddable implements Entities.Factory<"pdf"> {}
+export class PdfBlock
+  extends Embeddable<Blocks.Pdf>
+  implements Blocks.Template<Blocks.Pdf> {}
 
 export class AudioBlock
-  extends Embeddable
-  implements Entities.Factory<"audio"> {}
+  extends Embeddable<Blocks.Audio>
+  implements Blocks.Template<Blocks.Audio> {}
 
 export class GoogleDriveBlock
-  extends Embeddable
-  implements Entities.Factory<"drive">
+  extends Embeddable<Blocks.Drive>
+  implements Blocks.Template<Blocks.Drive>
 {
   get driveStatus(): Blocks.Format.DriveStatus {
     const defaultDriveStatus = { authed: false, last_fetched: Date.now() };
-    return getProperty(this._format, "drive_status", defaultDriveStatus);
+    return getProperty(this.format, "drive_status", defaultDriveStatus);
   }
 
   get driveProperties(): Blocks.Format.DriveProperties {
@@ -240,22 +265,25 @@ export class GoogleDriveBlock
       modified_time: Date.now(),
     };
 
-    return getProperty(
-      this._format,
-      "drive_properties",
-      defaultDriveProperties
-    );
+    return getProperty(this.format, "drive_properties", defaultDriveProperties);
   }
 }
 
-export class FileBlock extends Embeddable implements Entities.Factory<"file"> {
+const Fileable = Mixins.Titleable(Embeddable);
+export class FileBlock
+  extends Fileable<Blocks.File>
+  implements Blocks.Template<Blocks.File>
+{
   get size(): Decorated {
-    const value = getProperty(this._properties, "size", [[""]]);
+    const value = getProperty(this.properties, "size", [[""]]);
     return new Decorated(value);
   }
 }
 
-export class AliasBlock extends Block implements Entities.Factory<"alias"> {
+export class AliasBlock
+  extends Block<Blocks.Alias>
+  implements Blocks.Template<Blocks.Alias>
+{
   get aliasPointer(): Blocks.Format.AliasPointer {
     const defaultAliasPointer = {
       id: "",
@@ -263,17 +291,17 @@ export class AliasBlock extends Block implements Entities.Factory<"alias"> {
       spaceid: "",
     };
 
-    return getProperty(this._format, "alias_pointer", defaultAliasPointer);
+    return getProperty(this.format, "alias_pointer", defaultAliasPointer);
   }
 }
 
 export class TransclusionContainerBlock
-  extends Block
-  implements Entities.Factory<"transclusion_container"> {}
+  extends Block<Blocks.TransclusionContainer>
+  implements Blocks.Template<Blocks.TransclusionContainer> {}
 
 export class TransclusionReferenceBlock
-  extends Block
-  implements Entities.Factory<"transclusion_reference">
+  extends Block<Blocks.TransclusionReference>
+  implements Blocks.Template<Blocks.TransclusionReference>
 {
   get copiedFromPointer(): Blocks.Format.Pointer {
     const defaultPointer = {
@@ -281,7 +309,7 @@ export class TransclusionReferenceBlock
       spaceid: "",
     };
 
-    return getProperty(this._format, "copied_from_pointer", defaultPointer);
+    return getProperty(this.format, "copied_from_pointer", defaultPointer);
   }
 
   get transclusionReferencePointer(): Blocks.Format.Pointer {
@@ -291,19 +319,26 @@ export class TransclusionReferenceBlock
     };
 
     return getProperty(
-      this._format,
+      this.format,
       "transclusion_reference_pointer",
       defaultPointer
     );
   }
 }
 
-export class ColumnBlock extends Block implements Entities.Factory<"column"> {
+export class ColumnBlock
+  extends Block<Blocks.Column>
+  implements Blocks.Template<Blocks.Column>
+{
   get columnRatio(): number {
-    return getProperty(this._format, "column_ratio", 0);
+    return getProperty(this.format, "column_ratio", 0);
   }
 }
 
-export class DividerBlock implements Entities.Factory<"divider"> {}
+export class DividerBlock
+  extends Block<Blocks.Divider>
+  implements Blocks.Template<Blocks.Divider> {}
 
-export class ColumnListBlock implements Entities.Factory<"column_list"> {}
+export class ColumnListBlock
+  extends Block<Blocks.ColumnList>
+  implements Blocks.Template<Blocks.ColumnList> {}

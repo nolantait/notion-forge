@@ -4,8 +4,6 @@ import type * as Card from "./collections/cards";
 import type * as Properties from "./collections/properties";
 import type * as Query from "./collections/queries";
 
-import { Collections, Utils } from "@types";
-
 export type { Properties };
 export type { Card };
 export type { Query };
@@ -18,15 +16,7 @@ export type ViewID = Core.ID;
 export type ViewType = "table" | "gallery" | "list" | "board" | "calendar";
 
 export type CollectionMap = Core.NotionMap<Collection>;
-export type ViewMap = Core.NotionMap<View>;
-
-export type View = Core.Identity & {
-  type: ViewType;
-  name: string;
-  format: Record<string, any>;
-  query?: unknown;
-  query2: Query.ViewQuery;
-};
+export type ViewMap = Core.NotionMap<AnyView>;
 
 export type AnyView =
   | TableView
@@ -35,23 +25,55 @@ export type AnyView =
   | BoardView
   | CalendarView;
 
-export type GalleryView = ViewTemplate<"gallery">;
-export type ListView = ViewTemplate<"list">;
-export type CalendarView = ViewTemplate<"calendar">;
-export type TableView = ViewTemplate<"table"> & {
+interface BaseView extends Core.Identity {
+  id: Blocks.ID;
+  type: ViewType;
+  name: string;
+  query?: never;
+  query2: Query.ViewQuery;
+}
+
+export interface GalleryView extends BaseView {
+  type: "gallery";
+  format: {
+    gallery_cover: Card.Cover;
+    gallery_cover_size: Card.CoverSize;
+    gallery_cover_aspect: Card.CoverAspect;
+    gallery_properties: Array<Properties.Identity & Properties.Visible>;
+  };
+}
+export interface ListView extends BaseView {
+  type: "list";
+  format: {
+    list_properties: Array<Properties.Identity & Properties.Visible>;
+  };
+}
+export interface CalendarView extends BaseView {
+  type: "calendar";
+  format: Record<string, never>;
+}
+
+export interface TableView extends BaseView {
+  type: "table";
   page_sort: Blocks.ID[];
   format: {
     table_wrap: boolean;
-    table_properties: Properties.Identity & Properties.Width;
+    table_properties: Array<
+      Properties.Identity & Properties.Width & Properties.Visible
+    >;
   };
-};
-export type BoardView = ViewTemplate<"board"> & {
+}
+export interface BoardView extends BaseView {
+  type: "board";
   format: {
-    board_properties: Properties.Default[];
+    board_cover: Card.Cover;
+    board_cover_size: Card.CoverSize;
+    board_cover_aspect: Card.CoverAspect;
+    board_properties: Array<Properties.Identity & Properties.Visible>;
     board_groups2: BoardGroup[];
     board_columns: BoardColumn[];
   };
-};
+}
 
 export interface SelectOption {
   id: Core.PropertyID;
@@ -64,24 +86,26 @@ export type PropertySchema = {
   type: Core.PropertyType;
   options?: SelectOption[];
   number_format?: Formats.NumberFormat;
-  formula?: Formulas.Formula;
+  formula?: Formulas.Any;
 };
 
 export type PropertySchemaMap = {
   [key: string]: PropertySchema;
 };
 
-export type Collection = Core.Identity & {
+export interface Collection extends Core.Identity {
   name: Formats.Decoration[];
   schema: PropertySchemaMap;
   icon: string;
   copied_from: ID;
   template_pages?: ID[];
   format?: {
-    collection_page_properties?: Properties.Default[];
-    property_visibility?: Properties.Identity & Properties.Visible[];
+    collection_page_properties?: Array<
+      Properties.Identity & Properties.Visible
+    >;
+    property_visibility?: Array<Properties.Identity & Properties.Visibility>;
   };
-};
+}
 
 type BoardGroupValue = {
   type: Core.PropertyType;
@@ -90,33 +114,9 @@ type BoardGroupValue = {
 };
 
 type BoardGroup = {
-  value: BoardGroupValue;
-} & Properties.Identity &
-  Properties.Hidden;
-
-type BoardColumn = {
   property: Core.PropertyID;
   hidden: boolean;
   value: BoardGroupValue;
 };
 
-// Generics
-type ViewTemplate<T extends ViewType> = Utils.Merge<
-  View,
-  {
-    type: T;
-    format: TFormat<T>;
-  }
->;
-
-// Private Generics
-type TFormat<T extends ViewType> = Utils.Prefix<TCoverFormat, T> &
-  Utils.Prefix<TProperties, T>;
-type TCoverFormat = {
-  cover: Collections.Card.Cover;
-  cover_size: Collections.Card.CoverSize;
-  cover_aspect: Collections.Card.CoverAspect;
-};
-type TProperties = {
-  properties: Properties.Default[];
-};
+type BoardColumn = BoardGroup;
