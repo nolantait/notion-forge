@@ -2,10 +2,19 @@ import React from "react";
 
 import { useNotionContext } from "@context";
 import { Components } from "@types";
-import { AnyAsset } from "@entities";
+import * as Entities from "@entities";
 
 export type Props = {
-  block: AnyAsset;
+  block:
+    | Entities.CodepenBlock
+    | Entities.DriveBlock
+    | Entities.ExcalidrawBlock
+    | Entities.EmbedBlock
+    | Entities.FigmaBlock
+    | Entities.GistBlock
+    | Entities.MapsBlock
+    | Entities.TweetBlock
+    | Entities.VideoBlock;
   className?: string;
 };
 

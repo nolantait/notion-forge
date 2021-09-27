@@ -91,7 +91,9 @@ export type Every =
   | TransclusionContainer;
 
 type Lift<T, Key extends keyof T> = {
-  [K in keyof T[Key] as Utils.CamelCase<K>]: T[Key][K] extends Formats.Decoration[]
+  [K in keyof T[Key] as Utils.CamelCase<K>]: T[Key][K] extends
+    | Formats.Decoration[]
+    | undefined
     ? Option<Decorated>
     : Option<T[Key][K]>;
 };

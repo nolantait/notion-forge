@@ -26,7 +26,7 @@ type Traits = {
         format: Blocks.Format.Source;
       }
     | {
-        properties: Blocks.Format.Source;
+        properties: Blocks.Properties.Source;
       };
 };
 
