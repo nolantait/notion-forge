@@ -1,10 +1,10 @@
 import React from "react";
-import { Img } from "react-image";
+import { Img, ImgProps } from "react-image";
 
 import { isBrowser } from "@utils";
 import { Components } from "@types";
 
-export type Props = {
+export type Props = ImgProps & {
   className?: string;
   alt?: string;
   src: string;

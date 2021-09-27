@@ -1,9 +1,10 @@
 import React from "react";
 
-import { Utils, Components } from "@types";
+import { Components } from "@types";
 import { uuidToId } from "@utils";
 import { useNotionContext } from "@context";
 import { AnyBlock } from "@entities";
+import { Component as WrapText } from "./components/wrapped-text";
 
 export type Props = {
   block: AnyBlock;
@@ -26,7 +27,7 @@ export const Component: Components.Presenter<Props> = (props) => {
   const isCollectionView = block.type === "collection_view";
   const parentIsCollection = block.parentTable === "collection";
 
-  const blockId = hideBlockId
+  const className = hideBlockId
     ? "notion-block"
     : `notion-block notion-block-${uuidToId(block.id)}`;
 
@@ -42,38 +43,38 @@ export const Component: Components.Presenter<Props> = (props) => {
 
   switch (block.type) {
     case "collection_view_page":
-      return <components.page {...props} block={block} blockId={blockId} />;
+      return <components.page {...props} block={block} className={className} />;
     case "page":
       if (parentIsCollection) {
-        return <components.collectionRow block={block} blockId={blockId} />;
+        return <components.collectionRow block={block} className={className} />;
       }
 
-      return <components.page {...props} block={block} blockId={blockId} />;
+      return <components.page {...props} block={block} className={className} />;
     case "header":
     // Fallthrough
     case "sub_header":
     // Fallthrough
     case "sub_sub_header":
-      return <components.header block={block} blockId={blockId} />;
+      return <components.header block={block} className={className} />;
     case "divider":
-      return <components.divider blockId={blockId} />;
+      return <components.divider className={className} />;
     case "text": {
       return (
-        <components.wrappedText block={block} blockId={blockId}>
+        <WrapText block={block} className={className}>
           {children}
-        </components.wrappedText>
+        </WrapText>
       );
     }
     case "bulleted_list": {
       return (
-        <components.bulletedList block={block} blockId={blockId}>
+        <components.bulletedList block={block} className={className}>
           {children}
         </components.bulletedList>
       );
     }
     case "numbered_list": {
       return (
-        <components.numberedList block={block} blockId={blockId}>
+        <components.numberedList block={block} className={className}>
           {children}
         </components.numberedList>
       );
@@ -100,7 +101,7 @@ export const Component: Components.Presenter<Props> = (props) => {
     case "embed":
     // fallthrough
     case "video":
-      return <components.assetWrapper blockId={blockId} block={block} />;
+      return <components.assetWrapper className={className} block={block} />;
 
     case "drive": {
       const properties = block.format?.drive_properties;
@@ -109,25 +110,25 @@ export const Component: Components.Presenter<Props> = (props) => {
 
       //check if this drive actually needs to be embeded ex. google sheets.
       if (block.format?.display_source) {
-        return <components.assetWrapper blockId={blockId} block={block} />;
+        return <components.assetWrapper className={className} block={block} />;
       }
 
-      return <components.googleDrive block={block} className={blockId} />;
+      return <components.googleDrive block={block} className={className} />;
     }
 
     case "audio": {
-      return <components.audio block={block} className={blockId} />;
+      return <components.audio block={block} className={className} />;
     }
 
     case "file": {
-      return <components.file block={block} className={blockId} />;
+      return <components.file block={block} className={className} />;
     }
 
     case "equation": {
       const math = block.properties?.title[0][0];
       if (!math) return <></>;
 
-      return <components.equation math={math} block className={blockId} />;
+      return <components.equation math={math} block className={className} />;
     }
 
     case "code": {
@@ -159,7 +160,7 @@ export const Component: Components.Presenter<Props> = (props) => {
 
     case "column_list": {
       return (
-        <components.columnList blockId={blockId}>
+        <components.columnList className={className}>
           {children}
         </components.columnList>
       );
@@ -167,47 +168,47 @@ export const Component: Components.Presenter<Props> = (props) => {
 
     case "column": {
       return (
-        <components.column block={block} blockId={blockId}>
+        <components.column block={block} className={className}>
           {children}
         </components.column>
       );
     }
 
     case "quote": {
-      return <components.quote block={block} blockId={blockId} />;
+      return <components.quote block={block} className={className} />;
     }
 
     case "collection_view": {
-      return <components.collection block={block} blockId={blockId} />;
+      return <components.collection block={block} className={className} />;
     }
 
     case "callout": {
       return (
-        <components.callout block={block} blockId={blockId}>
+        <components.callout block={block} className={className}>
           {children}
         </components.callout>
       );
     }
 
     case "bookmark": {
-      return <components.bookmark block={block} blockId={blockId} />;
+      return <components.bookmark block={block} className={className} />;
     }
 
     case "toggle": {
       return (
-        <components.toggle block={block} blockId={blockId}>
+        <components.toggle block={block} className={className}>
           {children}
         </components.toggle>
       );
     }
 
     case "table_of_contents": {
-      return <components.tableOfContents block={block} blockId={blockId} />;
+      return <components.tableOfContents block={block} className={className} />;
     }
 
     case "to_do": {
       return (
-        <components.todo block={block} blockId={blockId}>
+        <components.todo block={block} className={className}>
           {children}
         </components.todo>
       );
@@ -215,7 +216,7 @@ export const Component: Components.Presenter<Props> = (props) => {
 
     case "transclusion_container": {
       return (
-        <components.syncContainer block={block} blockId={blockId}>
+        <components.syncContainer block={block} className={className}>
           {children}
         </components.syncContainer>
       );

@@ -45,7 +45,6 @@ export const Component: Components.Presenter<Props> = ({
 interface WrapListProps extends Pick<Props, "children"> {
   className: string;
 }
-
 const WrapList: Components.Presenter<WrapListProps> = ({
   children,
   className,
@@ -57,7 +56,6 @@ interface NestedListProps extends Pick<Props, "block"> {
   className: string;
   children?: React.ReactNode;
 }
-
 const NestedList: Components.Presenter<NestedListProps> = ({
   block,
   className,
@@ -73,7 +71,6 @@ const NestedList: Components.Presenter<NestedListProps> = ({
 };
 
 type ListItemProps = Pick<Props, "block">;
-
 const ListItem: Components.Presenter<ListItemProps> = ({ block }) => {
   const { components } = useNotionContext();
   const { title } = block;

@@ -58,7 +58,7 @@ const ImageIcon: Components.Presenter<ImageIconProps> = ({
   className,
 }) => {
   const { mapImageUrl, components } = useNotionContext();
-  const mappedUrl = mapImageUrl(iconUrl, block);
+  const mappedUrl = mapImageUrl(iconUrl, block.dto);
   const altText = title ? title : "Icon";
 
   return (

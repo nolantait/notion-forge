@@ -1,29 +1,45 @@
+import { Option, Some, None } from "excoptional";
 import { Core, Blocks } from "@types";
 
 export class Block<T extends Blocks.Any> {
   readonly dto: T;
-  readonly format: T["format"];
-  readonly properties: T["properties"];
   readonly type: T["type"];
 
   constructor(block: T) {
     this.dto = block;
-    this.properties = block.properties;
-    this.format = block.format;
     this.type = block.type;
   }
 
-  get id() {
+  get format(): Option<T["format"]> {
+    const value = this.dto.format;
+
+    if (!value) {
+      return None();
+    } else {
+      return Some(value);
+    }
+  }
+
+  get properties(): Option<T["properties"]> {
+    const value = this.dto.properties;
+
+    if (!value) {
+      return None();
+    } else {
+      return Some(value);
+    }
+  }
+
+  get content(): Blocks.ID[] {
+    return this.dto.content ?? [];
+  }
+
+  get id(): Blocks.ID {
     return this.dto.id;
   }
 
-  get parentId() {
-    const value = this.dto.parent_id;
-    if (typeof value === "string") {
-      return value;
-    }
-
-    throw new Error(`Missing parent ID for block ${this.id}`);
+  get parentId(): Blocks.ID {
+    return this.dto.parent_id;
   }
 
   get parentTable() {
@@ -39,7 +55,11 @@ export class Block<T extends Blocks.Any> {
     throw new Error(`Parent value invalid for block ${this.id}`);
   }
 
-  get content() {
-    return this.dto.content ?? [];
+  get _format(): T["format"] | undefined {
+    return this.format.getOrElse(undefined);
+  }
+
+  get _properties(): T["properties"] | undefined {
+    return this.properties.getOrElse(undefined);
   }
 }

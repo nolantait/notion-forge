@@ -9,6 +9,9 @@ export type {
   Primitive,
   CamelCasedPropertiesDeep,
   ValueOf,
+  RequireAtLeastOne,
+  JsonPrimitive,
+  JsonObject,
 } from "type-fest";
 import type { Formats, Blocks } from "@types";
 import type { Decorated } from "../entities";

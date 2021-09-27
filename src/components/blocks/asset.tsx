@@ -117,9 +117,10 @@ const PolymorphicAsset: Components.Presenter<PolymorphicAssetProps> = ({
       );
     }
     case "image": {
-      const src = mapImageUrl(block.source.asString, block);
+      const src = mapImageUrl(block.source.asString, block.dto);
       const caption = block.caption.asString;
       const alt = caption.length ? caption : "notion image";
+      const height = style.height?.toString() ?? "100%";
 
       return (
         <components.lazyImage
@@ -127,7 +128,7 @@ const PolymorphicAsset: Components.Presenter<PolymorphicAssetProps> = ({
           alt={alt}
           style={style}
           zoomable={true}
-          height={style.height as number}
+          height={height}
         />
       );
     }

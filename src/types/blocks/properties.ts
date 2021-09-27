@@ -18,7 +18,7 @@ export type Source = {
 };
 
 export type Caption = {
-  caption: Formats.Decoration[];
+  caption?: Formats.Decoration[];
 };
 
 export type Link = {

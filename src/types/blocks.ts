@@ -1,3 +1,4 @@
+import { Option } from "excoptional";
 import type * as Format from "./blocks/formats";
 import type * as Properties from "./blocks/properties";
 
@@ -10,60 +11,101 @@ export type { Format };
 
 export type ID = Core.ID;
 export type BlockMap = Core.NotionMap<Any>;
-export type BlockType = Any["type"];
-export type Any =
+export type BlockType =
+  | "alias"
+  | "page"
+  | "text"
+  | "bookmark"
+  | "bulleted_list"
+  | "numbered_list"
+  | "header"
+  | "sub_header"
+  | "sub_sub_header"
+  | "quote"
+  | "equation"
+  | "to_do"
+  | "table_of_contents"
+  | "divider"
+  | "column_list"
+  | "column"
+  | "callout"
+  | "toggle"
+  | "image"
+  | "embed"
+  | "gist"
+  | "video"
+  | "figma"
+  | "typeform"
+  | "codepen"
+  | "excalidraw"
+  | "tweet"
+  | "maps"
+  | "pdf"
+  | "audio"
+  | "drive"
+  | "file"
+  | "code"
+  | "collection_view"
+  | "collection_view_page"
+  | "transclusion_container"
+  | "transclusion_reference";
+
+export type Any = BaseBlock;
+export type Every =
   | Alias
-  | Audio
+  | Page
+  | Text
   | Bookmark
   | BulletedList
-  | Callout
-  | Column
-  | ColumnList
-  | Code
-  | Codepen
-  | CollectionViewPage
-  | CollectionView
-  | Divider
-  | Drive
-  | Excalidraw
-  | Embed
-  | Equation
-  | File
-  | Figma
-  | Gist
-  | Header
-  | Image
-  | Maps
   | NumberedList
-  | Page
-  | Pdf
-  | Quote
+  | Header
   | SubHeader
   | SubSubHeader
-  | TableOfContents
-  | Text
-  | TransclusionReference
-  | TransclusionContainer
+  | Quote
+  | Equation
   | Todo
+  | TableOfContents
+  | Divider
+  | ColumnList
+  | Column
+  | Callout
   | Toggle
+  | Image
+  | Embed
+  | Gist
+  | Video
+  | Figma
   | Typeform
+  | Codepen
+  | Excalidraw
   | Tweet
-  | Video;
+  | Maps
+  | Pdf
+  | Audio
+  | Drive
+  | File
+  | Code
+  | CollectionView
+  | CollectionViewPage
+  | TransclusionReference
+  | TransclusionContainer;
 
 type Lift<T, Key extends keyof T> = {
   [K in keyof T[Key] as Utils.CamelCase<K>]: T[Key][K] extends Formats.Decoration[]
-    ? Decorated
-    : T[Key][K];
+    ? Option<Decorated>
+    : Option<T[Key][K]>;
 };
 
-type Test = Utils.Simplify<Template<Code>>;
+// type Test = Utils.Simplify<Template<Code>>;
 
 export type Template<T extends BaseBlock> = Required<
   Lift<T, "properties"> & Lift<T, "format">
 >;
 
-type NarrowBy<T, U> = T extends U ? T : never;
-export type WithTrait<T> = NarrowBy<Any, T>;
+type NarrowBy<T, U> = T extends Partial<U> ? T : never;
+export type WithTrait<T> = NarrowBy<Every, T>;
+
+//type Test = WithTrait<{format: Format.Block} & {properties: Properties.Title}>;
 
 export interface Alias extends BaseBlock {
   type: "alias";
@@ -74,7 +116,7 @@ export interface Audio extends ContentBlock {
 }
 export interface Bookmark extends TextBlock {
   type: "bookmark";
-  properties: Properties.Link & Properties.Title;
+  properties: Properties.Caption & Properties.Link & Properties.Title;
   format: Format.Color & Format.Bookmark;
 }
 export interface BulletedList extends TextBlock {
@@ -169,6 +211,7 @@ export interface SubSubHeader extends TextBlock {
 }
 export interface TableOfContents extends TextBlock {
   type: "table_of_contents";
+  format?: Format.Color;
 }
 export interface Text extends TextBlock {
   type: "text";
@@ -198,21 +241,22 @@ export interface Video extends ContentBlock {
 }
 
 interface BaseBlock extends Core.Identity, Core.Creatable, Core.Editable {
-  properties?: Record<string, unknown>;
-  format?: Record<string, unknown>;
+  type: BlockType;
   content?: ID[];
+  properties?: Properties.Any;
+  format?: Format.Any;
 }
 interface TextBlock extends BaseBlock {
-  properties: Properties.Title;
-  format: Format.Color;
+  properties?: Properties.Title;
+  format?: Format.Color;
 }
 interface ContentBlock extends BaseBlock {
-  properties: Properties.Source & Properties.Caption;
-  format: Format.Source & Format.Block;
+  properties?: Properties.Source & Properties.Caption;
+  format?: Format.Source & Format.Block;
 }
 interface PageBlock extends BaseBlock {
   properties: Properties.Title;
-  format: Format.Page & Format.Access & Format.Color;
-  permissions: Core.Permission[];
+  format?: Format.Page & Format.Access & Format.Color & Format.Icon;
+  permissions?: Core.Permission[];
   file_ids?: string[];
 }

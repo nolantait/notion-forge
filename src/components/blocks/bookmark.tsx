@@ -37,45 +37,50 @@ export const Component: Components.Presenter<Props> = ({
         target="_blank"
         rel="noopener noreferrer"
         className={containerStyle}
-        href={link}
+        href={link.asString}
       >
         <div>
           {bookmarkTitle.asString.length && (
             <div className="notion-bookmark-title">
-              <components.text
-                value={bookmarkTitle.asDecoration}
-                block={block}
-              />
+              <components.text value={bookmarkTitle} block={block} />
             </div>
           )}
 
           {description.asString.length && (
             <div className="notion-bookmark-description">
-              <components.text value={description.asDecoration} block={block} />
+              <components.text value={description} block={block} />
             </div>
           )}
 
           <div className="notion-bookmark-link">
             {bookmarkIcon.length && (
-              <components.image src={bookmarkIcon} alt={title} loading="lazy" />
+              <components.image
+                src={bookmarkIcon}
+                alt={title.asString}
+                loading="lazy"
+              />
             )}
 
             <div>
-              <components.text value={link.asDecoration} block={block} />
+              <components.text value={link} block={block} />
             </div>
           </div>
         </div>
 
         {bookmarkCover.length && (
           <div className="notion-bookmark-image">
-            <components.image src={bookmarkCover} alt={title} loading="lazy" />
+            <components.image
+              src={bookmarkCover}
+              alt={title.asString}
+              loading="lazy"
+            />
           </div>
         )}
       </components.link>
 
       {caption.asString.length && (
         <div className="notion-bookmark-caption">
-          <components.text value={caption.asDecoration} block={block} />
+          <components.text value={caption} block={block} />
         </div>
       )}
     </>

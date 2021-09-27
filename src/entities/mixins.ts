@@ -1,15 +1,16 @@
+import { Some, None, Option } from "excoptional";
 import { Blocks, Formats } from "@types";
-import { getProperty, Block, Decorated } from "./";
+import { Block, Decorated } from "./";
 
-export type Constructor<T = object, A extends any[] = any[]> = new (
-  ...a: A
-) => T;
+export type Constructor<T, A extends unknown[] = any[]> = new (...a: A) => T;
+
+// type Test = Block<Blocks.Any>["type"];
 
 type BlocksWithTrait<T extends keyof Traits> = Block<
   Blocks.WithTrait<Traits[T]>
 >;
 
-// type Test = BlocksWithTrait<Traits["layoutable"]>;
+// type Test = Block<BlocksWithTrait<"titleable">>["type"];
 
 type Traits = {
   layoutable: { format: Blocks.Format.Page };
@@ -32,20 +33,24 @@ type Traits = {
 type WithLayout = BlocksWithTrait<"layoutable">;
 export function Layoutable<TBase extends Constructor<WithLayout>>(Base: TBase) {
   return class extends Base {
-    get pageFullWidth(): boolean {
-      return getProperty(this.format, "page_full_width", true);
+    get pageFullWidth(): Option<boolean> {
+      if (!this._format?.page_full_width) return None();
+      return Some(this._format.page_full_width);
     }
 
-    get pageSmallText(): boolean {
-      return getProperty(this.format, "page_small_text", false);
+    get pageSmallText(): Option<boolean> {
+      if (!this._format?.page_small_text) return None();
+      return Some(this._format.page_small_text);
     }
 
-    get pageCoverPosition(): number {
-      return getProperty(this.format, "page_cover_position", 0.5);
+    get pageCoverPosition(): Option<number> {
+      if (!this._format?.page_cover_position) return None();
+      return Some(this._format.page_cover_position);
     }
 
-    get pageCover(): string {
-      return getProperty(this.format, "page_cover", "");
+    get pageCover(): Option<string> {
+      if (!this._format?.page_cover) return None();
+      return Some(this._format.page_cover);
     }
   };
 }
@@ -53,8 +58,9 @@ export function Layoutable<TBase extends Constructor<WithLayout>>(Base: TBase) {
 type WithIcon = BlocksWithTrait<"glyphable">;
 export function Glyphable<TBase extends Constructor<WithIcon>>(Base: TBase) {
   return class extends Base {
-    get pageIcon(): string {
-      return getProperty(this.format, "page_icon", "");
+    get pageIcon(): Option<string> {
+      if (!this._format?.page_icon) return None();
+      return Some(this._format.page_icon);
     }
   };
 }
@@ -62,8 +68,9 @@ export function Glyphable<TBase extends Constructor<WithIcon>>(Base: TBase) {
 type WithColor = BlocksWithTrait<"colorable">;
 export function Colorable<TBase extends Constructor<WithColor>>(Base: TBase) {
   return class extends Base {
-    get blockColor(): Formats.Color {
-      return getProperty(this.format, "block_color", "transparent");
+    get blockColor(): Option<Formats.Color> {
+      if (!this._format?.block_color) return None();
+      return Some(this._format.block_color);
     }
   };
 }
@@ -71,12 +78,19 @@ export function Colorable<TBase extends Constructor<WithColor>>(Base: TBase) {
 type CanLock = BlocksWithTrait<"lockable">;
 export function Lockable<TBase extends Constructor<CanLock>>(Base: TBase) {
   return class extends Base {
-    get blockLocked(): boolean {
-      return getProperty(this.format, "block_locked", false);
+    get blockLocked(): Option<boolean> {
+      if (!this._format?.block_locked) return None();
+      return Some(this._format.block_locked);
     }
 
-    get blockLockedBy(): string {
-      return getProperty(this.format, "block_locked_by", "");
+    get blockLockedBy(): Option<string> {
+      if (!this._format?.block_locked_by) return None();
+      return Some(this._format.block_locked_by);
+    }
+
+    get _access() {
+      const defaults = { block_locked: false, block_locked_by: "" };
+      return Object.assign({}, defaults, this.format.getOrElse(defaults));
     }
   };
 }
@@ -84,9 +98,11 @@ export function Lockable<TBase extends Constructor<CanLock>>(Base: TBase) {
 type HasTitle = BlocksWithTrait<"titleable">;
 export function Titleable<TBase extends Constructor<HasTitle>>(Base: TBase) {
   return class extends Base {
-    get title(): Decorated {
-      const value = getProperty(this.properties, "title", [[""]]);
-      return new Decorated(value);
+    get title(): Option<Decorated> {
+      if (!this._properties?.title) return None();
+      const value = this._properties.title;
+      if (!value.length) return None();
+      return Some(new Decorated(value));
     }
   };
 }
@@ -94,14 +110,18 @@ export function Titleable<TBase extends Constructor<HasTitle>>(Base: TBase) {
 type HasLink = BlocksWithTrait<"linkable">;
 export function Linkable<TBase extends Constructor<HasLink>>(Base: TBase) {
   return class extends Base {
-    get link(): Decorated {
-      const value = getProperty(this.properties, "link", [[""]]);
-      return new Decorated(value);
+    get link(): Option<Decorated> {
+      if (!this._properties?.["link"]) return None();
+      const value = this._properties["link"];
+      if (!value.length) return None();
+      return Some(new Decorated(value));
     }
 
-    get description(): Decorated {
-      const value = getProperty(this.properties, "description", [[""]]);
-      return new Decorated(value);
+    get description(): Option<Decorated> {
+      if (!this._properties?.description) return None();
+      const value = this._properties.description;
+      if (!value.length) return None();
+      return Some(new Decorated(value));
     }
   };
 }
@@ -111,9 +131,11 @@ export function Captionable<TBase extends Constructor<HasCaption>>(
   Base: TBase
 ) {
   return class extends Base {
-    get caption(): Decorated {
-      const value = getProperty(this.properties, "caption", [[""]]);
-      return new Decorated(value);
+    get caption(): Option<Decorated> {
+      if (!this._properties?.caption) return None();
+      const value = this._properties.caption;
+      if (!value.length) return None();
+      return Some(new Decorated(value));
     }
   };
 }
@@ -121,28 +143,34 @@ export function Captionable<TBase extends Constructor<HasCaption>>(
 type HasShape = BlocksWithTrait<"shapeable">;
 export function Shapeable<TBase extends Constructor<HasShape>>(Base: TBase) {
   return class extends Base {
-    get blockWidth(): number {
-      return getProperty(this.format, "block_width", 0);
+    get blockWidth(): Option<number> {
+      if (!this._format?.block_width) return None();
+      return Some(this._format.block_width);
     }
 
-    get blockHeight(): number {
-      return getProperty(this.format, "block_height", 0);
+    get blockHeight(): Option<number> {
+      if (!this._format?.block_height) return None();
+      return Some(this._format.block_height);
     }
 
-    get blockAspectRatio(): number {
-      return getProperty(this.format, "block_aspect_ratio", 0);
+    get blockAspectRatio(): Option<number> {
+      if (!this._format?.block_aspect_ratio) return None();
+      return Some(this._format.block_aspect_ratio);
     }
 
-    get blockPreserveScale(): boolean {
-      return getProperty(this.format, "block_preserve_scale", true);
+    get blockPreserveScale(): Option<boolean> {
+      if (!this._format?.block_preserve_scale) return None();
+      return Some(this._format.block_preserve_scale);
     }
 
-    get blockFullWidth(): boolean {
-      return getProperty(this.format, "block_full_width", true);
+    get blockFullWidth(): Option<boolean> {
+      if (!this._format?.block_full_width) return None();
+      return Some(this._format.block_full_width);
     }
 
-    get blockPageWidth(): boolean {
-      return getProperty(this.format, "block_page_width", true);
+    get blockPageWidth(): Option<boolean> {
+      if (!this._format?.block_page_width) return None();
+      return Some(this._format.block_page_width);
     }
   };
 }
@@ -150,18 +178,21 @@ export function Shapeable<TBase extends Constructor<HasShape>>(Base: TBase) {
 type HasSource = BlocksWithTrait<"sourceable">;
 export function Sourceable<TBase extends Constructor<HasSource>>(Base: TBase) {
   return class extends Base {
-    get source(): Decorated {
-      const value = getProperty(this.properties, "source", [[""]]);
-      return new Decorated(value);
+    get source(): Option<Decorated> {
+      if (!this._properties?.source) return None();
+      return Some(new Decorated(this._properties.source));
     }
 
-    get displaySource(): string {
-      const value = getProperty(this.format, "display_source", "");
-      if (value.length) {
-        return value;
-      } else {
-        return this.source.asString;
+    get displaySource(): Option<string> {
+      const displaySource = this._format?.display_source;
+
+      if (!displaySource) {
+        const altSource = this.source.getOrElse(undefined);
+        if (!altSource) return None();
+        return Some(altSource.asString);
       }
+
+      return Some(displaySource);
     }
   };
 }
