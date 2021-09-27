@@ -8,6 +8,8 @@ import { Decorated } from "./decorated";
 
 export { Mixins, Block, Decorated };
 
+export * from "./blocks/page-block";
+
 // export type AnyBlock = Block<Blocks.Any>;
 // export type EveryBlock =
 //   | AliasBlock
