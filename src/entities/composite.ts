@@ -2,9 +2,6 @@ import { Option, Some, None } from "excoptional";
 import { API, Blocks } from "@types";
 import { Block } from "./";
 
-type Children = Leaf[];
-type Parent = Composite;
-
 export interface Leaf extends Tree {
   item: Block<Blocks.Every>;
   children: Children;
@@ -14,37 +11,8 @@ export interface Leaf extends Tree {
 
 export interface Tree {}
 
-const BuildNode = (
-  id: Blocks.ID,
-  recordMap: API.ExtendedRecordMap,
-  parent: Composite
-): Composite | Node => {
-  const value = recordMap.block[id].value;
-  const block = new Block(value);
-  if (block.content.length) {
-    const composite = BuildComposite(new Composite(block, parent), recordMap);
-    return composite;
-  } else {
-    const node = new Node(block, parent);
-    return node;
-  }
-};
-
-const BuildComposite = (
-  composite: Composite,
-  recordMap: API.ExtendedRecordMap
-): Composite => {
-  composite.children = composite.item.content.map((id) =>
-    BuildNode(id, recordMap, composite)
-  );
-  return composite;
-};
-
-const BuildTree = (recordMap: API.ExtendedRecordMap) => {
-  const root = new Composite(new Block(recordMap.block[0].value), undefined);
-  const tree = BuildComposite(root, recordMap);
-  return tree;
-};
+type Children = Leaf[];
+type Parent = Composite;
 
 export class Composer implements Tree {
   public root: Composite;
@@ -65,7 +33,10 @@ export class Composer implements Tree {
       .then((composites) => composites.map((composite) => composite.item));
   }
 
-  _ancestors(ancestors: Composite[], leaf: Composite | undefined): Composite[] {
+  private _ancestors(
+    ancestors: Composite[],
+    leaf: Composite | undefined
+  ): Composite[] {
     if (!leaf) return ancestors;
 
     return leaf.parent
@@ -78,7 +49,7 @@ export class Composer implements Tree {
       .getOrElse([]);
   }
 
-  _find(id: Blocks.ID): Option<Leaf> {
+  private _find(id: Blocks.ID): Option<Leaf> {
     return this.root.find(id);
   }
 }
@@ -137,3 +108,35 @@ class Node implements Leaf {
     return [];
   }
 }
+
+const BuildNode = (
+  id: Blocks.ID,
+  recordMap: API.ExtendedRecordMap,
+  parent: Composite
+): Composite | Node => {
+  const value = recordMap.block[id].value;
+  const block = new Block(value);
+  if (block.content.length) {
+    const composite = BuildComposite(new Composite(block, parent), recordMap);
+    return composite;
+  } else {
+    const node = new Node(block, parent);
+    return node;
+  }
+};
+
+const BuildComposite = (
+  composite: Composite,
+  recordMap: API.ExtendedRecordMap
+): Composite => {
+  composite.children = composite.item.content.map((id) =>
+    BuildNode(id, recordMap, composite)
+  );
+  return composite;
+};
+
+const BuildTree = (recordMap: API.ExtendedRecordMap) => {
+  const root = new Composite(new Block(recordMap.block[0].value), undefined);
+  const tree = BuildComposite(root, recordMap);
+  return tree;
+};

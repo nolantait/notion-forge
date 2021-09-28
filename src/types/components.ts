@@ -63,5 +63,6 @@ export interface Any {
   todo: Presenter<TodoProps>;
   toggle: Presenter<ToggleProps>;
   tweet: Presenter<AssetProps>;
+  typeform: Presenter<AssetProps>;
   video: Presenter<AssetProps>;
 }

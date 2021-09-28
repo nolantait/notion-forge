@@ -22,8 +22,6 @@ export type Props = Core.NotionContext & {
 export const Renderer: Components.Presenter<Props> = ({
   components,
   recordMap,
-  mapPageUrl,
-  mapImageUrl,
   fullPage,
   rootPageId,
   previewImages,
@@ -45,8 +43,6 @@ export const Renderer: Components.Presenter<Props> = ({
     <NotionContextProvider
       components={components}
       recordMap={recordMap}
-      mapPageUrl={mapPageUrl}
-      mapImageUrl={mapImageUrl}
       fullPage={fullPage}
       rootPageId={rootPageId}
       previewImages={previewImages}
@@ -64,28 +60,36 @@ export const Renderer: Components.Presenter<Props> = ({
 export type BlockRendererProps = {
   level: number;
   blockId?: Blocks.ID;
+  hideBlockId?: boolean;
   rest?: any[];
 };
 
 export const BlockRenderer: Components.Presenter<BlockRendererProps> = ({
   level = 0,
   blockId,
+  hideBlockId = false,
   ...rest
 }) => {
   const { recordMap } = useNotionContext();
-  const id = blockId || Object.keys(recordMap.block)[0];
-  const block = recordMap.block[id]?.value;
+  const id = blockId ?? recordMap.rootBlock.id;
+  const block = recordMap.findBlock(id).getOrElse(undefined);
 
   if (!block) {
     throw new Error(`Missing block ${id}`);
   }
 
   return (
-    <Block key={id} level={level} block={block} {...rest}>
-      {block?.content?.map((contentBlockId: Blocks.ID) => (
+    <Block
+      hideBlockId={hideBlockId}
+      key={id}
+      level={level}
+      block={block}
+      {...rest}
+    >
+      {block.content.map((childBlockId: Blocks.ID) => (
         <BlockRenderer
-          key={contentBlockId}
-          blockId={contentBlockId}
+          key={childBlockId}
+          blockId={childBlockId}
           level={level + 1}
           {...rest}
         />

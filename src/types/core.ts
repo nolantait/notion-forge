@@ -1,3 +1,4 @@
+import type { Block, RecordMap } from "@entities";
 import type { Formats, Components, Blocks, API } from "./";
 
 // Base Types
@@ -87,17 +88,12 @@ export type Editable = {
   last_edited_time: Timestamp;
 };
 
-export type MapPageUrl = (
-  pageId: string,
-  recordMap: API.ExtendedRecordMap
-) => string;
-export type MapImageUrl = (url: string, block: Blocks.Any) => string;
+export type MapPageUrl = (pageId: Blocks.ID, rootPageId?: Blocks.ID) => string;
+export type MapImageUrl = (url: string, block: Block<Blocks.Every>) => URL;
 
 export interface NotionContext {
-  recordMap: API.ExtendedRecordMap;
+  recordMap: RecordMap;
   components: Components.Any;
-  mapPageUrl: MapPageUrl;
-  mapImageUrl: MapImageUrl;
   rootPageId: string | undefined;
   fullPage: boolean;
   previewImages: boolean;

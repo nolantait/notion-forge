@@ -3,12 +3,12 @@ import formatNumber from "format-number";
 
 import { Components, Formats } from "@types";
 import { useNotionContext } from "@context";
-import { decorate } from "@utils";
 import { Props as PropertyProps } from "../property";
+import { Decorated } from "@entities";
 
 export type Props = Required<Pick<PropertyProps, "data" | "block">> & {
   schema: {
-    number_format: Formats.NumberFormat;
+    number_format?: Formats.NumberFormat;
   };
 };
 
@@ -31,8 +31,11 @@ export const Property: Components.Presenter<Props> = ({
   if (isNaN(value)) {
     return <components.text value={data} block={block} />;
   } else {
-    const formattedValue = formattedNumber(schema.number_format, value);
-    const decoratedValue = decorate(formattedValue);
+    const formattedValue = formattedNumber(
+      schema.number_format ?? "number_with_commas",
+      value
+    );
+    const decoratedValue = new Decorated(formattedValue);
 
     return <components.text value={decoratedValue} block={block} />;
   }

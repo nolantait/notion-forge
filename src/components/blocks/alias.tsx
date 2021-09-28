@@ -1,6 +1,6 @@
 import React from "react";
 
-import { BlockRenderer } from "../renderer";
+import { BlockRenderer } from "../../renderer";
 import { Components } from "@types";
 import { AliasBlock } from "@entities";
 
@@ -10,7 +10,7 @@ export type Props = {
 };
 
 export const Component: Components.Presenter<Props> = ({ block, level }) => {
-  const referencePointerId = block.aliasPointer.id;
+  const referencePointerId = block.aliasPointer.getOrElse({ id: undefined }).id;
 
   return (
     <BlockRenderer

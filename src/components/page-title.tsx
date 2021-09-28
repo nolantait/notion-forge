@@ -3,7 +3,8 @@ import React from "react";
 import { cs } from "@utils";
 import { useNotionContext } from "@context";
 import { Components } from "@types";
-import { PageBlock } from "@entities";
+import { Component as PageIcon } from "@components/page-icon";
+import { Decorated, PageBlock } from "@entities";
 
 export type Props = {
   block: PageBlock;
@@ -15,12 +16,12 @@ export const Component: Components.Presenter<Props> = ({
   className,
 }) => {
   const { components, defaultPageIcon } = useNotionContext();
-  const { title } = block;
+  const title = block.title.getOrElse(new Decorated());
   const style = cs("notion-page-title", className);
 
   return (
     <span className={style}>
-      <components.pageIcon
+      <PageIcon
         block={block}
         defaultIcon={defaultPageIcon}
         className="notion-page-title-icon"

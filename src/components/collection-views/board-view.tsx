@@ -1,21 +1,16 @@
 import React from "react";
 
-import { Collections, API, Core, Components } from "@types";
+import { Core, Components } from "@types";
 import { cs } from "@utils";
 import { EmptyIcon } from "@icons";
-import { Property } from "@components/property";
+import { PropertyComponent as Property } from "@components";
 import { useNotionContext } from "@context";
-import { Decorated } from "@entities";
+import { Decorated, Collection, BoardView, BoardGroup } from "@entities";
+import { Component as CollectionCard } from "./card";
 
 type BoardGroupValue = {
   type: Core.PropertyType;
   value: string;
-};
-
-type BoardGroup = {
-  property: Core.PropertyID;
-  hidden: boolean;
-  value: BoardGroupValue;
 };
 
 type BoardGroupHeaderProps = Omit<Props, "collectionView"> & {
@@ -29,38 +24,28 @@ type BoardGroupBodyProps = Props & {
 };
 
 export type Props = {
-  collection: Collections.Collection;
-  collectionView: Collections.BoardView;
-  collectionData: API.BoardCollectionQueryResult;
+  collection: Collection;
 };
 
-export const View: Components.Presenter<Props> = ({
-  collectionView,
-  collectionData,
-  collection,
-}) => {
-  const { format } = collectionView;
-  const { board_cover_size: boardCoverSize = "medium" } = format;
-
-  const boardGroups: Array<BoardGroup> =
-    format.board_groups2 ?? format.board_columns;
+export const View: Components.Presenter<Props> = ({ collection }) => {
+  const view = collection.currentView as BoardView;
 
   const containerStyle = cs(
     "notion-board-view",
-    `notion-board-view-size-${boardCoverSize}`
+    `notion-board-view-size-${view.coverSize}`
   );
 
   const mapHeaderProps = (
     group: BoardGroup,
     index: number
   ): BoardGroupHeaderProps => {
-    return { collection, collectionData, group, index };
+    return { collection, group, index };
   };
   const mapBodyProps = (
     group: BoardGroup,
     index: number
   ): BoardGroupBodyProps => {
-    return { collection, collectionData, collectionView, group, index };
+    return { collection, group, index };
   };
 
   return (
@@ -68,7 +53,7 @@ export const View: Components.Presenter<Props> = ({
       <div className={containerStyle}>
         <header className="notion-board-header">
           <div className="notion-board-header-inner">
-            {boardGroups
+            {view.groups
               .map((group, index) => mapHeaderProps(group, index))
               .map((prop, index) => {
                 return <BoardGroupHeader key={index} {...prop} />;
@@ -79,7 +64,7 @@ export const View: Components.Presenter<Props> = ({
         <div className="notion-board-header-placeholder" />
 
         <section className="notion-board-body">
-          {boardGroups
+          {view.groups
             .map((group, index) => mapBodyProps(group, index))
             .map((prop, index) => {
               return <BoardGroupBody key={index} {...prop} />;
@@ -91,12 +76,11 @@ export const View: Components.Presenter<Props> = ({
 };
 
 const BoardGroupHeader: Components.Presenter<BoardGroupHeaderProps> = ({
-  collectionData,
   collection,
   index,
   group,
 }) => {
-  if (!collectionData.groupResults || group.hidden) {
+  if (!collection.hasData || group.hidden) {
     // No groupResults in the data when collection is in a toggle
     return <></>;
   }
@@ -140,7 +124,7 @@ const BoardGroupBody: Components.Presenter<BoardGroupBodyProps> = ({
   index,
   group,
 }) => {
-  const { recordMap, components } = useNotionContext();
+  const { recordMap } = useNotionContext();
   const { format } = collectionView;
 
   if (!collectionData.groupResults || group.hidden) {
@@ -164,7 +148,7 @@ const BoardGroupBody: Components.Presenter<BoardGroupBodyProps> = ({
         if (!block) throw new Error(`Missing block ${blockId} in recordMap`);
 
         return (
-          <components.collectionCard
+          <CollectionCard
             className="notion-board-group-card"
             collection={collection}
             block={block}

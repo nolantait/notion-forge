@@ -1,6 +1,6 @@
 export { Block } from "./block";
 export { Decorated } from "./decorated";
-export { RecordMap } from "./record-map";
+export { RecordMap, MapPageUrl } from "./record-map";
 
 export * from "./composite";
 export * from "./collection";

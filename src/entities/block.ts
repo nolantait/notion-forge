@@ -30,12 +30,24 @@ export class Block<T extends Blocks.Any> {
     }
   }
 
+  get createdTime(): Date {
+    return new Date(this.dto.created_time);
+  }
+
+  get lastEditedTime(): Date {
+    return new Date(this.dto.last_edited_time);
+  }
+
   get content(): Blocks.ID[] {
     return this.dto.content ?? [];
   }
 
   get id(): Blocks.ID {
     return this.dto.id;
+  }
+
+  parentIs(type: Core.ParentType): boolean {
+    return this.parentTable === type;
   }
 
   get parentId(): Blocks.ID {

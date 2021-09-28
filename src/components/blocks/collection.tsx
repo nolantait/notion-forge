@@ -13,10 +13,11 @@ import { CollectionViewIcon, ChevronDownIcon } from "@icons";
 import { useNotionContext } from "@context";
 import { cs } from "@utils";
 import { Collections, Core, Components } from "@types";
-import { CollectionViewBlock } from "@entities";
+import { CollectionViewBlock, CollectionViewPageBlock } from "@entities";
+import { Component as CollectionView } from "../blocks/collection-view";
 
 export type Props = {
-  block: CollectionViewBlock;
+  block: CollectionViewBlock | CollectionViewPageBlock;
   className?: string;
 };
 
@@ -26,7 +27,7 @@ export const Component: Components.Presenter<Props> = ({
   block,
   className,
 }) => {
-  const { recordMap, components } = useNotionContext();
+  const { recordMap } = useNotionContext();
   const { collectionId, viewIds } = block;
   const defaultViewId: string | undefined = viewIds[0];
 
@@ -40,19 +41,12 @@ export const Component: Components.Presenter<Props> = ({
     viewIds.find((id) => id === collectionState?.collectionViewId) ||
     defaultViewId;
 
-  const collection = recordMap.collection[collectionId]?.value;
-  const currentView = recordMap.collection_view[currentViewId]?.value;
-  const currentViewData =
-    recordMap.collection_query[collectionId]?.[currentViewId];
+  const collection = recordMap
+    .findCollection(collectionId)
+    .getOrElse(undefined);
 
-  const isValidCollection = collection && currentView && currentViewData;
-
-  if (!isValidCollection) {
+  if (!collection?.hasData) {
     throw new Error(`Invalid collection ${collection}`);
-  }
-
-  if (collection.icon) {
-    block.pageIcon = collection.icon;
   }
 
   const containerStyle = cs("notion-collection", className);
@@ -69,11 +63,7 @@ export const Component: Components.Presenter<Props> = ({
       <div className={containerStyle}>
         <CollectionHeader {...collectionHeaderProps} />
 
-        <components.collectionView
-          collection={collection}
-          collectionView={currentView}
-          collectionData={currentViewData}
-        />
+        <CollectionView collection={collection} />
       </div>
     </CollectionActionContext.Provider>
   );

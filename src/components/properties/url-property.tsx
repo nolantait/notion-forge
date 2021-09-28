@@ -3,10 +3,11 @@ import React from "react";
 import { Components } from "@types";
 import { useNotionContext } from "@context";
 import { Props as PropertyProps } from "../property";
+import { Decorated } from "@entities";
 
 export type Props = Pick<PropertyProps, "data" | "inline" | "block">;
 
-export const UrlProperty: Components.Presenter<Props> = ({
+export const Property: Components.Presenter<Props> = ({
   data,
   inline,
   block,
@@ -25,9 +26,8 @@ export const UrlProperty: Components.Presenter<Props> = ({
 
   return (
     <components.text
-      value={value}
+      value={new Decorated(value)}
       block={block}
-      inline={inline}
       linkProps={{
         target: "_blank",
         rel: "noreferrer noopener",

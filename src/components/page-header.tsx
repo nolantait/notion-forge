@@ -1,18 +1,51 @@
 import React from "react";
 
-import { cs, getBlockTitle, getBlockIcon, getBlockParentPage } from "@utils";
+import { cs } from "@utils";
 import { useNotionContext } from "@context";
 import { Blocks } from "@types";
+import { Some, None, Option } from "excoptional";
+import { PageBlock } from "@entities";
+import { Component as PageLink } from "@components/page-link";
+import { Component as PageIcon } from "@components/page-icon";
 
 type PageLinkProps = React.ComponentProps<"a"> & React.ComponentProps<"div">;
 
-type Breadcrumb = {
-  block: Blocks.Page;
+type BreadcrumbOptions = {
   active: boolean;
-  pageId: string;
-  title: string | null;
-  icon: string | null;
+  pageId: Blocks.ID;
+  title?: string;
+  icon?: string;
 };
+
+class Breadcrumb {
+  readonly block: PageBlock;
+  private readonly _options: BreadcrumbOptions;
+
+  constructor(block: PageBlock, options: BreadcrumbOptions) {
+    this.block = block;
+    this._options = options;
+  }
+
+  get title(): Option<string> {
+    const value = this._options.title;
+    if (!value) return None();
+    return Some(value);
+  }
+
+  get icon(): Option<string> {
+    const value = this._options.icon;
+    if (!value) return None();
+    return Some(value);
+  }
+
+  get active(): boolean {
+    return this._options.active;
+  }
+
+  get pageId(): Blocks.ID {
+    return this._options.pageId;
+  }
+}
 
 type BreadcrumbProps = {
   breadcrumb: Breadcrumb;
@@ -22,47 +55,20 @@ type BreadcrumbProps = {
 export const Component = (): React.ReactElement => {
   const { recordMap } = useNotionContext();
 
-  const blockMap = recordMap.block;
-  const blockIds = Object.keys(blockMap);
-  const activePageId = blockIds[0];
-
-  if (!activePageId) {
-    return <></>;
-  }
-
-  const breadcrumbs: Breadcrumb[] = [];
-  let currentPageId = activePageId;
-
-  do {
-    const block = blockMap[currentPageId]?.value as Blocks.Page;
-
-    if (!block) break;
-
-    const title = getBlockTitle(block as any, recordMap);
-    const icon = getBlockIcon(block as any, recordMap);
-    const hasValidTitle = title || icon;
-
-    if (!hasValidTitle) break;
-
-    const breadcrumb = {
-      block,
-      active: currentPageId === activePageId,
-      pageId: currentPageId,
-      title,
-      icon,
-    };
-
-    breadcrumbs.push(breadcrumb);
-
-    const parentBlock = getBlockParentPage(block, recordMap);
-    const parentId = parentBlock?.id;
-
-    if (!parentId) break;
-
-    currentPageId = parentId as string;
-  } while (true);
-
-  breadcrumbs.reverse();
+  const rootBlockId = recordMap.rootBlock.id;
+  const breadcrumbs = recordMap.composition
+    .ancestors(rootBlockId)
+    .then((ancestors) => {
+      return ancestors
+        .filter((ancestor) => ancestor.type !== "page")
+        .map((ancestor) => {
+          const isActive = rootBlockId === ancestor.id;
+          const options = { active: isActive, pageId: ancestor.id };
+          return new Breadcrumb(ancestor as PageBlock, options);
+        });
+    })
+    .getOrElse([])
+    .reverse();
 
   return (
     <header className="notion-header">
@@ -70,9 +76,7 @@ export const Component = (): React.ReactElement => {
         <div className="breadcrumbs">
           {breadcrumbs.map((breadcrumb, index) => {
             const isMoreBreadcrumbs = index < breadcrumbs.length - 1;
-            return (
-              <Breadcrumb key={index} {...{ breadcrumb, isMoreBreadcrumbs }} />
-            );
+            return <Crumb key={index} {...{ breadcrumb, isMoreBreadcrumbs }} />;
           })}
         </div>
       </div>
@@ -80,33 +84,33 @@ export const Component = (): React.ReactElement => {
   );
 };
 
-const Breadcrumb = ({
+const Crumb = ({
   breadcrumb,
   isMoreBreadcrumbs,
 }: BreadcrumbProps): React.ReactElement => {
-  const { components, mapPageUrl } = useNotionContext();
+  const { recordMap } = useNotionContext();
 
   const isActive = breadcrumb.active;
   const { pageId } = breadcrumb;
   const pageLinkProps: any = {};
   const overrides = {
-    pageLink: isActive ? ActiveBreadcrumb : components.pageLink,
+    link: isActive ? ActiveBreadcrumb : PageLink,
   };
   const linkStyle = cs("breadcrumb", isActive && "active");
 
   if (!isActive) {
-    pageLinkProps.href = mapPageUrl(breadcrumb.pageId);
+    pageLinkProps.href = recordMap.mapPageUrl(breadcrumb.pageId);
   }
+
+  const icon = breadcrumb.icon.getOrElse(undefined);
 
   return (
     <React.Fragment key={pageId}>
-      <overrides.pageLink className={linkStyle} {...pageLinkProps}>
-        {breadcrumb.icon && (
-          <components.pageIcon className="icon" block={breadcrumb.block} />
-        )}
+      <overrides.link className={linkStyle} {...pageLinkProps}>
+        {icon && <PageIcon className="icon" block={breadcrumb.block} />}
 
         {breadcrumb.title && <span className="title">{breadcrumb.title}</span>}
-      </overrides.pageLink>
+      </overrides.link>
 
       {isMoreBreadcrumbs && <span className="spacer">/</span>}
     </React.Fragment>

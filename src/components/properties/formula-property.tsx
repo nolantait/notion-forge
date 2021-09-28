@@ -6,7 +6,7 @@ import { Formulas, Core, Components } from "@types";
 import { Props as PropertyProps } from "../property";
 
 export type Props = Pick<PropertyProps, "schema" | "collection"> & {
-  properties: Core.PropertyMap;
+  properties?: Core.PropertyMap;
 };
 
 export const Property: Components.Presenter<Props> = ({
@@ -14,12 +14,12 @@ export const Property: Components.Presenter<Props> = ({
   properties,
   collection,
 }) => {
-  if (!schema) return <></>;
+  if (!schema || !properties) return <></>;
 
   const { schema: collectionSchema } = collection;
   const { formula } = schema;
 
-  const formulaResult = evalFormula(formula as Formulas.Formula, {
+  const formulaResult = evalFormula(formula as Formulas.Any, {
     schema: collectionSchema as any,
     properties: properties as any,
   });

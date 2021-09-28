@@ -3,34 +3,27 @@ import React from "react";
 import { cs } from "@utils";
 import { Component as ColumnTitle } from "./column-title";
 import { useNotionContext } from "@context";
-import { Collections, Core, Components } from "@types";
-import { Props as ViewProps } from "../../collection-view";
+import { Core, Components } from "@types";
+import { Props as ViewProps } from "../blocks/collection-view";
+import { Component as Property } from "@components/property";
+import { Decorated, PageBlock, TableView, TableProperty } from "@entities";
 
-export type Props = Omit<ViewProps, "collectionView"> & {
-  collectionView: Collections.TableView;
-};
+export type Props = Pick<ViewProps, "collection">;
 
-export const View: Components.Presenter<Props> = ({
-  collection,
-  collectionView,
-  collectionData,
-}) => {
-  const tableProperties: TableProperty[] =
-    collectionView.format?.table_properties ?? [];
+export const View: Components.Presenter<Props> = ({ collection }) => {
+  const view = collection.currentView as TableView;
 
-  const filteredProperties = fetchTableProperties(
-    collection.schema,
-    tableProperties
-  );
+  const tableProperties = view.properties;
+  const blocks = collection.data.blocks.getOrElse([]);
 
   return (
     <div className="notion-table">
       <div className="notion-table-view">
-        {!!filteredProperties.length && (
+        {tableProperties.length && (
           <>
             <div className="notion-table-header">
               <div className="notion-table-header-inner">
-                {filteredProperties.map((property: TableProperty, index) => (
+                {tableProperties.map((property, index) => (
                   <TableHead key={index} {...{ collection, property }} />
                 ))}
               </div>
@@ -39,12 +32,12 @@ export const View: Components.Presenter<Props> = ({
             <div className="notion-table-header-placeholder"></div>
 
             <div className="notion-table-body">
-              {collectionData.blockIds.map((blockId) => (
-                <div className="notion-table-row" key={blockId}>
-                  {filteredProperties.map((property, index) => (
+              {blocks.map((block) => (
+                <div className="notion-table-row" key={block.id}>
+                  {tableProperties.map((property, index) => (
                     <TableCell
                       key={index}
-                      {...{ property, collection, blockId }}
+                      {...{ property, collection, blockId: block.id }}
                     />
                   ))}
                 </div>
@@ -62,11 +55,14 @@ const TableCell: Components.Presenter<TableCellProps> = ({
   collection,
   blockId,
 }) => {
-  const { components, recordMap } = useNotionContext();
-  const propertyId = property.property;
-  const schema = collection.schema?.[propertyId];
-  const block = recordMap.block[blockId].value;
-  const data = block?.properties?.[propertyId];
+  const { recordMap } = useNotionContext();
+  const propertyId = property.propertyId;
+  const schema = collection.schema[propertyId];
+  const block = recordMap.findBlock(blockId).getOrElse(undefined);
+  if (!block) throw new Error(`Could not find block for blockID ${blockId}`);
+  const page = block as PageBlock;
+
+  const data = page.getPageProperty(property).getOrElse(new Decorated());
 
   const style: React.CSSProperties = {
     width: getPropertyWidth(property),
@@ -79,20 +75,14 @@ const TableCell: Components.Presenter<TableCellProps> = ({
 
   return (
     <div key={propertyId} className={containerStyle} style={style}>
-      <components.property
+      <Property
         schema={schema}
         data={data}
-        block={block}
+        block={page}
         collection={collection}
       />
     </div>
   );
-};
-
-type TableProperty = {
-  property: Core.PropertyID;
-  visible?: boolean;
-  width?: number;
 };
 
 type TableCellProps = Pick<ViewProps, "collection"> & {
@@ -105,7 +95,7 @@ type TableHeadProps = Pick<ViewProps, "collection"> & {
 };
 
 const TableHead = ({ collection, property }: TableHeadProps): JSX.Element => {
-  const propertyId = property.property;
+  const propertyId = property.propertyId;
   const schema = collection.schema[propertyId];
   const style: React.CSSProperties = {
     width: getPropertyWidth(property),
@@ -123,7 +113,7 @@ const TableHead = ({ collection, property }: TableHeadProps): JSX.Element => {
 };
 
 const getPropertyWidth = (property: TableProperty): number => {
-  const isTitle = property.property === "title";
+  const isTitle = property.propertyId === "title";
 
   if (property.width) {
     return property.width;
@@ -132,20 +122,4 @@ const getPropertyWidth = (property: TableProperty): number => {
   } else {
     return 200;
   }
-};
-
-const fetchTableProperties = (
-  schema: Collections.PropertySchemaMap,
-  tableProperties: TableProperty[]
-): TableProperty[] => {
-  if (tableProperties.length > 0) {
-    return tableProperties.filter(
-      (prop) => prop.visible && schema[prop.property]
-    );
-  }
-  return [{ property: "title" }].concat(
-    Object.keys(schema)
-      .filter((p) => p !== "title")
-      .map((property) => ({ property }))
-  );
 };

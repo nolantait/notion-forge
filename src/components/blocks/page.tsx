@@ -4,7 +4,9 @@ import { cs } from "@utils";
 import { Component as NotionContainer } from "./container";
 import { useNotionContext } from "@context";
 import { Components } from "@types";
-import { PageBlock, CollectionViewPageBlock } from "@entities";
+import {PageBlock, CollectionViewPageBlock} from "@entities";
+import {Component as RowRenderer} from "../collection-row";
+import {Component as Collection} from "../blocks/collection
 
 export type Props = {
   block: PageBlock | CollectionViewPageBlock;
@@ -19,26 +21,32 @@ export type Props = {
 export const Component: Components.Presenter<Props> = (props) => {
   const { fullPage } = useNotionContext();
   const { block, className, level } = props;
+  const containerProps = { block, className };
+
+  const shouldRenderAsRow =
+    block.type !== "collection_view_page" && block.parentIs("collection");
+
+  const PageRenderer = shouldRenderAsRow ? (
+    <RowRenderer block={block} className={className} />
+  ) : fullPage ? (
+    <FullPage {...props} />
+  ) : (
+    <LightPage {...props} />
+  );
 
   // Render a page link instead of a page if this is a nested block
-  const PageRenderer = fullPage ? FullPage : LightPage;
   const Content = level > 0 ? PageLink : PageRenderer;
 
-  return (
-    <NotionContainer {...{ block, className }}>
-      <Content {...props} />
-    </NotionContainer>
-  );
+  return <NotionContainer {...containerProps}>{Content}</NotionContainer>;
 };
 
 const RenderContent: Components.Presenter<Props> = ({ block, className }) => {
-  const { components } = useNotionContext();
   const isCollection = block.type === "collection_view_page";
 
   return (
     <>
       {isCollection && (
-        <components.collection block={block} className={className} />
+        <Collection block={block} className={className} />
       )}
     </>
   );

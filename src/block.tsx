@@ -3,11 +3,11 @@ import React from "react";
 import { Components } from "@types";
 import { uuidToId } from "@utils";
 import { useNotionContext } from "@context";
-import { AnyBlock } from "@entities";
+import { Block } from "@entities";
 import { Component as WrapText } from "./components/wrapped-text";
 
 export type Props = {
-  block: AnyBlock;
+  block: Block<Blocks.Every>;
   level: number;
   hideBlockId: boolean;
   className?: string;

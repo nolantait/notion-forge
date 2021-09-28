@@ -1,9 +1,10 @@
 import React from "react";
 
 import { Components } from "@types";
-import { PageBlock, CollectionViewPageBlock } from "@entities";
+import { PageBlock, CollectionViewPageBlock, Decorated } from "@entities";
 import { useNotionContext } from "@context";
-import { cs, isUrl, getBlockIcon } from "@utils";
+import { cs, isUrl } from "@utils";
+import { PageHeader } from "@components";
 
 export type Props = {
   block: PageBlock | CollectionViewPageBlock;
@@ -16,8 +17,7 @@ export type Props = {
 };
 
 export const Component: Components.Presenter<Props> = (props) => {
-  const { mapImageUrl, defaultPageIcon, recordMap, components } =
-    useNotionContext();
+  const { recordMap, defaultPageIcon, components } = useNotionContext();
 
   const {
     block,
@@ -31,10 +31,8 @@ export const Component: Components.Presenter<Props> = (props) => {
 
   const hasPageCover = pageCover;
   const coverPosition = (1 - pageCoverPosition) * 100;
-  const pageIcon =
-    getBlockIcon(block._dto as any, recordMap) ?? defaultPageIcon;
+  const pageIcon = block.pageIcon.getOrElse(defaultPageIcon);
   const isPageIconUrl = pageIcon && isUrl(pageIcon);
-  const { pageFullWidth } = block;
 
   const outerContainerStyle = cs("notion", "notion-app", blockId, className);
 
@@ -43,16 +41,18 @@ export const Component: Components.Presenter<Props> = (props) => {
     hasPageCover ? "notion-page-has-cover" : "notion-page-no-cover",
     pageIcon ? "notion-page-has-icon" : "notion-page-no-icon",
     isPageIconUrl ? "notion-page-has-image-icon" : "notion-page-has-text-icon",
-    pageFullWidth && "notion-full-width"
+    block.pageFullWidth
+      .then((value) => value && "notion-full-width")
+      .getOrElse("")
   );
 
   const renderPageCover =
     typeof pageCover !== "string" ? (
       pageCover
     ) : (
-      <components.lazyImage
-        src={mapImageUrl(pageCover, block)}
-        alt={block.title.asString}
+      <components.image
+        src={recordMap.mapImageUrl(pageCover, block)}
+        alt={block.title.getOrElse(new Decorated()).asString}
         className="notion-page-cover"
         style={{
           objectPosition: `center ${coverPosition}%`,
@@ -63,7 +63,7 @@ export const Component: Components.Presenter<Props> = (props) => {
   return (
     <div className={outerContainerStyle}>
       <div className="notion-frame">
-        <components.pageHeader />
+        <PageHeader />
 
         <div className="notion-page-scroller">
           {hasPageCover ? renderPageCover : null}

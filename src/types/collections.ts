@@ -42,10 +42,12 @@ export interface GalleryView extends BaseView {
     gallery_properties: Array<Properties.Identity & Properties.Visible>;
   };
 }
+
+export type ListProperty = Properties.Identity & Properties.Visible;
 export interface ListView extends BaseView {
   type: "list";
   format: {
-    list_properties: Array<Properties.Identity & Properties.Visible>;
+    list_properties: ListProperty[];
   };
 }
 export interface CalendarView extends BaseView {
@@ -53,14 +55,16 @@ export interface CalendarView extends BaseView {
   format: Record<string, never>;
 }
 
+export type TableProperty = Properties.Identity &
+  Properties.Width &
+  Properties.Visible;
+
 export interface TableView extends BaseView {
   type: "table";
   page_sort: Blocks.ID[];
   format: {
     table_wrap: boolean;
-    table_properties: Array<
-      Properties.Identity & Properties.Width & Properties.Visible
-    >;
+    table_properties: TableProperty[];
   };
 }
 export interface BoardView extends BaseView {
@@ -93,6 +97,10 @@ export type PropertySchemaMap = {
   [key: string]: PropertySchema;
 };
 
+export type PropertyVisibility = Array<
+  Properties.Identity & Properties.Visibility
+>;
+export type PageProperty = Properties.Identity & Properties.Visible;
 export interface Collection extends Core.Identity {
   name: Formats.Decoration[];
   schema: PropertySchemaMap;
@@ -100,10 +108,8 @@ export interface Collection extends Core.Identity {
   copied_from: ID;
   template_pages?: ID[];
   format?: {
-    collection_page_properties?: Array<
-      Properties.Identity & Properties.Visible
-    >;
-    property_visibility?: Array<Properties.Identity & Properties.Visibility>;
+    collection_page_properties?: PageProperty[];
+    property_visibility?: PropertyVisibility[];
   };
 }
 
@@ -113,7 +119,7 @@ type BoardGroupValue = {
   // TODO: needs testing for more cases
 };
 
-type BoardGroup = {
+export type BoardGroup = {
   property: Core.PropertyID;
   hidden: boolean;
   value: BoardGroupValue;

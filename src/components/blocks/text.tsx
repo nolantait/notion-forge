@@ -1,7 +1,7 @@
 import React from "react";
 
-import { Components } from "@types";
-import { TextDecorator } from "./decorators";
+import { Blocks, Components } from "@types";
+import { TextDecorator } from "../decorators";
 import { Block, Decorated } from "@entities";
 
 /**
@@ -15,7 +15,7 @@ import { Block, Decorated } from "@entities";
 
 export type Props = {
   value: Decorated;
-  block: Block;
+  block?: Block<Blocks.Any>;
   linkProps?: React.HTMLProps<HTMLAnchorElement>;
   linkProtocol?: "https" | "http" | "mailto" | "tel";
 };

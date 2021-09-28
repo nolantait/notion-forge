@@ -4,17 +4,21 @@ import { useNotionContext } from "@context";
 import { Components } from "@types";
 import * as Entities from "@entities";
 
+type AssetBlocks =
+  | Entities.CodepenBlock
+  | Entities.DriveBlock
+  | Entities.ExcalidrawBlock
+  | Entities.EmbedBlock
+  | Entities.FigmaBlock
+  | Entities.GistBlock
+  | Entities.ImageBlock
+  | Entities.MapsBlock
+  | Entities.TweetBlock
+  | Entities.TypeformBlock
+  | Entities.VideoBlock;
+
 export type Props = {
-  block:
-    | Entities.CodepenBlock
-    | Entities.DriveBlock
-    | Entities.ExcalidrawBlock
-    | Entities.EmbedBlock
-    | Entities.FigmaBlock
-    | Entities.GistBlock
-    | Entities.MapsBlock
-    | Entities.TweetBlock
-    | Entities.VideoBlock;
+  block: AssetBlocks;
   className?: string;
 };
 
@@ -36,9 +40,9 @@ const PolymorphicAsset: Components.Presenter<PolymorphicAssetProps> = ({
   block,
   style,
 }) => {
-  const { recordMap, mapImageUrl, components } = useNotionContext();
+  const { recordMap, components } = useNotionContext();
   const { type } = block;
-  const signedUrl = recordMap.signed_urls?.[block.id];
+  const signedUrl = recordMap.getSignedUrl(block.id).getOrElse(undefined);
 
   switch (type) {
     case "tweet": {
@@ -74,7 +78,7 @@ const PolymorphicAsset: Components.Presenter<PolymorphicAssetProps> = ({
       return <div />;
     }
     case "gist": {
-      let src = block.displaySource;
+      let src = block.displaySource.getOrElse("");
 
       if (!src.length)
         throw new Error(`Could not parse github gist src ${src}`);
@@ -126,19 +130,16 @@ const PolymorphicAsset: Components.Presenter<PolymorphicAssetProps> = ({
       );
     }
     case "image": {
-      const src = mapImageUrl(block.source.asString, block.dto);
-      const caption = block.caption.asString;
+      const blockSource = block.source.getOrElse(new Entities.Decorated());
+      const src = recordMap.mapImageUrl(blockSource.asString, block);
+      const caption = block.caption.getOrElse(
+        new Entities.Decorated()
+      ).asString;
       const alt = caption.length ? caption : "notion image";
       const height = style.height?.toString() ?? "100%";
 
       return (
-        <components.lazyImage
-          src={src}
-          alt={alt}
-          style={style}
-          zoomable={true}
-          height={height}
-        />
+        <components.image src={src} alt={alt} style={style} height={height} />
       );
     }
     default: {
@@ -147,7 +148,7 @@ const PolymorphicAsset: Components.Presenter<PolymorphicAssetProps> = ({
   }
 };
 
-const getAssetStyle = (block: AnyAsset) => {
+const getAssetStyle = (block: AssetBlocks) => {
   const containerStyle: React.CSSProperties = {
     position: "relative",
     display: "flex",
@@ -160,15 +161,14 @@ const getAssetStyle = (block: AnyAsset) => {
 
   const classes = [];
   const isImage = block.type !== "image";
-  const {
-    blockFullWidth: fullWidth,
-    blockPageWidth: pageWidth,
-    blockPreserveScale: preserveScale,
-    blockAspectRatio: aspectRatio,
-    blockWidth: width,
-    blockHeight: height,
-  } = block;
-  const hasContainerWidth = block.blockFullWidth || block.blockPageWidth;
+  const fullWidth = block.blockFullWidth.getOrElse(false);
+  const pageWidth = block.blockPageWidth.getOrElse(false);
+  const preserveScale = block.blockPreserveScale.getOrElse(false);
+  const aspectRatio = block.blockAspectRatio.getOrElse(0);
+  const width = block.blockWidth.getOrElse(100);
+  const height = block.blockHeight.getOrElse(100);
+
+  const hasContainerWidth = fullWidth || pageWidth;
 
   if (fullWidth) classes.push("notion-asset--full-width");
   if (pageWidth) classes.push("notion-asset--page-width");

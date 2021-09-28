@@ -15,8 +15,7 @@ export const Component: Components.Presenter<Props> = ({
   className,
 }) => {
   const { recordMap } = useNotionContext();
-  const { id } = block;
-  const signedUrl = recordMap.signed_urls[id];
+  const signedUrl = recordMap.getSignedUrl(block.id).getOrElse("");
   const style = cs("notion-audio", className);
 
   return (

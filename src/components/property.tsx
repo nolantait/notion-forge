@@ -2,7 +2,7 @@ import React from "react";
 
 import { useNotionContext } from "@context";
 import { cs } from "@utils";
-import { Collections, Blocks, Components } from "@types";
+import { Core, Collections, Blocks, Components } from "@types";
 import {
   DateProperty,
   NumberProperty,
@@ -11,7 +11,10 @@ import {
   SelectTagProperty,
   UrlProperty,
 } from "./properties";
-import { Decorated } from "@entities";
+import { Block, Decorated, Collection, PageBlock } from "@entities";
+import { Component as PageLink } from "@components/page-link";
+import { Component as PageTitle } from "@components/page-title";
+import { Component as Checkbox } from "@components/checkbox";
 
 /**
  * Renders a single value of structured Notion data according to its schema.
@@ -21,11 +24,11 @@ import { Decorated } from "@entities";
  */
 
 export type Props = {
-  collection: Collections.Collection;
+  collection: Collection;
   data: Decorated;
-  schema?: Collections.PropertySchema;
+  schema: Collections.PropertySchema;
   inline?: boolean;
-  block?: Blocks.Any;
+  block?: Block<Blocks.Every>;
 };
 
 export const Component: Components.Presenter<Props> = ({
@@ -35,8 +38,6 @@ export const Component: Components.Presenter<Props> = ({
   collection,
   inline = false,
 }) => {
-  if (!schema) return <></>;
-
   const { type } = schema;
   const style = cs("notion-property", `notion-property-${type}`);
 
@@ -61,55 +62,54 @@ const PropertyContent: Components.Presenter<PropertyContentProps> = ({
   collection,
   data = new Decorated(),
 }) => {
-  const { components, mapPageUrl } = useNotionContext();
-  const properties = block?.properties ?? {};
+  const { components, recordMap } = useNotionContext();
 
   if (!block || !schema) {
     return <components.text value={data} />;
   }
+
+  const properties: Core.PropertyMap | undefined =
+    block.properties.getOrElse(undefined);
 
   switch (schema.type) {
     case "relation":
       return <components.text value={data} block={block} />;
 
     case "formula":
-      return <FormulaProperty {...{ schema, collection, properties }} />;
+      return (
+        <FormulaProperty.Property {...{ schema, collection, properties }} />
+      );
 
     case "title": {
       return (
-        <components.pageLink
+        <PageLink
           className={cs("notion-page-link")}
-          href={mapPageUrl(block.id)}
+          href={recordMap.mapPageUrl(block.id)}
         >
-          <components.pageTitle block={block} />
-        </components.pageLink>
+          <PageTitle block={block as PageBlock} />
+        </PageLink>
       );
     }
 
     case "select":
     // intentional fallthrough
     case "multi_select":
-      return <SelectTagProperty data={data} schema={schema} />;
+      return <SelectTagProperty.Property data={data} schema={schema} />;
 
     case "person":
       return <components.text value={data} block={block} />;
 
     case "file":
-      return <FileProperty data={data} block={block} />;
+      return <FileProperty.Property data={data} block={block} />;
 
     case "checkbox": {
       const isChecked = data.asString === "Yes";
 
-      return (
-        <components.checkbox
-          isChecked={isChecked ?? false}
-          blockId={block.id}
-        />
-      );
+      return <Checkbox isChecked={isChecked ?? false} />;
     }
 
     case "url":
-      return <UrlProperty block={block} data={data} inline={inline} />;
+      return <UrlProperty.Property block={block} data={data} inline={inline} />;
 
     case "email":
       return (
@@ -121,16 +121,26 @@ const PropertyContent: Components.Presenter<PropertyContentProps> = ({
 
     case "number":
       // TODO: Retype property schemas to use type inference
-      return <NumberProperty schema={schema} block={block} data={data} />;
+      return (
+        <NumberProperty.Property schema={schema} block={block} data={data} />
+      );
 
     case "created_time": {
-      const createdAt = block.created_time ?? Date.now();
-      return <DateProperty block={block} value={createdAt} />;
+      return (
+        <DateProperty.Property
+          block={block}
+          value={block.createdTime.getTime()}
+        />
+      );
     }
 
     case "last_edited_time": {
-      const lastEdited = block.last_edited_time ?? Date.now();
-      return <DateProperty block={block} value={lastEdited} />;
+      return (
+        <DateProperty.Property
+          block={block}
+          value={block.lastEditedTime.getTime()}
+        />
+      );
     }
 
     case "created_by":

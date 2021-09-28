@@ -5,6 +5,28 @@ import { cs } from "@utils";
 import { Components } from "@types";
 import { Decorated, BookmarkBlock } from "@entities";
 
+const getTitle = (block: BookmarkBlock): string => {
+  const rawTitle = block.title
+    .then((t) =>
+      t.asString.length
+        ? t
+        : block.link.getOrElse(block.caption.getOrElse(new Decorated()))
+    )
+    .getOrElse(new Decorated());
+
+  let title = rawTitle.asString;
+
+  if (title.startsWith("http")) {
+    try {
+      title = new URL(title).hostname;
+    } catch (err) {
+      // ignore if invalid link
+    }
+  }
+
+  return title;
+};
+
 export type Props = {
   block: BookmarkBlock;
   className?: string;
@@ -15,19 +37,12 @@ export const Component: Components.Presenter<Props> = ({
   className,
 }) => {
   const { components } = useNotionContext();
-  const { blockColor, description, caption, link, title } = block;
-  const blockTitle = block.title.asString;
-  const titleText = blockTitle.length
-    ? blockTitle
-    : link.asString.length
-    ? link.asString
-    : caption.asString;
-  const bookmarkTitle = new Decorated([[formatLinkTitle(titleText)]]);
   const { bookmarkCover, bookmarkIcon } = block;
+  const title = getTitle(block);
 
   const containerStyle = cs(
     "notion-bookmark",
-    `notion-${blockColor}`,
+    `notion-${block.blockColor.getOrElse("transparent")}`,
     className
   );
 
@@ -85,16 +100,4 @@ export const Component: Components.Presenter<Props> = ({
       )}
     </>
   );
-};
-
-const formatLinkTitle = (title: string): string => {
-  if (title.startsWith("http")) {
-    try {
-      return new URL(title).hostname;
-    } catch (err) {
-      // ignore if invalid link
-    }
-  }
-
-  return title;
 };

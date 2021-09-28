@@ -2,8 +2,8 @@ import React from "react";
 
 import { Components, Collections } from "@types";
 import { cs, getPagesFromQuery } from "@utils";
-import { useNotionContext } from "@context";
-import { Props as ViewProps } from "../../collection-view";
+import { Component as Card } from "../collection-views/card";
+import { Props as ViewProps } from "../blocks/collection-view";
 
 export type Props = Omit<ViewProps, "collectionView"> & {
   collectionView: Collections.GalleryView;
@@ -14,7 +14,6 @@ export const View: Components.Presenter<Props> = ({
   collectionView,
   collectionData,
 }) => {
-  const { components } = useNotionContext();
   const {
     gallery_cover = { type: "none" },
     gallery_cover_size = "medium",
@@ -32,11 +31,11 @@ export const View: Components.Presenter<Props> = ({
     <article className="notion-gallery">
       <div className="notion-gallery-view">
         <div className={galleryStyle}>
-          {blocks.map((block): JSX.Element => {
+          {blocks.map((block): React.ReactElement => {
             if (!block) return <></>;
 
             return (
-              <components.collectionCard
+              <Card
                 collection={collection}
                 block={block}
                 cover={gallery_cover}

@@ -27,7 +27,9 @@ export interface RecordMap {
 type CollectionViewMap = {
   [collectionViewId: Collections.ViewID]: CollectionQueryResult;
 };
-type CollectionQuery = { [collectionId: Collections.ID]: CollectionViewMap };
+export type CollectionQuery = {
+  [collectionId: Collections.ID]: CollectionViewMap;
+};
 type SignedUrlMap = {
   [blockId: Blocks.ID]: Core.URL;
 };

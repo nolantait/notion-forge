@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 
 import { Components, Core } from "@types";
-import { defaultMapPageUrl, defaultMapImageUrl } from "@utils";
+import { MapPageUrl, RecordMap } from "@entities";
 
 import {
   AliasComponent as DefaultAlias,
@@ -86,8 +86,6 @@ const defaultComponents: Components.Any = {
 const defaultNotionContext: Core.NotionContext = {
   rootPageId: undefined,
   components: defaultComponents,
-  mapPageUrl: defaultMapPageUrl(),
-  mapImageUrl: defaultMapImageUrl,
   fullPage: false,
   previewImages: false,
   showCollectionViewDropdown: true,
@@ -95,14 +93,7 @@ const defaultNotionContext: Core.NotionContext = {
   defaultPageCover: null,
   defaultPageCoverPosition: 0.5,
   zoom: null,
-  recordMap: {
-    block: {},
-    collection: {},
-    collection_view: {},
-    collection_query: {},
-    notion_user: {},
-    signed_urls: {},
-  },
+  recordMap: new RecordMap(),
 };
 
 const ctx = React.createContext<Core.NotionContext>(defaultNotionContext);
@@ -113,12 +104,14 @@ type ProviderProps = Core.NotionContext & {
 export const ContextProvider: Components.Presenter<ProviderProps> = ({
   components: themeComponents = {},
   children,
-  mapPageUrl,
-  mapImageUrl,
   rootPageId,
   ...rest
 }) => {
-  const pageMapper = rootPageId ? defaultMapPageUrl(rootPageId) : mapPageUrl;
+  const RemapPageUrl: Core.MapPageUrl = (page, rootId) =>
+    MapPageUrl(page, rootId);
+  const pageMapper = rootPageId ? RemapPageUrl : MapPageUrl;
+
+  defaultNotionContext.recordMap.mapPageUrl = pageMapper;
 
   return (
     <ctx.Provider
@@ -126,8 +119,6 @@ export const ContextProvider: Components.Presenter<ProviderProps> = ({
         ...defaultNotionContext,
         ...rest,
         rootPageId,
-        mapImageUrl,
-        mapPageUrl: pageMapper,
         components: { ...defaultComponents, ...themeComponents },
       }}
     >
