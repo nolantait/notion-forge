@@ -10,7 +10,7 @@ export type { Properties };
 export type { Format };
 
 export type ID = Core.ID;
-export type BlockMap = Core.NotionMap<Any>;
+export type BlockMap = Core.NotionMap<Every>;
 export type BlockType =
   | "alias"
   | "page"

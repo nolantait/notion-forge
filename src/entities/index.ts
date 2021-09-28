@@ -1,7 +1,9 @@
-import { Block } from "./block";
-import { Decorated } from "./decorated";
+export { Block } from "./block";
+export { Decorated } from "./decorated";
+export { RecordMap } from "./record-map";
 
-export { Block, Decorated };
+export * from "./composite";
+export * from "./collection";
 
 export * from "./blocks/alias-block";
 export * from "./blocks/audio-block";
