@@ -18,19 +18,44 @@ export interface RecordMap {
   block: Blocks.BlockMap;
   collection?: Collections.CollectionMap;
   collection_view?: Collections.ViewMap;
-  notion_user?: Core.UserMap;
+  notion_user?: UserMap;
+}
+
+export type UserMap = NotionMap<User>;
+export type UserID = Core.ID;
+
+export interface User {
+  id: UserID;
+  version: number;
+  email: string;
+  given_name: string;
+  family_name: string;
+  profile_photo: string;
+  onboarding_completed: boolean;
+  mobile_onboarding_completed: boolean;
+}
+
+export interface NotionMap<T> {
+  [key: string]: {
+    role: Core.Role;
+    value: T;
+  };
+}
+
+export interface PageMap {
+  [pageId: Blocks.ID]: ExtendedRecordMap | null;
 }
 
 // NOTE: This is not a native Notion type, but rather a convenience type that
 // extends Notion's native RecordMap with data for collection instances.
 
-type CollectionViewMap = {
+export type CollectionViewMap = {
   [collectionViewId: Collections.ViewID]: CollectionQueryResult;
 };
 export type CollectionQuery = {
   [collectionId: Collections.ID]: CollectionViewMap;
 };
-type SignedUrlMap = {
+export type SignedUrlMap = {
   [blockId: Blocks.ID]: Core.URL;
 };
 

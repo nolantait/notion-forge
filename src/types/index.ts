@@ -6,6 +6,7 @@ import type * as Collections from "./collections";
 import type * as Components from "./components";
 import type * as API from "./api";
 import type * as Utils from "./utils";
+import type * as Entities from "./entities";
 
 export type {
   Core,
@@ -16,4 +17,5 @@ export type {
   Components,
   API,
   Utils,
+  Entities,
 };

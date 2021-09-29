@@ -1,6 +1,6 @@
 import React from "react";
 
-import { Core, Components } from "@types";
+import { Components } from "@types";
 import { cs } from "@utils";
 import { EmptyIcon } from "@icons";
 import { PropertyComponent as Property } from "@components";
@@ -8,17 +8,14 @@ import { useNotionContext } from "@context";
 import { Decorated, Collection, BoardView, BoardGroup } from "@entities";
 import { Component as CollectionCard } from "./card";
 
-type BoardGroupValue = {
-  type: Core.PropertyType;
-  value: string;
-};
-
-type BoardGroupHeaderProps = Omit<Props, "collectionView"> & {
+type BoardGroupHeaderProps = Pick<Props, "collection"> & {
+  view: BoardView;
   index: number;
   group: BoardGroup;
 };
 
-type BoardGroupBodyProps = Props & {
+type BoardGroupBodyProps = Pick<Props, "collection"> & {
+  view: BoardView;
   index: number;
   group: BoardGroup;
 };
@@ -39,13 +36,13 @@ export const View: Components.Presenter<Props> = ({ collection }) => {
     group: BoardGroup,
     index: number
   ): BoardGroupHeaderProps => {
-    return { collection, group, index };
+    return { collection, view, group, index };
   };
   const mapBodyProps = (
     group: BoardGroup,
     index: number
   ): BoardGroupBodyProps => {
-    return { collection, group, index };
+    return { collection, view, group, index };
   };
 
   return (
@@ -85,16 +82,12 @@ const BoardGroupHeader: Components.Presenter<BoardGroupHeaderProps> = ({
     return <></>;
   }
 
-  const result = collectionData.groupResults[index];
-  const schema = collection.schema[group.property];
-  const value = group.value.value ?? "";
-  const decoratedValue = new Decorated(value);
-  const hasValue = value === "";
+  const query = collection.data;
+  const value = new Decorated(group.value);
 
-  if (!result) throw new Error("Collection data missing for group");
-  if (!schema) throw new Error(`Schema missing for ${group.property}`);
+  if (!collection.hasData) throw new Error("Collection data missing for group");
 
-  const { total } = result;
+  const total = query.total;
 
   return (
     <div className="notion-board-th" key={index}>

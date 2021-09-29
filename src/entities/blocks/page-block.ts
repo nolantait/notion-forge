@@ -1,5 +1,5 @@
 import { Some, None, Option } from "excoptional";
-import { Collections, Blocks, Formats } from "@types";
+import { Blocks, Formats } from "@types";
 import { Layoutable } from "../behaviour";
 import { TableProperty, Decorated } from "@entities";
 

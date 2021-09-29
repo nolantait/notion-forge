@@ -1,31 +1,22 @@
 import React from "react";
 
-import { Components, Collections } from "@types";
-import { cs, getPagesFromQuery } from "@utils";
+import { Components } from "@types";
+import { cs } from "@utils";
 import { Component as Card } from "../collection-views/card";
 import { Props as ViewProps } from "../blocks/collection-view";
+import { GalleryView } from "@entities";
 
-export type Props = Omit<ViewProps, "collectionView"> & {
-  collectionView: Collections.GalleryView;
-};
+export type Props = Pick<ViewProps, "collection">;
 
-export const View: Components.Presenter<Props> = ({
-  collection,
-  collectionView,
-  collectionData,
-}) => {
-  const {
-    gallery_cover = { type: "none" },
-    gallery_cover_size = "medium",
-    gallery_cover_aspect = "cover",
-  } = collectionView.format || {};
+export const View: Components.Presenter<Props> = ({ collection }) => {
+  const view = collection.currentView as GalleryView;
 
   const galleryStyle = cs(
     "notion-gallery-grid",
-    `notion-gallery-grid-size-${gallery_cover_size}`
+    `notion-gallery-grid-size-${view.coverSize}`
   );
 
-  const blocks = getPagesFromQuery(collectionData);
+  const blocks = collection.data.blocks.getOrElse([]);
 
   return (
     <article className="notion-gallery">
@@ -38,10 +29,10 @@ export const View: Components.Presenter<Props> = ({
               <Card
                 collection={collection}
                 block={block}
-                cover={gallery_cover}
-                coverSize={gallery_cover_size}
-                coverAspect={gallery_cover_aspect}
-                properties={collectionView.format?.gallery_properties}
+                cover={view.cover}
+                coverSize={view.coverSize}
+                coverAspect={view.coverAspect}
+                properties={view.properties}
                 key={block.id}
               />
             );

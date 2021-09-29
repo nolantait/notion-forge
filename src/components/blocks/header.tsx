@@ -1,6 +1,6 @@
 import React from "react";
 
-import { Components } from "@types";
+import { Components, Entities } from "@types";
 import { LinkIcon } from "@icons";
 import { useNotionContext } from "@context";
 import {
@@ -9,14 +9,17 @@ import {
   getBlockParentPage,
   uuidToId,
 } from "@utils";
-import { PageBlock, HeaderBlock } from "@entities";
+import { PageBlock, Decorated } from "@entities";
 
 const tocIndentLevelCache: {
   [blockId: string]: number;
 } = {};
 
 export type Props = {
-  block: HeaderBlock;
+  block:
+    | Entities.HeaderBlock
+    | Entities.SubHeaderBlock
+    | Entities.SubSubHeaderBlock;
   className?: string;
 };
 
@@ -28,9 +31,8 @@ export const Component: Components.Presenter<Props> = ({
 
   const { blockColor } = block;
   const id = uuidToId(block.id);
-  const title = block.title.isEmpty
-    ? `Notion Header ${id}`
-    : block.title.asString;
+  const defaultTitle = new Decorated(`Notion header ${id}`);
+  const title = block.title.getOrElse(defaultTitle).asString;
 
   // we use a cache here because constructing the ToC is non-trivial
   let indentLevel = tocIndentLevelCache[block.id];

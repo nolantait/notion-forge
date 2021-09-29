@@ -2,14 +2,8 @@ import React from "react";
 
 import { useNotionContext } from "@context";
 import { Components } from "@types";
-import {
-  cs,
-  getBlockParentPage,
-  getPageTableOfContents,
-  TableOfContentsEntry,
-  uuidToId,
-} from "@utils";
-import { TableOfContentsBlock } from "@entities";
+import { cs, uuidToId } from "@utils";
+import { TableOfContentsEntry, TableOfContentsBlock } from "@entities";
 
 export type Props = {
   block: TableOfContentsBlock;
@@ -21,21 +15,15 @@ export const Component: Components.Presenter<Props> = ({
   className,
 }) => {
   const { recordMap } = useNotionContext();
-  const page = getBlockParentPage(block._dto, recordMap);
-
-  if (!page) {
-    throw new Error(
-      `Missing parent block for table of contents block ${block.id}`
-    );
-  }
-
-  const tableOfContents = getPageTableOfContents(page as any, recordMap);
   const { blockColor } = block;
+
   const style = cs(
     "notion-table-of-contents",
     className,
     `notion-${blockColor}`
   );
+
+  const tableOfContents = recordMap.getTableOfContentsEntries();
 
   return (
     <div className={style}>
@@ -53,11 +41,11 @@ type TableOfContentsItemProps = {
 const TableOfContentsItem: Components.Presenter<TableOfContentsItemProps> = ({
   item,
 }) => {
-  const { id, indentLevel, text } = item;
+  const { id, level, text } = item;
   const href = `#${uuidToId(id)}`;
   const itemStyle = {
     display: "inline-block",
-    marginLeft: indentLevel * 24,
+    marginLeft: level * 24,
   };
 
   return (

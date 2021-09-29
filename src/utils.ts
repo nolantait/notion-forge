@@ -2,8 +2,6 @@ import isUrl from "is-url-superb";
 
 export * from "@lib";
 
-export * from "notion-utils";
-
 export const cs = (...classes: Array<string | undefined | false>) =>
   classes.filter((a) => !!a).join(" ");
 

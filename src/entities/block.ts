@@ -3,11 +3,15 @@ import { Core, Blocks } from "@types";
 
 export class Block<T extends Blocks.Any> {
   readonly dto: T;
-  readonly type: T["type"];
+  type: T["type"];
 
   constructor(block: T) {
     this.dto = block;
     this.type = block.type;
+  }
+
+  convert(type: Blocks.BlockType) {
+    this.type = type;
   }
 
   get format(): Option<T["format"]> {

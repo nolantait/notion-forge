@@ -1,7 +1,20 @@
 import { Option, Some, None } from "excoptional";
-import { Core, Blocks, API, Collections } from "@types";
-import { Collection, Block } from "@entities";
-import { Composer } from "./composite";
+import { Entities, Core, Blocks, API, Collections } from "@types";
+import {
+  AnyView,
+  Collection,
+  Block,
+  BlockMap,
+  CollectionQueryResult,
+  CollectionViewMap,
+  CollectionMap,
+  CollectionQueryMap,
+  UserMap,
+  User,
+  SignedUrlMap,
+  SignedUrl,
+  TableOfContentsEntry,
+} from "@entities";
 
 export const MapPageUrl: Core.MapPageUrl = (
   pageId: Blocks.ID,
@@ -63,10 +76,16 @@ const defaultRecordMap = {
 };
 
 export class RecordMap {
-  dto: API.ExtendedRecordMap;
-  composition: Composer;
-  mapImageUrl: Core.MapImageUrl;
-  mapPageUrl: Core.MapPageUrl;
+  readonly dto: API.ExtendedRecordMap;
+  readonly mapImageUrl: Core.MapImageUrl;
+  readonly mapPageUrl: Core.MapPageUrl;
+
+  private readonly _collections: CollectionMap;
+  private readonly _views: CollectionViewMap;
+  private readonly _queries: CollectionQueryMap;
+  private readonly _blocks: BlockMap;
+  private readonly _users: UserMap;
+  private readonly _urls: SignedUrlMap;
 
   constructor(
     dto: API.ExtendedRecordMap = defaultRecordMap,
@@ -74,35 +93,46 @@ export class RecordMap {
     mapPageUrl: Core.MapPageUrl = MapPageUrl
   ) {
     this.dto = dto;
-    this.composition = new Composer(dto);
     this.mapImageUrl = mapImageUrl;
     this.mapPageUrl = mapPageUrl;
+
+    this._blocks = new BlockMap(dto);
+    this._collections = new CollectionMap(dto.collection);
+    this._views = new CollectionViewMap(dto.collection_view);
+    this._queries = new CollectionQueryMap(dto.collection_query);
+    this._users = new UserMap(dto.notion_user);
+    this._urls = new SignedUrlMap(dto.signed_urls);
   }
 
   get rootBlock(): Block<Blocks.Any> {
-    return this.composition.root.item;
+    return this._blocks.root.item;
   }
 
   findBlock(id: Blocks.ID): Option<Block<Blocks.Every>> {
-    return this.composition.find(id);
+    return this._blocks.find(id);
   }
 
   findCollection(id: Collections.ID): Option<Collection> {
-    const value = this.dto.collection[id]?.value;
-    if (!value) return None();
-    return Some(new Collection(this, value));
+    return this._collections.find(id);
   }
 
-  findUser(id: Core.ID): Option<Core.User> {
-    const value = this.dto.notion_user[id]?.value;
-    if (!value) return None();
-    return Some(value);
+  findUser(id: API.UserID): Option<User> {
+    return this._users.find(id);
   }
 
-  getSignedUrl(id: Blocks.ID): Option<Core.URL> {
-    const value = this.dto.signed_urls?.[id];
-    if (!value) return None();
-    return Some(value);
+  findView(id: Collections.ViewID): Option<AnyView> {
+    return this._views.find(id);
+  }
+
+  findQuery(
+    collectionId: Collections.ID,
+    viewId: Collections.ViewID
+  ): Option<CollectionQueryResult> {
+    return this._queries.find(collectionId, viewId);
+  }
+
+  getSignedUrl(id: Blocks.ID): Option<SignedUrl> {
+    return this._urls.find(id);
   }
 
   getParentBlock(
@@ -116,7 +146,7 @@ export class RecordMap {
   }
 
   getParentPageBlock(block: BlockOrCollection): Option<Block<Blocks.Page>> {
-    const page = this.composition
+    const page = this._blocks
       .ancestors(block.id)
       .then((blocks) => blocks.filter((block) => block.type !== "page"))
       .getOrElse([])
@@ -124,5 +154,15 @@ export class RecordMap {
 
     if (!page) return None();
     return Some(page as Block<Blocks.Page>);
+  }
+
+  getTableOfContentsEntries(): TableOfContentsEntry[] {
+    const headerBlocks = this._blocks.where((block) =>
+      ["header", "sub_header", "sub_sub_header"].includes(block.type)
+    );
+
+    return headerBlocks.map(
+      (block) => new TableOfContentsEntry(block as Entities.AnyHeader)
+    );
   }
 }

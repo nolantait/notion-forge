@@ -1,24 +1,32 @@
 import { Option, Some, None } from "excoptional";
 import { API, Blocks } from "@types";
-import { Block } from "./";
+import { Block } from "@entities";
 
 export interface Leaf extends Tree {
   item: Block<Blocks.Every>;
   children: Children;
   parent: Option<Parent>;
   find: (id: Blocks.ID) => Option<Leaf>;
+  where: (condition: WhereClause) => Option<Leaf> | Option<Leaf[]>;
 }
 
 export interface Tree {}
 
 type Children = Leaf[];
 type Parent = Composite;
+type WhereClause = (block: Block<Blocks.Every>) => boolean;
 
-export class Composer implements Tree {
+export class BlockMap implements Tree {
   public root: Composite;
 
   constructor(recordMap: API.ExtendedRecordMap) {
     this.root = BuildTree(recordMap);
+  }
+
+  where(condition: WhereClause): Block<Blocks.Every>[] {
+    const found = this.root.where(condition).getOrElse([]);
+
+    return found.map((leaf) => leaf.item);
   }
 
   find(id: Blocks.ID): Option<Block<Blocks.Every>> {
@@ -29,13 +37,13 @@ export class Composer implements Tree {
 
   ancestors(id: Blocks.ID): Option<Block<Blocks.Every>[]> {
     return this._find(id)
-      .then((composite) => this._ancestors([], composite as Composite))
+      .then((composite) => this._ancestors([], composite))
       .then((composites) => composites.map((composite) => composite.item));
   }
 
   private _ancestors(
     ancestors: Composite[],
-    leaf: Composite | undefined
+    leaf: Leaf | undefined
   ): Composite[] {
     if (!leaf) return ancestors;
 
@@ -63,6 +71,15 @@ class Composite implements Leaf {
     this.item = block;
     this.children = [];
     this.parent = parent ? Some(parent) : None();
+  }
+
+  where(condition: WhereClause): Option<Leaf[]> {
+    const predicate = (child: Leaf) => child.where(condition).getOrElse(null);
+    const removeNull = (child: Leaf[] | Leaf | null): child is Leaf => !!child;
+    const found = this.children.map(predicate).filter(removeNull);
+
+    if (!found.length) return None();
+    return Some(found);
   }
 
   find(id: Blocks.ID): Option<Leaf> {
@@ -96,7 +113,15 @@ class Node implements Leaf {
     this.parent = Option.of(parent);
   }
 
-  find(id: Blocks.ID): Option<Node> {
+  where(condition: WhereClause): Option<Node> {
+    if (condition(this.item)) {
+      return Some(this);
+    }
+
+    return None();
+  }
+
+  find(id: Blocks.ID): Option<Leaf> {
     if (this.item.id === id) {
       return Some(this);
     }

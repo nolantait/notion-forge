@@ -1,4 +1,4 @@
-import type { Blocks, Core, Formats, Formulas } from "./";
+import type { API, Blocks, Core, Formats, Formulas } from "./";
 
 import type * as Card from "./collections/cards";
 import type * as Properties from "./collections/properties";
@@ -15,8 +15,8 @@ export type ViewID = Core.ID;
 
 export type ViewType = "table" | "gallery" | "list" | "board" | "calendar";
 
-export type CollectionMap = Core.NotionMap<Collection>;
-export type ViewMap = Core.NotionMap<AnyView>;
+export type CollectionMap = API.NotionMap<Collection>;
+export type ViewMap = API.NotionMap<AnyView>;
 
 export type AnyView =
   | TableView
@@ -33,13 +33,14 @@ interface BaseView extends Core.Identity {
   query2: Query.ViewQuery;
 }
 
+export type GalleryProperty = Properties.Identity & Properties.Visible;
 export interface GalleryView extends BaseView {
   type: "gallery";
   format: {
     gallery_cover: Card.Cover;
     gallery_cover_size: Card.CoverSize;
     gallery_cover_aspect: Card.CoverAspect;
-    gallery_properties: Array<Properties.Identity & Properties.Visible>;
+    gallery_properties: GalleryProperty[];
   };
 }
 
@@ -113,7 +114,7 @@ export interface Collection extends Core.Identity {
   };
 }
 
-type BoardGroupValue = {
+export type BoardGroupValue = {
   type: Core.PropertyType;
   value: string;
   // TODO: needs testing for more cases

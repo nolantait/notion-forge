@@ -1,5 +1,5 @@
 import * as Mix from "./mixins";
-import { Block } from "./";
+import { Block } from "@entities";
 
 export const Typographic = Mix.Titleable(Mix.Colorable(Block));
 export const Captionable = Mix.Captionable(Typographic);

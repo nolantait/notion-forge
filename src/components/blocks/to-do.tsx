@@ -17,7 +17,7 @@ export const Component: Components.Presenter<Props> = ({
   children,
 }) => {
   const { components } = useNotionContext();
-  const { isChecked, title } = block;
+  const { checked: isChecked, title } = block;
   const containerStyle = cs("notion-to-do", className);
   const wrapperStyle = cs(
     "notion-to-do-body",

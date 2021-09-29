@@ -1,13 +1,12 @@
 import React from "react";
 
-import { Components } from "@types";
+import { Components, Entities } from "@types";
 import { uuidToId } from "@utils";
 import { useNotionContext } from "@context";
-import { Block } from "@entities";
 import { Component as WrapText } from "./components/wrapped-text";
 
 export type Props = {
-  block: Block<Blocks.Every>;
+  block: Entities.AnyBlock;
   level: number;
   hideBlockId: boolean;
   className?: string;
@@ -23,39 +22,21 @@ export const Component: Components.Presenter<Props> = (props) => {
     throw new Error(`Missing block ${block}`);
   }
 
-  const isTopLevel = level === 0;
-  const isCollectionView = block.type === "collection_view";
-  const parentIsCollection = block.parentTable === "collection";
-
   const className = hideBlockId
     ? "notion-block"
     : `notion-block notion-block-${uuidToId(block.id)}`;
-
-  // ugly hack to make viewing raw collection views work properly
-  // e.g., 6d886ca87ab94c21a16e3b82b43a57fb
-  if (isTopLevel && isCollectionView) {
-    if (!block) return <></>;
-
-    block.type = "collection_view_page";
-
-    return <components.page {...props} block={block} />;
-  }
 
   switch (block.type) {
     case "collection_view_page":
       return <components.page {...props} block={block} className={className} />;
     case "page":
-      if (parentIsCollection) {
-        return <components.collectionRow block={block} className={className} />;
-      }
-
       return <components.page {...props} block={block} className={className} />;
     case "header":
-    // Fallthrough
-    case "sub_header":
-    // Fallthrough
-    case "sub_sub_header":
       return <components.header block={block} className={className} />;
+    case "sub_header":
+      return <components.subHeader block={block} className={className} />;
+    case "sub_sub_header":
+      return <components.subSubHeader block={block} className={className} />;
     case "divider":
       return <components.divider className={className} />;
     case "text": {

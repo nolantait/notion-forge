@@ -4,7 +4,7 @@ import { FileIcon } from "@icons";
 import { useNotionContext } from "@context";
 import { cs } from "@utils";
 import { Components } from "@types";
-import { FileBlock } from "@entities";
+import { Decorated, FileBlock } from "@entities";
 
 export type Props = {
   block: FileBlock;
@@ -16,9 +16,9 @@ export const Component: Components.Presenter<Props> = ({
   className,
 }) => {
   const { components, recordMap } = useNotionContext();
-  const signedUrl = recordMap.signed_urls[block.id];
+  const signedUrl = recordMap.getSignedUrl(block.id).getOrElse("");
   const size = block.size;
-  const title = block.title.isEmpty ? block.title.asDecoration : [["File"]];
+  const title = block.title.getOrElse(new Decorated("File"));
   const style = cs("notion-file", className);
 
   return (

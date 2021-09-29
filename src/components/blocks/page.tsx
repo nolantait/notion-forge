@@ -4,9 +4,9 @@ import { cs } from "@utils";
 import { Component as NotionContainer } from "./container";
 import { useNotionContext } from "@context";
 import { Components } from "@types";
-import {PageBlock, CollectionViewPageBlock} from "@entities";
-import {Component as RowRenderer} from "../collection-row";
-import {Component as Collection} from "../blocks/collection
+import { PageBlock, CollectionViewPageBlock } from "@entities";
+import { Component as RowRenderer } from "../collection-row";
+import { Component as Collection } from "../blocks/collection";
 
 export type Props = {
   block: PageBlock | CollectionViewPageBlock;
@@ -44,11 +44,7 @@ const RenderContent: Components.Presenter<Props> = ({ block, className }) => {
   const isCollection = block.type === "collection_view_page";
 
   return (
-    <>
-      {isCollection && (
-        <Collection block={block} className={className} />
-      )}
-    </>
+    <>{isCollection && <Collection block={block} className={className} />}</>
   );
 };
 

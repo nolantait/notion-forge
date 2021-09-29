@@ -1,5 +1,5 @@
 import type { Block, RecordMap } from "@entities";
-import type { Formats, Components, Blocks, API } from "./";
+import type { Formats, Components, Blocks } from "./";
 
 // Base Types
 // ----------------------------------------------------------------------------
@@ -102,28 +102,4 @@ export interface NotionContext {
   defaultPageCover: string | null;
   defaultPageCoverPosition: number;
   zoom: unknown;
-}
-
-export interface User {
-  id: ID;
-  version: number;
-  email: string;
-  given_name: string;
-  family_name: string;
-  profile_photo: string;
-  onboarding_completed: boolean;
-  mobile_onboarding_completed: boolean;
-}
-
-export interface NotionMap<T> {
-  [key: string]: {
-    role: Role;
-    value: T;
-  };
-}
-
-export type UserMap = NotionMap<User>;
-
-export interface PageMap {
-  [pageId: ID]: API.ExtendedRecordMap | null;
 }
