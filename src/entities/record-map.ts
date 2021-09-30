@@ -1,5 +1,6 @@
+import * as Blocks from "@blocks";
 import { Option, Some, None } from "excoptional";
-import { Entities, Core, Blocks, API, Collections } from "@types";
+import { Entities, Core, API, Collections } from "@types";
 import {
   AnyView,
   Collection,
@@ -28,9 +29,9 @@ export const MapPageUrl: Core.MapPageUrl = (
   }
 };
 
-const MapImageUrl: Core.MapImageUrl = (
+export const MapImageUrl: Core.MapImageUrl = (
   url: string,
-  block: Block<Blocks.Every>
+  block: Blocks.Any
 ): Core.URL => {
   const prefixNotionUrl = (url: string) => `https://notion.so${url}`;
 
@@ -77,8 +78,8 @@ const defaultRecordMap = {
 
 export class RecordMap {
   readonly dto: API.ExtendedRecordMap;
-  readonly mapImageUrl: Core.MapImageUrl;
-  readonly mapPageUrl: Core.MapPageUrl;
+  mapImageUrl: Core.MapImageUrl;
+  mapPageUrl: Core.MapPageUrl;
 
   private readonly _collections: CollectionMap;
   private readonly _views: CollectionViewMap;
@@ -104,11 +105,11 @@ export class RecordMap {
     this._urls = new SignedUrlMap(dto.signed_urls);
   }
 
-  get rootBlock(): Block<Blocks.Any> {
+  get rootBlock(): Blocks.Any {
     return this._blocks.root.item;
   }
 
-  findBlock(id: Blocks.ID): Option<Block<Blocks.Every>> {
+  findBlock(id: Blocks.ID): Option<Blocks.Any> {
     return this._blocks.find(id);
   }
 
@@ -125,19 +126,27 @@ export class RecordMap {
   }
 
   findQuery(
-    collectionId: Collections.ID,
-    viewId: Collections.ViewID
+    view: Blocks.CollectionView.AnyView
   ): Option<CollectionQueryResult> {
-    return this._queries.find(collectionId, viewId);
+    return this._queries.find(view.id);
+  }
+
+  getBlocks(blockIds: Blocks.ID[]): Blocks.Any[] {
+    const blocks = blockIds
+      .map((id) => this.findBlock(id))
+      .reduce((acc, item) => {
+        item.then((value) => acc.push(value));
+        return acc;
+      }, [] as Blocks.Any[]);
+
+    return blocks;
   }
 
   getSignedUrl(id: Blocks.ID): Option<SignedUrl> {
     return this._urls.find(id);
   }
 
-  getParentBlock(
-    block: Block<Blocks.Every>
-  ): Option<Block<Blocks.Every> | Collection> {
+  getParentBlock(block: Blocks.Any): Option<Blocks.Any | Collection> {
     if (block.parentTable === "collection") {
       return this.findCollection(block.id);
     }
@@ -145,7 +154,7 @@ export class RecordMap {
     return this.findBlock(block.id);
   }
 
-  getParentPageBlock(block: BlockOrCollection): Option<Block<Blocks.Page>> {
+  getParentPageBlock(block: BlockOrCollection): Option<Blocks.Page.Entity> {
     const page = this._blocks
       .ancestors(block.id)
       .then((blocks) => blocks.filter((block) => block.type !== "page"))
@@ -153,7 +162,7 @@ export class RecordMap {
       .pop();
 
     if (!page) return None();
-    return Some(page as Block<Blocks.Page>);
+    return Some(page as Blocks.Page.Entity);
   }
 
   getTableOfContentsEntries(): TableOfContentsEntry[] {

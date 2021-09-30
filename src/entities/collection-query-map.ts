@@ -10,10 +10,10 @@ export class CollectionQueryMap {
   }
 
   find(
-    id: Collections.ID,
+    collectionId: Collections.ID,
     viewId: Collections.ViewID
   ): Option<CollectionQueryResult> {
-    const value = this.dto[id]?.[viewId];
+    const value = this.dto[collectionId]?.[viewId];
     if (!value) return None();
     return Some(new CollectionQueryResult(value));
   }

@@ -89,7 +89,7 @@ export type Editable = {
 };
 
 export type MapPageUrl = (pageId: Blocks.ID, rootPageId?: Blocks.ID) => string;
-export type MapImageUrl = (url: string, block: Block<Blocks.Every>) => URL;
+export type MapImageUrl = (url: string, block: Blocks.Any) => URL;
 
 export interface NotionContext {
   recordMap: RecordMap;

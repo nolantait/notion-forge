@@ -1,13 +1,14 @@
 import React from "react";
 
-import { cs, isUrl } from "@utils";
+import { cs } from "@utils";
 import { DefaultPageIcon } from "@icons";
 import { useNotionContext } from "@context";
 import { Components } from "@types";
-import { Decorated, PageBlock } from "@entities";
+import { Icon, Decorated } from "@entities";
+import { Page } from "@blocks";
 
 export type Props = {
-  block: PageBlock;
+  block: Page.Entity;
   className?: string;
   defaultIcon?: string | null;
   hideDefaultIcon?: boolean;
@@ -19,34 +20,32 @@ export const Component: Components.Presenter<Props> = ({
   defaultIcon = null,
   hideDefaultIcon = false,
 }) => {
+  const altIcon = new Icon(defaultIcon ?? "");
+  const icon = block.pageIcon.getOrElse(altIcon);
+
   if (hideDefaultIcon) return <EmptyIcon />;
 
-  const icon = block.pageIcon.length ? block.pageIcon : defaultIcon;
-
-  if (!icon) return <EmptyIcon />;
-
-  const { title } = block;
   const iconStyle = cs(className, "notion-page-icon");
+  const alt = block.title.getOrElse(Decorated.fromString("Page")).asString;
 
-  if (isUrl(icon)) {
-    return (
-      <ImageIcon {...{ block, iconUrl: icon, title, iconStyle: className }} />
-    );
-  } else {
-    const iconValue = icon.trim();
-
-    if (!iconValue) {
+  switch (icon.type) {
+    case "empty":
+      return <EmptyIcon />;
+    case "url":
       return (
-        <DefaultPageIcon className={iconStyle} alt={title ? title : "Page"} />
+        <ImageIcon
+          {...{ block, iconUrl: icon.path, alt, iconStyle: className }}
+        />
       );
-    }
-
-    return <TextIcon icon={icon} className={iconStyle} />;
+    case "text":
+      return <TextIcon icon={icon.path} className={iconStyle} />;
+    default:
+      return <DefaultPageIcon className={iconStyle} alt={alt} />;
   }
 };
 
 type ImageIconProps = Pick<Props, "block"> & {
-  title: Decorated;
+  alt: string;
   iconUrl: string;
   className?: string;
 };
@@ -54,18 +53,17 @@ type ImageIconProps = Pick<Props, "block"> & {
 const ImageIcon: Components.Presenter<ImageIconProps> = ({
   block,
   iconUrl,
-  title,
+  alt,
   className,
 }) => {
-  const { mapImageUrl, components } = useNotionContext();
-  const mappedUrl = mapImageUrl(iconUrl, block.dto);
-  const altText = title ? title : "Icon";
+  const { recordMap, components } = useNotionContext();
+  const mappedUrl = recordMap.mapImageUrl(iconUrl, block.dto);
 
   return (
     <components.image
       className={className}
       src={mappedUrl}
-      alt={altText}
+      alt={alt}
       loading="lazy"
     />
   );

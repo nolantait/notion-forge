@@ -1,6 +1,5 @@
-import { Core, Collections, Formats } from "@types";
-import { Some, None, Option } from "excoptional";
-import { CollectionProperty, PageProperty } from "@entities";
+import { Core } from "@types";
+import { Decorated, CollectionProperty } from "@entities";
 
 export class Property {
   readonly type: Core.PropertyType;
@@ -13,5 +12,7 @@ export class Property {
     this._data = data;
   }
 
-  get value(): string {}
+  get data(): string {
+    return this._data.asString;
+  }
 }

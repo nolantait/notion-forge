@@ -34,25 +34,25 @@ export type Color = {
 };
 
 export type Block = {
-  block_width: number;
-  block_height: number;
-  block_full_width: boolean;
-  block_page_width: boolean;
-  block_aspect_ratio: number;
-  block_preserve_scale: boolean;
+  block_width?: number;
+  block_height?: number;
+  block_full_width?: boolean;
+  block_page_width?: boolean;
+  block_aspect_ratio?: number;
+  block_preserve_scale?: boolean;
 };
 
 export type Source = {
-  display_source: string;
+  display_source?: string;
 };
 
 export type Bookmark = {
-  bookmark_icon: string;
-  bookmark_cover: string;
+  bookmark_icon?: string;
+  bookmark_cover?: string;
 };
 
 export type Icon = {
-  page_icon: string;
+  page_icon?: string;
 };
 
 export type Drive = {

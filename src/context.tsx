@@ -3,89 +3,51 @@ import React, { useContext } from "react";
 import { Components, Core } from "@types";
 import { MapPageUrl, RecordMap } from "@entities";
 
-import {
-  AliasComponent as DefaultAlias,
-  AudioComponent as DefaultAudio,
-  BookmarkComponent as DefaultBookmark,
-  BulletedListComponent as DefaultBulletedList,
-  CalloutComponent as DefaultCallout,
-  ColumnComponent as DefaultColumn,
-  ColumnListComponent as DefaultColumnList,
-  CodeComponent as DefaultCode,
-  CodepenComponent as DefaultCodepen,
-  CollectionViewPageComponent as DefaultCollectionViewPage,
-  CollectionViewComponent as DefaultCollectionView,
-  DividerComponent as DefaultDivider,
-  DriveComponent as DefaultDrive,
-  ExcalidrawComponent as DefaultExcalidraw,
-  EmbedComponent as DefaultEmbed,
-  EquationComponent as DefaultEquation,
-  FileComponent as DefaultFile,
-  FigmaComponent as DefaultFigma,
-  GistComponent as DefaultGist,
-  HeaderComponent as DefaultHeader,
-  ImageComponent as DefaultImage,
-  MapsComponent as DefaultMaps,
-  NumberedListComponent as DefaultNumberedList,
-  PageComponent as DefaultPage,
-  PdfComponent as DefaultPdf,
-  QuoteComponent as DefaultQuote,
-  SubHeaderComponent as DefaultSubHeader,
-  SubSubHeaderComponent as DefaultSubSubHeader,
-  TableOfContentsComponent as DefaultTableOfContents,
-  TextComponent as DefaultText,
-  TransclusionContainerComponent as DefaultTransclusionContainer,
-  TransclusionReferenceComponent as DefaultTransclusionReference,
-  TodoComponent as DefaultTodo,
-  ToggleComponent as DefaultToggle,
-  TypeformComponent as DefaultTypeform,
-  TweetComponent as DefaultTweet,
-  VideoComponent as DefaultVideo,
-} from "@components";
+import * as Blocks from "@blocks";
 
-const defaultComponents: Components.Any = {
-  alias: DefaultAlias,
-  audio: DefaultAudio,
-  bookmark: DefaultBookmark,
-  bulletedList: DefaultBulletedList,
-  callout: DefaultCallout,
-  column: DefaultColumn,
-  columnList: DefaultColumnList,
-  code: DefaultCode,
-  codepen: DefaultCodepen,
-  collectionViewPage: DefaultCollectionViewPage,
-  collectionView: DefaultCollectionView,
-  divider: DefaultDivider,
-  drive: DefaultDrive,
-  excalidraw: DefaultExcalidraw,
-  embed: DefaultEmbed,
-  equation: DefaultEquation,
-  file: DefaultFile,
-  figma: DefaultFigma,
-  gist: DefaultGist,
-  header: DefaultHeader,
-  image: DefaultImage,
-  maps: DefaultMaps,
-  numberedList: DefaultNumberedList,
-  page: DefaultPage,
-  pdf: DefaultPdf,
-  quote: DefaultQuote,
-  subHeader: DefaultSubHeader,
-  subSubHeader: DefaultSubSubHeader,
-  tableOfContents: DefaultTableOfContents,
-  text: DefaultText,
-  transclusionContainer: DefaultTransclusionContainer,
-  transclusionReference: DefaultTransclusionReference,
-  todo: DefaultTodo,
-  toggle: DefaultToggle,
-  typeform: DefaultTypeform,
-  tweet: DefaultTweet,
-  video: DefaultVideo,
+const DefaultComponents: Components.Any = {
+  alias: Blocks.Alias.Component,
+  audio: Blocks.Audio.Component,
+  bookmark: Blocks.Bookmark.Component,
+  bulletedList: Blocks.BulletedList.Component,
+  callout: Blocks.Callout.Component,
+  column: Blocks.Column.Component,
+  columnList: Blocks.ColumnList.Component,
+  code: Blocks.Code.Component,
+  codepen: Blocks.Codepen.Component,
+  collectionViewPage: Blocks.CollectionViewPage.Component,
+  collectionView: Blocks.CollectionView.Component,
+  divider: Blocks.Divider.Component,
+  drive: Blocks.Drive.Component,
+  excalidraw: Blocks.Excalidraw.Component,
+  embed: Blocks.Embed.Component,
+  equation: Blocks.Equation.Component,
+  file: Blocks.File.Component,
+  figma: Blocks.Figma.Component,
+  gist: Blocks.Gist.Component,
+  header: Blocks.Header.Component,
+  image: Blocks.Image.Component,
+  maps: Blocks.Maps.Component,
+  numberedList: Blocks.NumberedList.Component,
+  page: Blocks.Page.Component,
+  pdf: Blocks.Pdf.Component,
+  quote: Blocks.Quote.Component,
+  subHeader: Blocks.SubHeader.Component,
+  subSubHeader: Blocks.SubSubHeader.Component,
+  tableOfContents: Blocks.TableOfContents.Component,
+  text: Blocks.Text.Component,
+  transclusionContainer: Blocks.TransclusionContainer.Component,
+  transclusionReference: Blocks.TransclusionReference.Component,
+  todo: Blocks.Todo.Component,
+  toggle: Blocks.Toggle.Component,
+  typeform: Blocks.Typeform.Component,
+  tweet: Blocks.Tweet.Component,
+  video: Blocks.Video.Component,
 };
 
-const defaultNotionContext: Core.NotionContext = {
+const DefaultNotionContext: Core.NotionContext = {
   rootPageId: undefined,
-  components: defaultComponents,
+  components: DefaultComponents,
   fullPage: false,
   previewImages: false,
   showCollectionViewDropdown: true,
@@ -96,7 +58,7 @@ const defaultNotionContext: Core.NotionContext = {
   recordMap: new RecordMap(),
 };
 
-const ctx = React.createContext<Core.NotionContext>(defaultNotionContext);
+const ctx = React.createContext<Core.NotionContext>(DefaultNotionContext);
 
 type ProviderProps = Core.NotionContext & {
   children: React.ReactElement;
@@ -111,7 +73,7 @@ export const ContextProvider: Components.Presenter<ProviderProps> = ({
     MapPageUrl(page, rootId);
   const pageMapper = rootPageId ? RemapPageUrl : MapPageUrl;
 
-  defaultNotionContext.recordMap.mapPageUrl = pageMapper;
+  DefaultNotionContext.recordMap.mapPageUrl = pageMapper;
 
   return (
     <ctx.Provider
@@ -119,7 +81,7 @@ export const ContextProvider: Components.Presenter<ProviderProps> = ({
         ...defaultNotionContext,
         ...rest,
         rootPageId,
-        components: { ...defaultComponents, ...themeComponents },
+        components: { ...DefaultComponents, ...themeComponents },
       }}
     >
       {children}

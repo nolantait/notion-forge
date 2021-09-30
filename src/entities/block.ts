@@ -1,7 +1,7 @@
 import { Option, Some, None } from "excoptional";
 import { Core, Blocks } from "@types";
 
-export class Block<T extends Blocks.Any> {
+export abstract class Block<T extends Blocks.DTO> {
   readonly dto: T;
   type: T["type"];
 
@@ -17,21 +17,15 @@ export class Block<T extends Blocks.Any> {
   get format(): Option<T["format"]> {
     const value = this.dto.format;
 
-    if (!value) {
-      return None();
-    } else {
-      return Some(value);
-    }
+    if (!value) return None();
+    return Some(value);
   }
 
   get properties(): Option<T["properties"]> {
     const value = this.dto.properties;
 
-    if (!value) {
-      return None();
-    } else {
-      return Some(value);
-    }
+    if (!value) return None();
+    return Some(value);
   }
 
   get createdTime(): Date {
@@ -48,6 +42,10 @@ export class Block<T extends Blocks.Any> {
 
   get id(): Blocks.ID {
     return this.dto.id;
+  }
+
+  get uuid(): string {
+    return this.id.replace(/-/g, "");
   }
 
   parentIs(type: Core.ParentType): boolean {
@@ -69,13 +67,5 @@ export class Block<T extends Blocks.Any> {
     }
 
     throw new Error(`Parent value invalid for block ${this.id}`);
-  }
-
-  get _format(): T["format"] | undefined {
-    return this.format.getOrElse(undefined);
-  }
-
-  get _properties(): T["properties"] | undefined {
-    return this.properties.getOrElse(undefined);
   }
 }

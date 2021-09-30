@@ -10,4 +10,8 @@ export class SignedUrl {
   get url(): URL {
     return new URL(this._url);
   }
+
+  get href(): string {
+    return this.url.href;
+  }
 }

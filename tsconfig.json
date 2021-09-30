@@ -27,6 +27,8 @@
     "jsx": "react",
     "types": ["node"],
     "paths": {
+      "@blocks": ["blocks"],
+      "@blocks/*": ["blocks/*"],
       "@icons": ["icons"],
       "@entities": ["entities"],
       "@types": ["types"],
@@ -35,7 +37,9 @@
       "@components/*": ["components/*"],
       "@utils": ["utils.ts"],
       "@context": ["context.tsx"],
-      "@lib": ["lib"]
+      "@mixins": ["mixins"],
+      "@lib": ["lib"],
+      "@src/*": ["./*"]
     }
   },
   "compileOnSave": false,

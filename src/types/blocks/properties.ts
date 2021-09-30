@@ -1,6 +1,7 @@
 import { Formats, Core } from "../";
 
 export type Any =
+  | Identity
   | Title
   | Source
   | Caption
@@ -10,11 +11,11 @@ export type Any =
   | Checked;
 
 export type Title = {
-  title: Formats.Decoration[];
+  title?: Formats.Decoration[];
 };
 
 export type Source = {
-  source: Formats.Decoration[];
+  source?: Formats.Decoration[];
 };
 
 export type Caption = {
@@ -22,20 +23,20 @@ export type Caption = {
 };
 
 export type Link = {
-  link: Formats.Decoration[];
-  description: Formats.Decoration[];
+  link?: Formats.Decoration[];
+  description?: Formats.Decoration[];
 };
 
 export type FileSize = {
-  size: Formats.Decoration[];
+  size?: Formats.Decoration[];
 };
 
 export type Language = {
-  language: Formats.Decoration[];
+  language?: Formats.Decoration[];
 };
 
 export type Checked = {
-  checked: (["Yes"] | ["No"])[];
+  checked?: (["Yes"] | ["No"])[];
 };
 
 export type Identity = {

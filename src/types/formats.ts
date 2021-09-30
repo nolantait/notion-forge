@@ -1,3 +1,4 @@
+import { Core } from "@types";
 /** Block colors supported by Notion */
 
 export type Color =
@@ -34,31 +35,44 @@ export type NumberFormat =
   | "won"
   | "yuan";
 
-export type BoldFormat = ["b"];
+export type BoldSymbol = "b";
+export type BoldFormat = [BoldSymbol];
 
-export type ItalicFormat = ["i"];
+export type ItalicSymbol = "i";
+export type ItalicFormat = [ItalicSymbol];
 
-export type StrikeFormat = ["s"];
+export type StrikeSymbol = "s";
+export type StrikeFormat = [StrikeSymbol];
 
-export type CodeFormat = ["c"];
+export type CodeSymbol = "c";
+export type CodeFormat = [CodeSymbol];
 
-export type UnderlineFormat = ["_"];
+export type UnderlineSymbol = "_";
+export type UnderlineFormat = [UnderlineSymbol];
 
-export type LinkFormat = ["a", string];
+export type LinkSymbol = "a";
+export type LinkFormat = [LinkSymbol, Core.URL];
 
-export type ColorFormat = ["h", Color];
+export type ColorSymbol = "h";
+export type ColorFormat = [ColorSymbol, Color];
 
-export type UserFormat = ["u", string];
+export type UserSymbol = "u";
+export type UserFormat = [UserSymbol, string];
 
-export type PageFormat = ["p", string];
+export type PageSymbol = "p";
+export type PageFormat = [PageSymbol, string];
 
-export type InlineEquationFormat = ["e", string];
+export type InlineEquationSymbol = "e";
+export type InlineEquationFormat = [InlineEquationSymbol, string];
 
-export type DiscussionFormat = ["m", string];
+export type DiscussionSymbol = "m";
+export type DiscussionFormat = [DiscussionSymbol, string];
 
-export type ExternalLinkFormat = ["‣", UserFormat | PageFormat];
+export type ExternalLinkSymbol = "‣";
+export type ExternalLinkFormat = [ExternalLinkSymbol, UserFormat | PageFormat];
 
-export type DateFormat = ["d", FormattedDate];
+export type DateSymbol = "d";
+export type DateFormat = [DateSymbol, FormattedDate];
 
 export type FormattedDate = {
   type: "date" | "daterange";
@@ -66,6 +80,21 @@ export type FormattedDate = {
   end_date?: string;
   date_format?: string;
 };
+
+export type SubDecorationSymbol =
+  | BoldSymbol
+  | ItalicSymbol
+  | StrikeSymbol
+  | CodeSymbol
+  | UnderlineSymbol
+  | LinkSymbol
+  | ColorSymbol
+  | DateSymbol
+  | UserSymbol
+  | InlineEquationSymbol
+  | PageSymbol
+  | ExternalLinkSymbol
+  | DiscussionSymbol;
 
 export type SubDecoration =
   | BoldFormat

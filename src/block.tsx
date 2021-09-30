@@ -1,7 +1,6 @@
 import React from "react";
 
 import { Components, Entities } from "@types";
-import { uuidToId } from "@utils";
 import { useNotionContext } from "@context";
 import { Component as WrapText } from "./components/wrapped-text";
 
@@ -24,7 +23,7 @@ export const Component: Components.Presenter<Props> = (props) => {
 
   const className = hideBlockId
     ? "notion-block"
-    : `notion-block notion-block-${uuidToId(block.id)}`;
+    : `notion-block notion-block-${block.uuid}`;
 
   switch (block.type) {
     case "collection_view_page":
