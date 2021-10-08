@@ -38,11 +38,42 @@ import * as Video from "./video";
 
 export { List } from "./list";
 export { Heading } from "./heading";
-import type { Components, Blocks } from "@types";
+import type { Api, Domain } from "@types";
+import type { Decorated } from "@entities";
+import type { Option } from "excoptional";
 
-export type Presenter<T> = Components.Presenter<T>;
-export type ID = Blocks.ID;
-export type BlockType = Blocks.BlockType;
+export type ID = Api.Blocks.ID;
+export type BlockType = Api.Blocks.BlockType;
+
+type OptionalPropertyNames<T> = {
+  [K in keyof T]-?: undefined extends T[K] ? K : never;
+}[keyof T];
+
+type RequiredPropertyNames<T> = {
+  [K in keyof T]-?: undefined extends T[K] ? never : K;
+}[keyof T];
+
+type OptionalProperties<T> = Required<Pick<T, OptionalPropertyNames<T>>>;
+type RequiredProperties<T> = Pick<T, RequiredPropertyNames<T>>;
+
+type Map<Value> = Value extends Api.Formats.Decoration[] ? Decorated : Value;
+type WrapOptional<T> = {
+  [K in keyof OptionalProperties<T>]: Option<NonNullable<T[K]>>;
+};
+type WrapRequired<T> = {
+  [K in keyof RequiredProperties<T>]: Option<NonNullable<T[K]>>;
+};
+type Wrap<T> = WrapOptional<T> & WrapRequired<T>;
+
+type Lift<T, Key extends keyof T> = {
+  [K in keyof T[Key] as Domain.Utils.CamelCase<K>]: Map<T[Key][K]>;
+};
+
+// type Test = Template<Api.Blocks.Alias>;
+export type Template<T extends Api.Blocks.Any> = Domain.Utils.Merge<
+  Wrap<Lift<Required<T>, "properties">>,
+  Wrap<Lift<Required<T>, "format">>
+>;
 
 export {
   Alias,
@@ -91,6 +122,7 @@ export type Any =
   | BulletedList.Entity
   | Callout.Entity
   | Code.Entity
+  | Codepen.Entity
   | CollectionViewPage.Entity
   | CollectionView.Entity
   | ColumnList.Entity

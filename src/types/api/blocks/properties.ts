@@ -15,7 +15,7 @@ export type Title = {
 };
 
 export type Source = {
-  source?: Formats.Decoration[];
+  source: Formats.Decoration[];
 };
 
 export type Caption = {
@@ -32,11 +32,13 @@ export type FileSize = {
 };
 
 export type Language = {
-  language?: Formats.Decoration[];
+  language: Formats.Decoration[];
 };
 
+type IsChecked = "Yes" | "No";
+
 export type Checked = {
-  checked?: (["Yes"] | ["No"])[];
+  checked?: [IsChecked][];
 };
 
 export type Identity = {

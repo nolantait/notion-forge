@@ -1,17 +1,31 @@
 import { Some, None, Option } from "excoptional";
-import { BlocksWithTrait } from "./";
+import { Domain, Api, Mixins } from "@types";
 
-import { Constructor } from "@mixins";
-import { Icon } from "@entities";
+export type IsIconable = {
+  format?: Api.Blocks.Format.Icon;
+};
 
-type Whitelist = BlocksWithTrait<"iconable">;
+export type HasIcon = Mixins.Constructor<
+  Domain.Block<Mixins.WithTrait<IsIconable>>
+>;
 
-export function Iconable<TBase extends Constructor<Whitelist>>(Base: TBase) {
-  return class extends Base {
-    get pageIcon(): Option<Icon> {
-      const path = this._format?.page_icon;
-      if (!path) return None();
-      return Some(new Icon(path));
+export type IIconable = {
+  pageIcon: Option<string>;
+};
+
+export function Iconable<TBase extends HasIcon>(
+  Base: TBase
+): Mixins.Constructor<IIconable> & TBase {
+  return class Iconable extends Base implements IIconable {
+    readonly pageIcon: Option<string>;
+
+    constructor(...args: any[]) {
+      super(...args);
+      this.pageIcon = this.format.then((format) => {
+        const value = format?.page_icon;
+        if (!value) return None();
+        return Some(value);
+      });
     }
   };
 }

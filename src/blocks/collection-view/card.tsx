@@ -1,53 +1,39 @@
 import React from "react";
 
-import { Collections, Formats, Components, Collections } from "@components";
-import { PageBlock } from "@entities";
-import { useNotionContext, dummyLink, NotionContextProvider } from "@context";
-import { CardCover } from "./card/cover";
+import { Domain, Api, View } from "@types";
+import { Property } from "@entities";
+import { useNotionContext } from "@context";
+import { Cover as CardCover } from "./card/cover";
 import { cs } from "@utils";
 
 export type Props = {
-  collection: Collections.Collection;
-  block: PageBlock;
-  cover: Collections.Card.Cover;
-  coverSize: Collections.Card.CoverSize;
-  coverAspect: Collections.Card.CoverAspect;
+  block: Domain.Blocks.CollectionView.Entity;
+  view: Domain.Blocks.CollectionView.AnyView;
   children?: React.ReactNode;
-  properties?: Collections.Properties.Visible & Collections.Properties.Identity;
-  rest?: any[];
+  properties?: Property[];
 };
 
-export const Component: Components.Presenter<Props> = (props) => {
+export const Component: View.Component<Props> = ({
+  view,
+  block,
+  properties,
+}) => {
   const context = useNotionContext();
-  const { components, mapPageUrl } = context;
+  const { components, recordMap } = context;
 
-  const {
-    collection,
-    block,
-    cover,
-    coverSize,
-    coverAspect,
-    properties = [],
-    className,
-    ...rest
-  } = props;
-
-  const format = block.format ?? {
-    page_cover: undefined,
-    page_cover_position: 0.5,
-  };
-
-  const { page_cover: coverUrl, page_cover_position = 0.5 } = format;
-  const coverPosition = (1 - page_cover_position) * 100;
+  const cover = view.cover.getOrElse(undefined);
+  const coverSize = view.coverSize.getOrElse(undefined);
+  const coverAspect = view.coverAspect.getOrElse(undefined);
+  const pageCover = block.pageCover.getOrElse(undefined);
+  const pageCoverPosition = block.pageCoverPosition.getOrElse(0.5);
+  const coverPosition = (1 - pageCoverPosition) * 100;
 
   const coverProps = {
     block,
     cover,
     coverAspect,
-    coverUrl,
     coverSize,
     coverPosition,
-    collection,
   };
   const coverContent = <CardCover {...coverProps} />;
 
@@ -77,7 +63,9 @@ export const Component: Components.Presenter<Props> = (props) => {
     <NotionContextProvider {...context} components={stubbedComponents}>
       <components.pageLink className={linkStyle} href={pageLink} {...rest}>
         {shouldRenderContent && (
-          <div className="notion-collection-card-cover">{coverContent}</div>
+          <div className="notion-collection-card-cover">
+            <CardCover />
+          </div>
         )}
 
         <div className="notion-collection-card-body">

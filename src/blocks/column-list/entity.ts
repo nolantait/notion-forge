@@ -1,6 +1,5 @@
-import { Blocks } from "@types";
-import { Block } from "@entities";
+import { Domain, Api } from "@types";
 
 export class ColumnListBlock
-  extends Block<Blocks.ColumnList>
-  implements Blocks.Template<Blocks.ColumnList> {}
+  extends Domain.Block<Api.Blocks.ColumnList>
+  implements Domain.Blocks.Template<Api.Blocks.ColumnList> {}

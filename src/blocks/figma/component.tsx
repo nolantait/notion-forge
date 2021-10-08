@@ -1,14 +1,13 @@
 import React from "react";
 
-import { Components } from "@types";
+import { Domain, View } from "@types";
 import { IFrame, AssetWrapper } from "@components";
-import * as Blocks from "@blocks";
 
 export type Props = {
-  block: Blocks.Any;
+  block: Domain.Blocks.Any;
 };
 
-export const FigmaComponent: Components.Presenter<Props> = ({ block }) => {
+export const FigmaComponent: View.Component<Props> = ({ block }) => {
   return (
     <AssetWrapper block={block}>
       <IFrame block={block} />

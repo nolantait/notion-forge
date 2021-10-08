@@ -1,39 +1,66 @@
 import { Some, None, Option } from "excoptional";
-import { BlocksWithTrait } from "./";
-import { Constructor } from "@mixins";
+import { Domain, Api, Mixins } from "@types";
 
-type Whitelist = BlocksWithTrait<"shapeable">;
+export type IsShapeable = {
+  format?: Api.Blocks.Format.Block;
+};
 
-export function Shapeable<TBase extends Constructor<Whitelist>>(Base: TBase) {
-  return class extends Base {
-    get blockWidth(): Option<number> {
-      if (!this._format?.block_width) return None();
-      return Some(this._format.block_width);
-    }
+export type HasShape = Mixins.Constructor<
+  Domain.Block<Mixins.WithTrait<IsShapeable>>
+>;
 
-    get blockHeight(): Option<number> {
-      if (!this._format?.block_height) return None();
-      return Some(this._format.block_height);
-    }
+export type IShapeable = {
+  blockWidth: Option<number>;
+  blockHeight: Option<number>;
+  blockAspectRatio: Option<number>;
+  blockPreserveScale: Option<boolean>;
+  blockFullWidth: Option<boolean>;
+  blockPageWidth: Option<boolean>;
+};
 
-    get blockAspectRatio(): Option<number> {
-      if (!this._format?.block_aspect_ratio) return None();
-      return Some(this._format.block_aspect_ratio);
-    }
+export function Shapeable<TBase extends HasShape>(
+  Base: TBase
+): Mixins.Constructor<IShapeable> & TBase {
+  return class Shapeable extends Base implements IShapeable {
+    readonly blockWidth: Option<number>;
+    readonly blockHeight: Option<number>;
+    readonly blockAspectRatio: Option<number>;
+    readonly blockPreserveScale: Option<boolean>;
+    readonly blockFullWidth: Option<boolean>;
+    readonly blockPageWidth: Option<boolean>;
 
-    get blockPreserveScale(): Option<boolean> {
-      if (!this._format?.block_preserve_scale) return None();
-      return Some(this._format.block_preserve_scale);
-    }
-
-    get blockFullWidth(): Option<boolean> {
-      if (!this._format?.block_full_width) return None();
-      return Some(this._format.block_full_width);
-    }
-
-    get blockPageWidth(): Option<boolean> {
-      if (!this._format?.block_page_width) return None();
-      return Some(this._format.block_page_width);
+    constructor(...args: any[]) {
+      super(...args);
+      this.blockWidth = this.format.then((format) => {
+        const value = format?.block_width;
+        if (!value) return None();
+        return Some(value);
+      });
+      this.blockHeight = this.format.then((format) => {
+        const value = format?.block_height;
+        if (!value) return None();
+        return Some(value);
+      });
+      this.blockAspectRatio = this.format.then((format) => {
+        const value = format?.block_aspect_ratio;
+        if (!value) return None();
+        return Some(value);
+      });
+      this.blockPreserveScale = this.format.then((format) => {
+        const value = format?.block_preserve_scale;
+        if (!value) return None();
+        return Some(value);
+      });
+      this.blockFullWidth = this.format.then((format) => {
+        const value = format?.block_full_width;
+        if (!value) return None();
+        return Some(value);
+      });
+      this.blockPageWidth = this.format.then((format) => {
+        const value = format?.block_page_width;
+        if (!value) return None();
+        return Some(value);
+      });
     }
   };
 }

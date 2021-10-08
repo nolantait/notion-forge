@@ -1,9 +1,9 @@
-import { Core } from "@types";
+import { Domain } from "@types";
 
 export class SignedUrl {
-  private readonly _url: Core.URL;
+  private readonly _url: Domain.Url;
 
-  constructor(url: Core.URL) {
+  constructor(url: Domain.Url) {
     this._url = url;
   }
 

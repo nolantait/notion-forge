@@ -1,7 +1,11 @@
+import React from "react";
+
 import { useNotionContext } from "@context";
 import { cs } from "@utils";
-import { Components } from "@types";
-import { Decorated, BookmarkBlock } from "@entities";
+import { View } from "@types";
+import { Decorated } from "@entities";
+import { Entity as BookmarkBlock } from "./";
+import { Link } from "@components";
 
 const getTitle = (block: BookmarkBlock): string => {
   const rawTitle = block.title
@@ -30,13 +34,11 @@ export type Props = {
   className?: string;
 };
 
-export const BookmarkComponent: Components.Presenter<Props> = ({
+export const BookmarkComponent: View.Component<Props> = ({
   block,
   className,
 }) => {
   const { components } = useNotionContext();
-  const { bookmarkCover, bookmarkIcon } = block;
-  const title = getTitle(block);
 
   const containerStyle = cs(
     "notion-bookmark",
@@ -44,13 +46,23 @@ export const BookmarkComponent: Components.Presenter<Props> = ({
     className
   );
 
+  const empty = new Decorated();
+  const link = block.link.getOrElse(empty);
+  const href = link.asString;
+  const bookmarkTitle = block.title.getOrElse(empty);
+  const bookmarkIcon = block.bookmarkIcon.getOrElse("");
+  const bookmarkCover = block.bookmarkCover.getOrElse("");
+  const description = block.description.getOrElse(empty);
+  const title = getTitle(block);
+  const caption = block.caption.getOrElse(empty);
+
   return (
     <>
-      <components.link
+      <Link
         target="_blank"
         rel="noopener noreferrer"
         className={containerStyle}
-        href={link.asString}
+        href={href}
       >
         <div>
           {bookmarkTitle.asString.length && (
@@ -67,11 +79,7 @@ export const BookmarkComponent: Components.Presenter<Props> = ({
 
           <div className="notion-bookmark-link">
             {bookmarkIcon.length && (
-              <components.image
-                src={bookmarkIcon}
-                alt={title.asString}
-                loading="lazy"
-              />
+              <components.image src={bookmarkIcon} alt={title} loading="lazy" />
             )}
 
             <div>
@@ -82,14 +90,10 @@ export const BookmarkComponent: Components.Presenter<Props> = ({
 
         {bookmarkCover.length && (
           <div className="notion-bookmark-image">
-            <components.image
-              src={bookmarkCover}
-              alt={title.asString}
-              loading="lazy"
-            />
+            <components.image src={bookmarkCover} alt={title} loading="lazy" />
           </div>
         )}
-      </components.link>
+      </Link>
 
       {caption.asString.length && (
         <div className="notion-bookmark-caption">

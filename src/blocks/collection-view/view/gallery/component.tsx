@@ -1,24 +1,29 @@
 import React from "react";
 
-import { Components } from "@types";
+import { Domain, View } from "@types";
 import { cs } from "@utils";
-import { Component as Card } from "../collection-views/card";
-import { Props as ViewProps } from "../blocks/collection-view";
-import { GalleryView } from "@entities";
+import { Component as Card } from "../../card";
+import { useNotionContext } from "@context";
 
-export type Props = Pick<ViewProps, "collection">;
+export type Props = {
+  view: Domain.Blocks.CollectionView.Gallery.Entity;
+  block: Domain.Blocks.CollectionView.Entity;
+};
 
-export const GalleryViewComponent: Components.Presenter<Props> = ({
-  collection,
+export const GalleryViewComponent: View.Component<Props> = ({
+  view,
+  block,
 }) => {
-  const view = collection.currentView as GalleryView;
+  const { recordMap } = useNotionContext();
 
   const galleryStyle = cs(
     "notion-gallery-grid",
     `notion-gallery-grid-size-${view.coverSize}`
   );
 
-  const blocks = collection.data.blocks.getOrElse([]);
+  const blocks = recordMap
+    .getViewBlocks(view.id, block.collectionId)
+    .getOrElse([]);
 
   return (
     <article className="notion-gallery">

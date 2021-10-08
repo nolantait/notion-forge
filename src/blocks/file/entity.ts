@@ -1,15 +1,20 @@
 import { Option, Some, None } from "excoptional";
 import { Ability } from "@mixins";
-import { Blocks } from "@types";
 import { Decorated } from "@entities";
+import { Domain, Api } from "@types";
 
 export class FileBlock
-  extends Ability.Attachable<Blocks.File>
-  implements Blocks.Template<Blocks.File>
+  extends Ability.Attachable<Api.Blocks.File>(Domain.Block)
+  implements Domain.Blocks.Template<Api.Blocks.File>
 {
-  get size(): Option<Decorated> {
-    const value = this._properties?.size;
-    if (!value) return None();
-    return Some(new Decorated(value));
+  readonly size: Option<Decorated>;
+
+  constructor(...args: any[]) {
+    super(...args);
+    this.size = this.properties.then((properties) => {
+      const value = properties?.size;
+      if (!value) return None();
+      return Some(new Decorated(value));
+    });
   }
 }

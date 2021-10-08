@@ -1,14 +1,14 @@
 import React from "react";
 
 import { cs } from "@utils";
-import { Components } from "@types";
+import { View } from "@types";
 
 export type Props = {
   className?: string;
   children?: React.ReactNode;
 };
 
-export const ColumnListComponent: Components.Presenter<Props> = ({
+export const ColumnListComponent: View.Component<Props> = ({
   className,
   children,
 }) => {

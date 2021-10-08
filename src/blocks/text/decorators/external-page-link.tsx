@@ -1,21 +1,18 @@
 import React from "react";
 
-import { Formats, Components } from "@types";
+import { Api, View } from "@types";
 import { useNotionContext } from "@context";
-import { Block } from "@entities";
 
-import { Decorator as DecoratedUser } from "./user";
-import { Decorator as DecoratedPageLink } from "./page-link";
+import { UserDecorator } from "./user";
+import { PageLinkDecorator } from "./page-link";
 
 export type Props = {
-  decoration: Formats.ExternalLinkFormat;
-  block: Block;
+  decoration: Api.Formats.ExternalLinkFormat;
   linkProps: React.HTMLProps<HTMLAnchorElement>;
 };
 
-export const ExternalPageLinkDecorator: Components.Presenter<Props> = ({
+export const ExternalPageLinkDecorator: View.Component<Props> = ({
   decoration,
-  block,
   linkProps = {},
 }) => {
   const { recordMap } = useNotionContext();
@@ -25,20 +22,18 @@ export const ExternalPageLinkDecorator: Components.Presenter<Props> = ({
 
   switch (linkType) {
     case "u": {
-      if (!block) return <></>;
-
-      return <DecoratedUser decoration={decoration[1]} block={block} />;
+      return <UserDecorator decoration={decoration[1]} />;
     }
     default: {
-      const linkedBlock = recordMap.block[id]?.value;
+      const linkedBlock = recordMap.findBlock(id).getOrElse(undefined);
 
       if (!linkedBlock) {
         throw new Error(`Missing block ${linkType} ${id}`);
       }
 
-      const format: Formats.PageFormat = ["p", id];
+      const format: Api.Formats.PageFormat = ["p", id];
 
-      return <DecoratedPageLink decoration={format} linkProps={linkProps} />;
+      return <PageLinkDecorator decoration={format} linkProps={linkProps} />;
     }
   }
 };

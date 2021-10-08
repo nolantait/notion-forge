@@ -1,19 +1,22 @@
 import { Option, Some, None } from "excoptional";
 import { Ability } from "@mixins";
-import { Blocks } from "@types";
+import { Domain, Api } from "@types";
 import { Decorated } from "@entities";
 
 export class CodeBlock
-  extends Ability.Captionable<Blocks.Code>
-  implements Blocks.Template<Blocks.Code>
+  extends Ability.Captionable<Api.Blocks.Code>(Domain.Block)
+  implements Domain.Blocks.Template<Api.Blocks.Code>
 {
-  get language(): Option<Decorated> {
-    const value = this._properties?.language;
-    if (!value) return None();
-    return Some(new Decorated(value));
-  }
+  readonly language: Option<Decorated>;
+  readonly code: string;
 
-  get code(): string {
-    return this.title.getOrElse(new Decorated()).asString;
+  constructor(...args: any[]) {
+    super(...args);
+    this.language = this.properties.then((properties) => {
+      const value = properties?.language;
+      if (!value) return None();
+      return Some(new Decorated(value));
+    });
+    this.code = this.title.getOrElse(new Decorated()).asString;
   }
 }

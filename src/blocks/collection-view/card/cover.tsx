@@ -1,40 +1,29 @@
 import React from "react";
 
-import { Formats, API, Collections, Components } from "@types";
+import { Domain, Api, View } from "@types";
 import { useNotionContext } from "@context";
-import { PageBlock, ImageBlock } from "@entities";
+import { Collection } from "@entities";
+import { Image } from "@blocks";
 
 type CoverImageProps = Pick<WithContentProps, "coverAspect"> & {
-  block: ImageBlock;
+  block: Domain.Blocks.Image.Entity;
 };
-
-type WithContentProps = Pick<Props, "block" | "coverAspect">;
 
 type WithImageProps = Pick<
   Props,
   "block" | "coverAspect" | "coverUrl" | "coverPosition"
 >;
 
-type WithPropertyProps = Pick<
-  Props,
-  | "block"
-  | "cover"
-  | "coverAspect"
-  | "coverUrl"
-  | "coverPosition"
-  | "collection"
->;
-
 export type Props = {
-  block: PageBlock;
-  collection: Collections.Collection;
-  cover: Collections.Card.Cover;
-  coverAspect: Collections.Card.CoverAspect;
+  block: Domain.Blocks.Page.Entity;
+  collection: Collection;
+  cover: Api.Collections.Card.Cover;
+  coverAspect: Api.Collections.Card.CoverAspect;
   coverPosition: number;
   coverUrl: string;
 };
 
-export const Cover: Components.Presenter<Props> = (props) => {
+export const Cover: View.Component<Props> = (props) => {
   const { cover } = props;
   const { type } = cover;
 
@@ -53,21 +42,23 @@ export const Cover: Components.Presenter<Props> = (props) => {
   }
 };
 
-const CardCoverWithContent: Components.Presenter<WithContentProps> = ({
+type WithContentProps = Pick<Props, "block" | "coverAspect">;
+const CardCoverWithContent: View.Component<WithContentProps> = ({
   block,
   coverAspect,
 }) => {
   const { recordMap } = useNotionContext();
-  const contentBlockId = findFirstImage(block, recordMap);
+  const contentBlock = recordMap.getFirstImage(block).getOrElse(undefined);
 
   if (!contentBlockId) return <CardCoverEmpty />;
 
-  const contentBlock = new ImageBlock(recordMap.block[contentBlockId].value);
+  const foundBlock = recordMap.find(contentBlockId);
+  const contentBlock = new Image.Entity();
 
   return <CardCoverImage block={contentBlock} coverAspect={coverAspect} />;
 };
 
-const CardCoverWithImage: Components.Presenter<WithImageProps> = ({
+const CardCoverWithImage: View.Component<WithImageProps> = ({
   block,
   coverAspect,
   coverUrl,
@@ -91,6 +82,16 @@ const CardCoverWithImage: Components.Presenter<WithImageProps> = ({
     />
   );
 };
+
+type WithPropertyProps = Pick<
+  Props,
+  | "block"
+  | "cover"
+  | "coverAspect"
+  | "coverUrl"
+  | "coverPosition"
+  | "collection"
+>;
 
 const CardCoverWithProperty: Components.Presenter<WithPropertyProps> = ({
   block,

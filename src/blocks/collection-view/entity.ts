@@ -1,15 +1,23 @@
+import { Some, None, Option } from "excoptional";
 import { Ability } from "@mixins";
-import { Blocks } from "@types";
+import { Domain, Api } from "@types";
 
 export class CollectionViewBlock
-  extends Ability.Collectable<Blocks.CollectionView>
-  implements Blocks.Template<Blocks.CollectionView>
+  extends Ability.Layoutable<Api.Blocks.CollectionView>(Domain.Block)
+  implements Domain.Blocks.Template<Api.Blocks.CollectionView>
 {
-  get viewIds(): Blocks.ID[] {
-    return this.dto.view_ids;
-  }
+  readonly viewIds: Domain.Blocks.ID[];
+  readonly collectionId: Domain.Blocks.ID;
+  readonly collectionPointer: Option<Domain.Pointer>;
 
-  get collectionId(): Blocks.ID {
-    return this.dto.collection_id;
+  constructor(...args: any[]) {
+    super(...args);
+    this.viewIds = this.dto.view_ids;
+    this.collectionId = this.dto.collection_id;
+    this.collectionPointer = this.format.then((format) => {
+      const value = format?.collection_pointer;
+      if (!value) return None();
+      return Some(value);
+    });
   }
 }

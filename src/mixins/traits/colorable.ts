@@ -1,15 +1,29 @@
 import { Some, None, Option } from "excoptional";
-import { BlocksWithTrait } from "./";
-import { Constructor } from "@mixins";
-import { Formats } from "@types";
+import { Domain, Api, Mixins } from "@types";
 
-type Whitelist = BlocksWithTrait<"colorable">;
+export type HasColor = Mixins.Constructor<
+  Domain.Block<Mixins.WithTrait<IsColorable>>
+>;
 
-export function Colorable<TBase extends Constructor<Whitelist>>(Base: TBase) {
-  return class extends Base {
-    get blockColor(): Option<Formats.Color> {
-      if (!this._format?.block_color) return None();
-      return Some(this._format.block_color);
+export type IsColorable = { format?: Api.Blocks.Format.Color };
+
+export type IColorable = {
+  blockColor: Option<Domain.Color>;
+};
+
+export function Colorable<TBase extends HasColor>(
+  Base: TBase
+): Mixins.Constructor<IColorable> & TBase {
+  return class Colorable extends Base implements IColorable {
+    readonly blockColor: Option<Domain.Color>;
+
+    constructor(...args: any[]) {
+      super(...args);
+      this.blockColor = this.format.then((format) => {
+        const value = format?.block_color;
+        if (!value) return None();
+        return Some(value);
+      });
     }
   };
 }

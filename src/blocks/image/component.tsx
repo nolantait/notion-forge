@@ -2,7 +2,7 @@ import React from "react";
 import { Img, ImgProps } from "react-image";
 
 import { isBrowser } from "@utils";
-import { Components } from "@types";
+import { View } from "@types";
 
 export type Props = ImgProps & {
   className?: string;
@@ -10,7 +10,7 @@ export type Props = ImgProps & {
   src: string;
 };
 
-export const ImageComponent: Components.Presenter<Props> = (props) => {
+export const ImageComponent: View.Component<Props> = (props) => {
   if (isBrowser) {
     return <Img {...props} />;
   } else {

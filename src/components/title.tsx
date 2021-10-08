@@ -1,15 +1,15 @@
 import React from "react";
 
-import { Components } from "@types";
+import { Domain, View } from "@types";
 import { useNotionContext } from "@context";
-import { PageBlock, CollectionViewPageBlock, Decorated } from "@entities";
+import { Decorated } from "@entities";
 
 export type Props = {
-  block: PageBlock | CollectionViewPageBlock;
+  block: Domain.Blocks.Page.Entity | Domain.Blocks.CollectionViewPage.Entity;
   value: Decorated;
 };
 
-export const Component: Components.Presenter<Props> = ({ value, block }) => {
+export const Component: View.Component<Props> = ({ value, block }) => {
   const { components } = useNotionContext();
 
   return (

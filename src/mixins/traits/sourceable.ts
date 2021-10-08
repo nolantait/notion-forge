@@ -1,27 +1,48 @@
 import { Some, None, Option } from "excoptional";
-import { BlocksWithTrait } from "./";
-import { Constructor } from "@mixins";
 import { Decorated } from "@entities";
+import { Domain, Api, Mixins } from "@types";
 
-type Whitelist = BlocksWithTrait<"sourceable">;
-
-export function Sourceable<TBase extends Constructor<Whitelist>>(Base: TBase) {
-  return class extends Base {
-    get source(): Option<Decorated> {
-      if (!this._properties?.source) return None();
-      return Some(new Decorated(this._properties.source));
+export type IsSourceable =
+  | {
+      format?: Api.Blocks.Format.Source;
     }
+  | {
+      properties?: Api.Blocks.Properties.Source;
+    };
 
-    get displaySource(): Option<string> {
-      const displaySource = this._format?.display_source;
+export type HasSource = Mixins.Constructor<
+  Domain.Block<Mixins.WithTrait<IsSourceable>>
+>;
 
-      if (!displaySource) {
-        const altSource = this.source.getOrElse(undefined);
-        if (!altSource) return None();
-        return Some(altSource.asString);
-      }
+export type ISourceable = {
+  source: Option<Decorated>;
+  displaySource: Option<string>;
+};
 
-      return Some(displaySource);
+export function Sourceable<TBase extends HasSource>(
+  Base: TBase
+): Mixins.Constructor<ISourceable> & TBase {
+  return class Sourceable extends Base implements ISourceable {
+    readonly source: Option<Decorated>;
+    readonly displaySource: Option<string>;
+
+    constructor(...args: any[]) {
+      super(...args);
+      this.source = this.properties.then((properties) => {
+        const value = properties?.source;
+        if (!value) return None();
+        return Some(new Decorated(value));
+      });
+
+      const maybeFormat = Object.assign(
+        { display_source: undefined },
+        this.format.getOrElse({ display_source: undefined })
+      );
+      this.displaySource = maybeFormat?.display_source
+        ? Some(maybeFormat.display_source)
+        : this.source.getOrElse(undefined)
+        ? Some(this.source.getOrElse(new Decorated()).asString)
+        : None();
     }
   };
 }

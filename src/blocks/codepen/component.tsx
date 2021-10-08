@@ -1,14 +1,14 @@
 import React from "react";
 
-import { Components } from "@types";
+import { View } from "@types";
 import { IFrame, AssetWrapper } from "@components";
-import * as Blocks from "@blocks";
+import { Entity as CodepenBlock } from "./";
 
 export type Props = {
-  block: Blocks.Any;
+  block: CodepenBlock;
 };
 
-export const CodepenComponent: Components.Presenter<Props> = ({ block }) => {
+export const CodepenComponent: View.Component<Props> = ({ block }) => {
   return (
     <AssetWrapper block={block}>
       <IFrame block={block} />

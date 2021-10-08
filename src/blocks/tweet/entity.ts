@@ -1,7 +1,6 @@
-import { Ability } from "@mixins";
-import { Blocks } from "@types";
+import { Traits, Ability } from "@mixins";
+import { Domain, Api } from "@types";
 
-type TweetDTO = Blocks.Template<Blocks.Tweet>;
 export class TweetBlock
-  extends Ability.Embeddable<Blocks.Tweet>
-  implements Blocks.Template<Blocks.Tweet> {}
+  extends Traits.Captionable(Ability.Embeddable<Api.Blocks.Tweet>(Domain.Block))
+  implements Domain.Blocks.Template<Api.Blocks.Tweet> {}

@@ -2,20 +2,20 @@ import React from "react";
 import { highlight, languages } from "prismjs";
 
 import { cs } from "@utils";
-import { Components } from "@types";
+import { View } from "@types";
 import { Entity as CodeBlock } from "./";
+import { Decorated } from "@entities";
 
 export type Props = {
   block: CodeBlock;
   className?: string;
 };
 
-export const CodeComponent: Components.Presenter<Props> = ({
-  block,
-  className,
-}) => {
-  const { code, language } = block;
+export const CodeComponent: View.Component<Props> = ({ block, className }) => {
+  const code = block.code;
+  const language = block.language.getOrElse(Decorated.fromString("javascript"));
   const formattedLanguage = language.asString.toLowerCase();
+
   const prismLanguage = languages[formattedLanguage] || languages.javascript;
   const style = cs(`language-${formattedLanguage}`, className);
 

@@ -1,10 +1,10 @@
 import React from "react";
 
-import { Formats, Components } from "@types";
+import { View, Api } from "@types";
 import { useNotionContext } from "@context";
 
 import { DateDecorator as DecoratedDate } from "./date";
-import { ExternalPageLinkDecorator as DecoratedExternalPageLink } from "./external-page-link";
+import { ExternalPageLinkDecorator } from "./external-page-link";
 import { PageLinkDecorator as DecoratedPageLink } from "./page-link";
 import { UserDecorator as DecoratedUser } from "./user";
 import { LinkDecorator as DecoratedLink } from "./link";
@@ -13,12 +13,12 @@ import { Props as TextProps } from "../";
 
 export type Props = Pick<TextProps, "block" | "linkProps" | "linkProtocol"> & {
   linkProps: React.HTMLProps<HTMLAnchorElement>;
-  decorations: Formats.SubDecoration[];
+  decorations: Api.Formats.SubDecoration[];
   text: string;
   index: number;
 };
 
-export const Decorator: Components.Presenter<Props> = ({
+export const TextDecorator: View.Component<Props> = ({
   decorations,
   text,
   index,
@@ -41,11 +41,11 @@ export const Decorator: Components.Presenter<Props> = ({
 };
 
 export type ElementProps = Omit<Props, "decorations" | "text" | "index"> & {
-  decoration: Formats.SubDecoration;
+  decoration: Api.Formats.SubDecoration;
   element: React.ReactElement;
 };
 
-const DecoratedElement: Components.Presenter<ElementProps> = ({
+const DecoratedElement: View.Component<ElementProps> = ({
   element,
   decoration,
   block,
@@ -60,7 +60,7 @@ const DecoratedElement: Components.Presenter<ElementProps> = ({
       return <DecoratedPageLink decoration={decoration} />;
     case "‣":
       return (
-        <DecoratedExternalPageLink {...{ decoration, block, linkProps }} />
+        <ExternalPageLinkDecorator {...{ decoration, block, linkProps }} />
       );
 
     case "h":
@@ -99,7 +99,7 @@ const DecoratedElement: Components.Presenter<ElementProps> = ({
 
     case "u":
       if (!block) return <></>;
-      return <DecoratedUser decoration={decoration} block={block} />;
+      return <DecoratedUser decoration={decoration} />;
 
     default: {
       throw new Error(`Unsupported text format ${decoration}`);

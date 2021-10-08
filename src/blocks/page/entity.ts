@@ -1,17 +1,17 @@
 import { Some, None, Option } from "excoptional";
-import { Blocks, Formats } from "@types";
+import { Domain, Api } from "@types";
 import { Ability } from "@mixins";
-import { TableProperty, Decorated } from "@entities";
+import { CollectionViewProperty, Decorated } from "@entities";
 
 type PropertyAccess = {
-  [key: string]: Formats.Decoration[] | undefined;
+  [key: string]: Api.Formats.Decoration[] | undefined;
 };
 
 export class PageBlock
-  extends Ability.Layoutable<Blocks.Page>
-  implements Blocks.Template<Blocks.Page>
+  extends Ability.Layoutable<Api.Blocks.Page>(Domain.Block)
+  implements Domain.Blocks.Template<Api.Blocks.Page>
 {
-  getPageProperty(property: TableProperty): Option<Decorated> {
+  getPageProperty(property: CollectionViewProperty): Option<Decorated> {
     const value = this.properties.getOrElse(undefined);
     if (!value) return None();
     const mappedValue: PropertyAccess = value;

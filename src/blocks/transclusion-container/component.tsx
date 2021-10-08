@@ -1,6 +1,6 @@
 import React from "react";
 
-import { Components } from "@types";
+import { View } from "@types";
 import { cs } from "@utils";
 
 export type Props = {
@@ -8,7 +8,7 @@ export type Props = {
   className?: string;
 };
 
-export const TransclusionContainerComponent: Components.Presenter<Props> = ({
+export const TransclusionContainerComponent: View.Component<Props> = ({
   children,
   className,
 }) => {

@@ -12,3 +12,5 @@ export type AnyView =
   | Calendar.Entity;
 
 export { Table, List, Gallery, Calendar, Board };
+
+export { ViewComponent } from "./component";

@@ -1,5 +1,4 @@
 export { Traits } from "../";
-export type { Constructor } from "../";
 
 export * from "./collectable";
 export * from "./embeddable";

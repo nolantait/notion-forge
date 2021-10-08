@@ -1,14 +1,18 @@
 import { Option, Some, None } from "excoptional";
-import { Blocks } from "@types";
-import { Block } from "@entities";
+import { Domain, Api } from "@types";
 
 export class AliasBlock
-  extends Block<Blocks.Alias>
-  implements Blocks.Template<Blocks.Alias>
+  extends Domain.Block<Api.Blocks.Alias>
+  implements Domain.Blocks.Template<Api.Blocks.Alias>
 {
-  get aliasPointer(): Option<Blocks.Format.AliasPointer> {
-    const value = this._format?.alias_pointer;
-    if (!value) return None();
-    return Some(value);
+  readonly aliasPointer: Option<Api.Blocks.Format.Pointer>;
+
+  constructor(block: Api.Blocks.Alias) {
+    super(block);
+    this.aliasPointer = this.format.then((format) => {
+      const value = format?.alias_pointer;
+      if (!value) return None();
+      return Some(value);
+    });
   }
 }

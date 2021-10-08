@@ -1,11 +1,19 @@
+import React from "react";
 import { cs } from "@utils";
 
-import { Component as NotionContainer } from "./container";
+import {
+  Container as NotionContainer,
+  CollectionRow as RowRenderer,
+  PageIcon,
+  Title,
+  PageLink,
+  PageLinkTitle,
+} from "@components";
+import { Decorated } from "@entities";
 import { useNotionContext } from "@context";
-import { Components } from "@types";
-import { PageBlock, CollectionViewPageBlock } from "@entities";
-import { Component as RowRenderer } from "../collection-row";
-import { Component as Collection } from "../blocks/collection";
+import { View } from "@types";
+import { Entity as CollectionViewPageBlock } from "./";
+import { CollectionView } from "@blocks";
 
 export type Props = {
   block: CollectionViewPageBlock;
@@ -17,12 +25,10 @@ export type Props = {
   children?: React.ReactNode;
 };
 
-export const CollectionViewPageComponent: Components.Presenter<Props> = (
-  props
-) => {
+export const CollectionViewPageComponent: View.Component<Props> = (props) => {
   const { fullPage } = useNotionContext();
   const { block, className, level } = props;
-  const containerProps = { block, className };
+  const containerProps = { block, className, blockId: block.id };
 
   const shouldRenderAsRow =
     block.type !== "collection_view_page" && block.parentIs("collection");
@@ -36,26 +42,32 @@ export const CollectionViewPageComponent: Components.Presenter<Props> = (
   );
 
   // Render a page link instead of a page if this is a nested block
-  const Content = level > 0 ? PageLink : PageRenderer;
+  const Content = level > 0 ? LinkPage : PageRenderer;
 
   return <NotionContainer {...containerProps}>{Content}</NotionContainer>;
 };
 
-const RenderContent: Components.Presenter<Props> = ({ block, className }) => {
+const RenderContent: View.Component<Props> = ({ block, className }) => {
   const isCollection = block.type === "collection_view_page";
 
   return (
-    <>{isCollection && <Collection block={block} className={className} />}</>
+    <>
+      {isCollection && (
+        <CollectionView.Component block={block} className={className} />
+      )}
+    </>
   );
 };
 
-const FullPage: Components.Presenter<Props> = (props) => {
+const FullPage: View.Component<Props> = (props) => {
   const { block, className, pageAside, pageHeader, pageFooter, children } =
     props;
-  const { components, defaultPageIcon } = useNotionContext();
-  const { title, pageIcon, pageFullWidth } = block;
+  const { defaultPageIcon } = useNotionContext();
 
+  const pageIcon = block.pageIcon.getOrElse("");
+  const pageFullWidth = block.pageFullWidth.getOrElse(false);
   const hasAside = (pageAside ?? false) && !pageFullWidth;
+  const title = block.title.getOrElse(Decorated.empty());
 
   const containerStyle = cs(
     "notion-page-content",
@@ -67,13 +79,13 @@ const FullPage: Components.Presenter<Props> = (props) => {
     <>
       {pageIcon && (
         <div className="notion-page-icon-wrapper">
-          <components.pageIcon block={block} defaultIcon={defaultPageIcon} />
+          <PageIcon block={block} defaultIcon={defaultPageIcon} />
         </div>
       )}
 
       {pageHeader}
 
-      <components.title value={title} block={block} />
+      <Title value={title} block={block} />
 
       <div className={containerStyle}>
         <article className="notion-page-content-inner">
@@ -88,7 +100,7 @@ const FullPage: Components.Presenter<Props> = (props) => {
   );
 };
 
-const LightPage: Components.Presenter<Props> = (props) => {
+const LightPage: View.Component<Props> = (props) => {
   const { children, pageHeader, pageFooter } = props;
 
   return (
@@ -100,18 +112,14 @@ const LightPage: Components.Presenter<Props> = (props) => {
   );
 };
 
-const PageLink: Components.Presenter<Props> = ({ className, block }) => {
-  const { components, mapPageUrl } = useNotionContext();
-  const { blockColor } = block;
-  const pageLinkStyle = cs(
-    "notion-page-link",
-    blockColor && `notion-${blockColor}`,
-    className
-  );
+const LinkPage: View.Component<Props> = ({ className, block }) => {
+  const { recordMap } = useNotionContext();
+  const href = recordMap.mapPageUrl(block).href;
+  const pageLinkStyle = cs("notion-page-link", className);
 
   return (
-    <components.pageLink className={pageLinkStyle} href={mapPageUrl(block.id)}>
-      <components.pageTitle block={block} />
-    </components.pageLink>
+    <PageLink block={block} className={pageLinkStyle} href={href}>
+      <PageLinkTitle block={block} />
+    </PageLink>
   );
 };

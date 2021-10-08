@@ -1,71 +1,60 @@
 import { Option, Some, None } from "excoptional";
-import { Core, Blocks } from "@types";
+import { Domain, Api } from "@types";
 
-export abstract class Block<T extends Blocks.DTO> {
+export class Block<T extends Api.Blocks.DTO> {
+  readonly id: string;
+  readonly uuid: string;
+  readonly parentId: Domain.ID;
+  readonly parentType: Domain.ParentType;
   readonly dto: T;
-  type: T["type"];
+  readonly type: T["type"];
+  readonly properties: Option<T["properties"]>;
+  readonly format: Option<T["format"]>;
+  readonly copiedFromPointer: Option<Api.Blocks.Format.Pointer>;
+  readonly content: Domain.Blocks.ID[];
 
   constructor(block: T) {
+    this.id = block.id;
+    this.uuid = this.id.replace(/-/g, "");
+    this.parentId = block.parent_id;
+    this.parentType = block.parent_table;
     this.dto = block;
     this.type = block.type;
+    this.properties = block.properties ? Some(block.properties) : None();
+    this.format = block.format ? Some(block.format) : None();
+    this.content = (block as any).content ?? [];
+    this.copiedFromPointer = this.format.then((format) => {
+      if (!format?.hasOwnProperty("copied_from_pointer")) return None();
+      const value = (format as any)
+        ?.copied_from_pointer as Api.Blocks.Format.Pointer;
+      if (!value) return None();
+      return Some(value);
+    });
   }
 
-  convert(type: Blocks.BlockType) {
-    this.type = type;
+  get hasContent(): boolean {
+    return this.content.length > 0;
   }
 
-  get format(): Option<T["format"]> {
-    const value = this.dto.format;
+  get isRoot(): boolean {
+    return this.parentIs("space");
+  }
 
+  get createdTime(): Option<Date> {
+    const value = this.dto.created_time;
     if (!value) return None();
-    return Some(value);
+    const date = new Date(value);
+    return Some(date);
   }
 
-  get properties(): Option<T["properties"]> {
-    const value = this.dto.properties;
-
+  get lastEditedTime(): Option<Date> {
+    const value = this.dto.last_edited_time;
     if (!value) return None();
-    return Some(value);
+    const date = new Date(value);
+    return Some(date);
   }
 
-  get createdTime(): Date {
-    return new Date(this.dto.created_time);
-  }
-
-  get lastEditedTime(): Date {
-    return new Date(this.dto.last_edited_time);
-  }
-
-  get content(): Blocks.ID[] {
-    return this.dto.content ?? [];
-  }
-
-  get id(): Blocks.ID {
-    return this.dto.id;
-  }
-
-  get uuid(): string {
-    return this.id.replace(/-/g, "");
-  }
-
-  parentIs(type: Core.ParentType): boolean {
-    return this.parentTable === type;
-  }
-
-  get parentId(): Blocks.ID {
-    return this.dto.parent_id;
-  }
-
-  get parentTable() {
-    const value = this.dto.parent_table;
-    if (typeof value === "string") {
-      const validParents = ["space", "block", "table", "collection"];
-      if (validParents.includes(value)) {
-        return value as Core.ParentType;
-      }
-      throw new Error(`Invalid parent type ${value}`);
-    }
-
-    throw new Error(`Parent value invalid for block ${this.id}`);
+  parentIs(type: Api.Core.ParentType): boolean {
+    return this.parentType === type;
   }
 }

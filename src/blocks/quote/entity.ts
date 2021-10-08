@@ -1,6 +1,6 @@
 import { Ability } from "@mixins";
-import { Blocks } from "@types";
+import { Domain, Api } from "@types";
 
 export class QuoteBlock
-  extends Ability.Typographic<Blocks.Quote>
-  implements Blocks.Template<Blocks.Quote> {}
+  extends Ability.Iconable<Api.Blocks.Quote>(Domain.Block)
+  implements Domain.Blocks.Template<Api.Blocks.Quote> {}

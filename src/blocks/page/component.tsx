@@ -1,6 +1,6 @@
 import React from "react";
 
-import { Components } from "@types";
+import { View } from "@types";
 import { Layout } from "@components";
 import { Link, Entity as PageBlock } from "./";
 
@@ -14,7 +14,7 @@ export type Props = {
   children?: React.ReactNode;
 };
 
-export const PageComponent: Components.Presenter<Props> = (props) => {
+export const PageComponent: View.Component<Props> = (props) => {
   const { block, className, level, children } = props;
 
   // Render a page link instead of a page if this is a nested block

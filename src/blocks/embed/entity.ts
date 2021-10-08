@@ -1,6 +1,6 @@
-import { Ability } from "@mixins";
-import { Blocks } from "@types";
+import { Traits, Ability } from "@mixins";
+import { Domain, Api } from "@types";
 
 export class EmbedBlock
-  extends Ability.Embeddable<Blocks.Embed>
-  implements Blocks.Template<Blocks.Embed> {}
+  extends Traits.Captionable(Ability.Embeddable<Api.Blocks.Embed>(Domain.Block))
+  implements Domain.Blocks.Template<Api.Blocks.Embed> {}

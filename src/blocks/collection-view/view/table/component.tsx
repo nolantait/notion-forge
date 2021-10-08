@@ -2,18 +2,19 @@ import React from "react";
 
 import { cs } from "@utils";
 import { useNotionContext } from "@context";
-import { Core, Components } from "@types";
+import { View, Domain } from "@types";
 import { Component as Property } from "@components/property";
-import * as Blocks from "@blocks";
+import { Decorated, CollectionViewProperty, Collection } from "@entities";
 
 export type Props = {
-  view: Blocks.CollectionView.Table.Entity;
+  view: Domain.Blocks.CollectionView.Table.Entity;
+  block: Domain.Blocks.CollectionView.Entity;
 };
 
-export const TableComponent: Components.Presenter<Props> = ({ view }) => {
+export const TableComponent: View.Component<Props> = ({ view, block }) => {
   const { recordMap } = useNotionContext();
-  const tableProperties = view.properties;
-  const blocks = recordMap.getBlocks(view.blockIds);
+  const tableProperties = view.properties.getOrElse([]);
+  const blocks = recordMap.getViewBlocks(view.id, block.collectionId);
 
   return (
     <div className="notion-table">
@@ -49,7 +50,7 @@ export const TableComponent: Components.Presenter<Props> = ({ view }) => {
   );
 };
 
-const TableCell: Components.Presenter<TableCellProps> = ({
+const TableCell: View.Component<TableCellProps> = ({
   property,
   collection,
   blockId,
@@ -59,7 +60,7 @@ const TableCell: Components.Presenter<TableCellProps> = ({
   const schema = collection.schema[propertyId];
   const block = recordMap.findBlock(blockId).getOrElse(undefined);
   if (!block) throw new Error(`Could not find block for blockID ${blockId}`);
-  const page = block as PageBlock;
+  const page = block as Domain.Blocks.Page.Entity;
 
   const data = page.getPageProperty(property).getOrElse(new Decorated());
 
@@ -84,17 +85,19 @@ const TableCell: Components.Presenter<TableCellProps> = ({
   );
 };
 
-type TableCellProps = Pick<ViewProps, "collection"> & {
-  property: TableProperty;
-  blockId: Core.ID;
+type TableCellProps = Props & {
+  collection: Collection;
+  property: CollectionViewProperty;
+  blockId: Domain.Blocks.ID;
 };
 
-type TableHeadProps = Pick<ViewProps, "collection"> & {
-  property: TableProperty;
+type TableHeadProps = Props & {
+  collection: Collection;
+  property: CollectionViewProperty;
 };
 
 const TableHead = ({ collection, property }: TableHeadProps): JSX.Element => {
-  const propertyId = property.propertyId;
+  const propertyId = property.id;
   const schema = collection.schema[propertyId];
   const style: React.CSSProperties = {
     width: getPropertyWidth(property),

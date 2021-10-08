@@ -31,6 +31,7 @@
       "@blocks/*": ["blocks/*"],
       "@icons": ["icons"],
       "@entities": ["entities"],
+      "@factories": ["factories"],
       "@types": ["types"],
       "@types/*": ["types/*"],
       "@components": ["components"],

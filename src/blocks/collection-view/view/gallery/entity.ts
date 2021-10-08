@@ -1,28 +1,21 @@
-import { Collections } from "@types";
+import { Option, Some, None } from "excoptional";
+import { Api } from "@types";
 import { View } from "../entity";
+import { BoardGroup } from "../board/group";
 
-export class GalleryView extends View {
-  readonly type: Collections.ViewType = "gallery";
-  public dto: Collections.GalleryView;
+export class GalleryView extends View<Api.CollectionViews.GalleryView> {
+  readonly groups: Option<BoardGroup[]>;
 
-  constructor(dto: Collections.GalleryView) {
+  constructor(dto: Api.CollectionViews.GalleryView) {
     super(dto);
-    this.dto = dto;
-  }
-
-  get properties(): Collections.GalleryProperty[] {
-    return this.dto.format.gallery_properties;
-  }
-
-  get coverSize(): Collections.Card.CoverSize {
-    return this.dto.format.gallery_cover_size;
-  }
-
-  get cover(): Collections.Card.Cover {
-    return this.dto.format.gallery_cover;
-  }
-
-  get coverAspect(): Collections.Card.CoverAspect {
-    return this.dto.format.gallery_cover_aspect;
+    this.groups = this.format.then((format) => {
+      const value = format?.board_groups2;
+      if (!value) return None();
+      return Some(
+        value.map(
+          (group: Api.CollectionViews.BoardGroup) => new BoardGroup(group)
+        )
+      );
+    });
   }
 }

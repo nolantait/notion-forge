@@ -1,17 +1,17 @@
-import { Core, Collections } from "@types";
+import { Domain, Api } from "@types";
 
 export class BoardGroup {
-  readonly dto: Collections.BoardGroup;
+  readonly dto: Api.CollectionViews.BoardGroup;
 
-  constructor(dto: Collections.BoardGroup) {
+  constructor(dto: Api.CollectionViews.BoardGroup) {
     this.dto = dto;
   }
 
-  get value(): Collections.BoardGroupValue["value"] {
-    return this.dto.value.value;
+  get value(): string {
+    return this.dto.value.value ?? "";
   }
 
-  get propertyId(): Core.PropertyID {
+  get propertyId(): Domain.PropertyID {
     return this.dto.property;
   }
 

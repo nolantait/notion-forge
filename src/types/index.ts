@@ -1,21 +1,4 @@
-import type * as Core from "./core";
-import type * as Blocks from "./blocks";
-import type * as Formats from "./formats";
-import type * as Formulas from "./formulas";
-import type * as Collections from "./collections";
-import type * as Components from "./components";
-import type * as API from "./api";
-import type * as Utils from "./utils";
-import type * as Entities from "./entities";
-
-export type {
-  Core,
-  Blocks,
-  Formats,
-  Formulas,
-  Collections,
-  Components,
-  API,
-  Utils,
-  Entities,
-};
+export * as Mixins from "./mixins";
+export * as Api from "./api";
+export * as Domain from "./domain";
+export * as View from "./components";

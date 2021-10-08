@@ -1,14 +1,13 @@
 import React from "react";
 
-import { Components } from "@types";
-import { PageBlock, CollectionViewPageBlock, Decorated } from "@entities";
+import { Domain, View } from "@types";
+import { Decorated } from "@entities";
 import { useNotionContext } from "@context";
 import { cs, isUrl } from "@utils";
 import { PageHeader } from "@components";
 
 export type Props = {
-  block: PageBlock | CollectionViewPageBlock;
-  blockId: string;
+  block: Domain.Blocks.Page.Entity | Domain.Blocks.CollectionViewPage.Entity;
   className?: string;
   pageCover?: React.ReactNode | string;
   pageCoverPosition?: number;
@@ -16,25 +15,24 @@ export type Props = {
   children: React.ReactNode;
 };
 
-export const Component: Components.Presenter<Props> = (props) => {
+export const Component: View.Component<Props> = (props) => {
   const { recordMap, defaultPageIcon, components } = useNotionContext();
 
   const {
     block,
     pageCover,
     footer,
-    blockId,
     className,
     pageCoverPosition = 0.5,
     children,
   } = props;
-
-  const hasPageCover = pageCover;
-  const coverPosition = (1 - pageCoverPosition) * 100;
+  const altText = block.title.getOrElse(new Decorated()).asString;
   const pageIcon = block.pageIcon.getOrElse(defaultPageIcon);
   const isPageIconUrl = pageIcon && isUrl(pageIcon);
+  const hasPageCover = pageCover;
+  const coverPosition = (1 - pageCoverPosition) * 100;
 
-  const outerContainerStyle = cs("notion", "notion-app", blockId, className);
+  const outerContainerStyle = cs("notion", "notion-app", className);
 
   const innerContainerStyle = cs(
     "notion-page",
@@ -52,7 +50,7 @@ export const Component: Components.Presenter<Props> = (props) => {
     ) : (
       <components.image
         src={recordMap.mapImageUrl(pageCover, block)}
-        alt={block.title.getOrElse(new Decorated()).asString}
+        alt={altText}
         className="notion-page-cover"
         style={{
           objectPosition: `center ${coverPosition}%`,

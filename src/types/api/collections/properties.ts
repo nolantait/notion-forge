@@ -15,7 +15,7 @@ export type Identity = {
 };
 
 export type Width = {
-  width: number;
+  width?: number;
 };
 
 export type Hidden = {

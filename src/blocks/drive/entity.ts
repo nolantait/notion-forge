@@ -1,20 +1,25 @@
 import { Option, Some, None } from "excoptional";
 import { Ability } from "@mixins";
-import { Blocks } from "@types";
+import { Domain, Api } from "@types";
 
 export class DriveBlock
-  extends Ability.Embeddable<Blocks.Drive>
-  implements Blocks.Template<Blocks.Drive>
+  extends Ability.Embeddable<Api.Blocks.Drive>(Domain.Block)
+  implements Domain.Blocks.Template<Api.Blocks.Drive>
 {
-  get driveStatus(): Option<Blocks.Format.DriveStatus> {
-    const value = this._format?.drive_status;
-    if (!value) return None();
-    return Some(value);
-  }
+  driveStatus: Option<Api.Blocks.Format.DriveStatus>;
+  driveProperties: Option<Api.Blocks.Format.DriveProperties>;
 
-  get driveProperties(): Option<Blocks.Format.DriveProperties> {
-    const value = this._format?.drive_properties;
-    if (!value) return None();
-    return Some(value);
+  constructor(...args: any[]) {
+    super(...args);
+    this.driveStatus = this.format.then((format) => {
+      const value = format?.drive_status;
+      if (!value) return None();
+      return Some(value);
+    });
+    this.driveProperties = this.format.then((format) => {
+      const value = format?.drive_properties;
+      if (!value) return None();
+      return Some(value);
+    });
   }
 }

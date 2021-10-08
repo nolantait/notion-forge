@@ -1,9 +1,9 @@
-import { Blocks, API } from "@types";
+import { Domain, Api } from "@types";
 
 export class CollectionQueryResult {
-  readonly dto: API.CollectionQueryResult;
+  readonly dto: Api.Responses.CollectionQueryResult;
 
-  constructor(dto: API.CollectionQueryResult) {
+  constructor(dto: Api.Responses.CollectionQueryResult) {
     this.dto = dto;
   }
 
@@ -15,7 +15,7 @@ export class CollectionQueryResult {
     return this.dto.total;
   }
 
-  get blockIds(): Blocks.ID[] {
+  get blockIds(): Domain.Blocks.ID[] {
     return this.dto.blockIds;
   }
 }

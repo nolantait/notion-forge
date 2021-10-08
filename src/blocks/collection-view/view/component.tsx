@@ -1,31 +1,38 @@
 import React from "react";
 
-import { ListView, BoardView, TableView, GalleryView } from "./";
-import { Collection } from "@entities";
-import { Components } from "@types";
+import { List, Board, Table, Gallery } from "./";
+import { useNotionContext } from "@context";
+import { View, Domain } from "@types";
 
 export type Props = {
-  collection: Collection;
+  block:
+    | Domain.Blocks.CollectionView.Entity
+    | Domain.Blocks.CollectionViewPage.Entity;
+  currentViewId: Domain.ID;
 };
 
 // Rendered as a child of a Collection "collection.tsx"
-export const ViewComponent: Components.Presenter<Props> = ({ collection }) => {
-  const type = collection.currentView.type;
+export const ViewComponent: View.Component<Props> = ({
+  block,
+  currentViewId,
+}) => {
+  const { recordMap } = useNotionContext();
+  const view = recordMap.findView(currentViewId).getOrElse(undefined);
 
-  switch (type) {
+  if (!view) throw new Error(`Missing view for block ${block}`);
+
+  switch (view.type) {
     case "table":
-      return <TableView collection={collection} />;
-
+      return <Table.Component view={view} block={block} />;
     case "gallery":
-      return <GalleryView collection={collection} />;
-
+      return <Gallery.Component view={view} block={block} />;
     case "list":
-      return <ListView collection={collection} />;
-
+      return <List.Component view={view} block={block} />;
     case "board":
-      return <BoardView collection={collection} />;
-
+      return <Board.Component view={view} block={block} />;
+    case "calendar":
+      return <></>;
     default:
-      throw new Error(`Unsupported collection view ${type}`);
+      throw new Error(`Unsupported collection view ${(view as any).type}`);
   }
 };

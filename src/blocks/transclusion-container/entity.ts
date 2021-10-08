@@ -1,6 +1,6 @@
-import { Blocks } from "@types";
+import { Domain, Api } from "@types";
 import { Block } from "@entities";
 
 export class TransclusionContainerBlock
-  extends Block<Blocks.TransclusionContainer>
-  implements Blocks.Template<Blocks.TransclusionContainer> {}
+  extends Block<Api.Blocks.TransclusionContainer>
+  implements Domain.Blocks.Template<Api.Blocks.TransclusionContainer> {}

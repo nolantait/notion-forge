@@ -2,7 +2,7 @@ import React from "react";
 
 import { cs } from "@utils";
 import { useNotionContext } from "@context";
-import { Components } from "@types";
+import { View } from "@types";
 import { Entity as EquationBlock } from "./";
 
 const katexSettings = {
@@ -11,21 +11,29 @@ const katexSettings = {
 };
 
 export type Props = {
-  block: EquationBlock;
+  math: string;
+  block?: EquationBlock;
   className?: string;
+  children?: React.ReactNode;
+  settings?: typeof katexSettings;
 };
 
-export const EquationComponent: Components.Presenter<Props> = ({
+export const EquationComponent: View.Component<Props> = ({
   className,
   block,
+  math,
+  ...rest
 }) => {
   const { components } = useNotionContext();
-  const math = block.title.asString;
-  const style = cs("notion-equation", "notion-equation-block", className);
+  const style = cs(
+    "notion-equation",
+    block ? "notion-equation-block" : "notion-equation-inline",
+    className
+  );
 
   return (
     <span role="button" tabIndex={0} className={style}>
-      <components.equation math={math} settings={katexSettings} />
+      <components.equation math={math} settings={katexSettings} {...rest} />
     </span>
   );
 };

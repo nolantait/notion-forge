@@ -1,35 +1,39 @@
 import React from "react";
 
-import { Components, Formats } from "@types";
+import { Api, View } from "@types";
 import { useNotionContext } from "@context";
+import { PageLink, PageLinkTitle } from "@components";
 
 export type Props = {
-  decoration: Formats.PageFormat;
+  decoration: Api.Formats.PageFormat;
   linkProps?: React.HTMLProps<HTMLAnchorElement>;
 };
 
-export const PageLinkDecorator: Components.Presenter<Props> = ({
+export const PageLinkDecorator: View.Component<Props> = ({
   decoration,
   linkProps,
 }) => {
-  const { components, recordMap, mapPageUrl } = useNotionContext();
+  const { recordMap } = useNotionContext();
   const blockId = decoration[1];
   const linkType = decoration[0];
-  const linkedBlock = recordMap.block[blockId]?.value;
+  const linkedBlock = recordMap.findBlock(blockId).getOrElse(undefined);
 
   if (!linkedBlock) {
     throw new Error(`Missing block ${linkType} ${blockId}`);
   }
 
+  const href = recordMap.mapPageUrl(blockId);
+
   return (
-    <components.pageLink
+    <PageLink
       className="notion-link"
-      href={mapPageUrl(blockId)}
+      href={href}
       {...linkProps}
+      blockId={blockId}
       target="_blank"
       rel="noopener noreferrer"
     >
-      <components.pageTitle block={linkedBlock} />
-    </components.pageLink>
+      <PageLinkTitle block={linkedBlock} />
+    </PageLink>
   );
 };

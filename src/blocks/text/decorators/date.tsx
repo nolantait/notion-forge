@@ -1,12 +1,12 @@
 import React from "react";
 
-import { Formats, Components } from "@types";
+import { View, Api } from "@types";
 
 export type Props = {
-  decoration: [string, Formats.FormattedDate];
+  decoration: [string, Api.Formats.FormattedDate];
 };
 
-export const DateDecorator: Components.Presenter<Props> = ({ decoration }) => {
+export const DateDecorator: View.Component<Props> = ({ decoration }) => {
   const dateDetails = decoration[1];
   const [startDate, endDate, formattedDate] = getDateStrings(dateDetails);
 
@@ -18,7 +18,7 @@ export const DateDecorator: Components.Presenter<Props> = ({ decoration }) => {
 };
 
 const getDateStrings = (
-  dateDetails: Formats.FormattedDate
+  dateDetails: Api.Formats.FormattedDate
 ): [string, string | undefined, string] => {
   const startDate = dateDetails.start_date;
   const endDate = dateDetails.end_date;

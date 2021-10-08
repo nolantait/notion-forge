@@ -1,7 +1,7 @@
 import React from "react";
 
 import { BlockRenderer } from "../../renderer";
-import { Components } from "@types";
+import { View } from "@types";
 import { Entity as AliasBlock } from "./";
 
 export type Props = {
@@ -9,10 +9,7 @@ export type Props = {
   level: number;
 };
 
-export const AliasComponent: Components.Presenter<Props> = ({
-  block,
-  level,
-}) => {
+export const AliasComponent: View.Component<Props> = ({ block, level }) => {
   const referencePointerId = block.aliasPointer.getOrElse({ id: undefined }).id;
 
   return (

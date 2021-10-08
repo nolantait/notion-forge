@@ -1,19 +1,30 @@
 import { Some, None, Option } from "excoptional";
-import { Constructor } from "@mixins";
-import { BlocksWithTrait } from "./";
+import { Domain, Api, Mixins } from "@types";
 import { Decorated } from "@entities";
 
-type Whitelist = BlocksWithTrait<"captionable">;
+export type IsCaptionable = { properties?: Api.Blocks.Properties.Caption };
+//type Test = Mixins.WithTrait<IsCaptionable>;
+export type HasCaption = Mixins.Constructor<
+  Domain.Block<Mixins.WithTrait<IsCaptionable>>
+>;
 
-export function Captionable<TBase extends Constructor<Whitelist>>(
+export type ICaptionable = {
+  caption: Option<Decorated>;
+};
+
+export function Captionable<TBase extends HasCaption>(
   Base: TBase
-): Constructor<Whitelist> {
-  return class Captionable extends Base {
-    get caption(): Option<Decorated> {
-      if (!this.properties.caption) return None();
-      const value = this._properties.caption;
-      if (!value.length) return None();
-      return Some(new Decorated(value));
+): Mixins.Constructor<ICaptionable> & TBase {
+  return class Captionable extends Base implements ICaptionable {
+    readonly caption: Option<Decorated>;
+
+    constructor(...args: any[]) {
+      super(...args);
+      this.caption = this.properties.then((properties) => {
+        const value = properties?.caption;
+        if (!value) return None();
+        return Some(new Decorated(value));
+      });
     }
   };
 }

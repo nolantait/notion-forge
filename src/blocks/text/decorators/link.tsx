@@ -1,24 +1,23 @@
 import React from "react";
 
-import { useNotionContext } from "@context";
-import { Core, Components } from "@types";
+import { View, Api } from "@types";
+import { PageLink, Link } from "@components";
 import { parsePageId } from "@utils";
 
 export type Props = {
   decoration: ["a", string];
   linkProps: React.HTMLProps<HTMLAnchorElement>;
-  linkProtocol?: Core.LinkProtocol;
+  linkProtocol?: Api.Core.LinkProtocol;
   element: React.ReactElement;
 };
 
 // ["a", external_or_relative_path]
-export const Decorator: Components.Presenter<Props> = ({
+export const LinkDecorator: View.Component<Props> = ({
   decoration,
   linkProps,
   linkProtocol,
   element,
 }) => {
-  const { components, mapPageUrl } = useNotionContext();
   const path = decoration[1];
   const pathname = path.substr(1);
   const id = parsePageId(pathname, { uuid: true });
@@ -26,26 +25,19 @@ export const Decorator: Components.Presenter<Props> = ({
   const externalUrl = linkProtocol
     ? `${linkProtocol}:${decoration[1]}`
     : decoration[1];
+  const href = externalUrl;
 
   if (isRelativePath && id) {
     return (
-      <components.pageLink
-        className="notion-link"
-        href={mapPageUrl(id)}
-        {...linkProps}
-      >
+      <PageLink blockId={id} className="notion-link" href={href} {...linkProps}>
         {element}
-      </components.pageLink>
+      </PageLink>
     );
   } else {
     return (
-      <components.link
-        className="notion-link"
-        href={externalUrl}
-        {...linkProps}
-      >
+      <Link className="notion-link" href={externalUrl} {...linkProps}>
         {element}
-      </components.link>
+      </Link>
     );
   }
 };

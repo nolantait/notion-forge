@@ -1,6 +1,8 @@
-import { Embeddable } from "../behaviour";
-import { Blocks } from "@types";
+import { Traits, Ability } from "@mixins";
+import { Domain, Api } from "@types";
 
 export class CodepenBlock
-  extends Embeddable<Blocks.Codepen>
-  implements Blocks.Template<Blocks.Codepen> {}
+  extends Traits.Captionable(
+    Ability.Embeddable<Api.Blocks.Codepen>(Domain.Block)
+  )
+  implements Domain.Blocks.Template<Api.Blocks.Codepen> {}

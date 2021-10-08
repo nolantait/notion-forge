@@ -1,6 +1,5 @@
-import { Blocks } from "@types";
-import { Block } from "@entities";
+import { Domain, Api } from "@types";
 
 export class DividerBlock
-  extends Block<Blocks.Divider>
-  implements Blocks.Template<Blocks.Divider> {}
+  extends Domain.Block<Api.Blocks.Divider>
+  implements Domain.Blocks.Template<Api.Blocks.Divider> {}

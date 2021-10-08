@@ -1,6 +1,6 @@
-import { Ability } from "@mixins";
-import { Blocks } from "@types";
+import { Traits, Ability } from "@mixins";
+import { Domain, Api } from "@types";
 
 export class MapsBlock
-  extends Ability.Embeddable<Blocks.Maps>
-  implements Blocks.Template<Blocks.Maps> {}
+  extends Traits.Captionable(Ability.Embeddable<Api.Blocks.Maps>(Domain.Block))
+  implements Domain.Blocks.Template<Api.Blocks.Maps> {}

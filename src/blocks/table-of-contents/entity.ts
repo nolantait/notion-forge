@@ -1,6 +1,6 @@
-import { Ability } from "@mixins";
-import { Blocks } from "@types";
+import { Traits } from "@mixins";
+import { Domain, Api } from "@types";
 
 export class TableOfContentsBlock
-  extends Ability.Typographic<Blocks.TableOfContents>
-  implements Blocks.Template<Blocks.TableOfContents> {}
+  extends Traits.Colorable(Domain.Block)<Api.Blocks.TableOfContents>
+  implements Domain.Blocks.Template<Api.Blocks.TableOfContents> {}

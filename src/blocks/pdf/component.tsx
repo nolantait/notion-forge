@@ -1,17 +1,14 @@
 import React from "react";
 
 import { Page, Document } from "react-pdf";
-import { Components } from "@types";
+import { View } from "@types";
 
 export type Props = {
   file: string;
   rest: any[];
 };
 
-export const PdfComponent: Components.Presenter<Props> = ({
-  file,
-  ...rest
-}) => {
+export const PdfComponent: View.Component<Props> = ({ file, ...rest }) => {
   const [numPages, setNumPages] = React.useState(0);
 
   function onDocumentLoadSuccess({ numPages }: { numPages: number }) {

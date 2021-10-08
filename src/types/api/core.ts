@@ -1,6 +1,3 @@
-import type { Block, RecordMap } from "@entities";
-import type { Formats, Components, Blocks } from "./";
-
 // Base Types
 // ----------------------------------------------------------------------------
 
@@ -22,43 +19,52 @@ export type URL = string;
 export type Timestamp = number;
 export type Author = ParentType & "notion_user";
 export type ParentType = "space" | "block" | "table" | "collection";
-export type Role = "editor" | "reader" | "none" | "read_and_write";
-export type PermissionType = "user_permission";
+export type Role =
+  | "editor"
+  | "reader"
+  | "none"
+  | "read_and_write"
+  | "comment_only";
+export type PermissionType =
+  | "user_permission"
+  | "space_permission"
+  | "bot_permission"
+  | "public_permission";
 export type LinkProtocol = "https" | "http" | "mailto" | "tel";
+
+/** Block colors supported by Notion */
+
+export type Color =
+  | "transparent"
+  | "gray"
+  | "brown"
+  | "orange"
+  | "yellow"
+  | "teal"
+  | "blue"
+  | "purple"
+  | "pink"
+  | "red"
+  | "gray_background"
+  | "brown_background"
+  | "orange_background"
+  | "yellow_background"
+  | "teal_background"
+  | "blue_background"
+  | "purple_background"
+  | "pink_background"
+  | "red_background";
 
 export type Permission = {
   role: Role;
   type: PermissionType;
-  user_id: ID;
+  user_id?: ID;
+  added_timestamp?: number;
+  allow_duplicate?: boolean;
+  allow_search_engine_indexing?: boolean;
 };
 
 export type PropertyID = string;
-
-/** Types of structured data supported by Notion collections */
-
-export type PropertyType =
-  | "title"
-  | "text"
-  | "number"
-  | "select"
-  | "multi_select"
-  | "date"
-  | "person"
-  | "file"
-  | "checkbox"
-  | "url"
-  | "email"
-  | "phone_number"
-  | "formula"
-  | "relation"
-  | "created_time"
-  | "created_by"
-  | "last_edited_time"
-  | "last_edited_by";
-
-export type PropertyMap = {
-  [key: string]: Formats.Decoration[];
-};
 
 export type Attachable = {
   file_ids?: string[];
@@ -69,37 +75,21 @@ export type Identity = {
   version: number;
   parent_id: ID;
   parent_table: ParentType;
-  space_id?: ID;
-  shard_id?: number;
+  space_id: ID;
   alive: boolean;
+  shard_id?: number;
+  copied_from?: ID;
 };
 
 export type Creatable = {
   created_by_table: Author;
   created_by_id: ID;
-  created_by: ID;
   created_time: Timestamp;
+  created_by?: ID;
 };
 
 export type Editable = {
   last_edited_by_table: Author;
   last_edited_by_id: ID;
-  last_edited_by: ID;
   last_edited_time: Timestamp;
 };
-
-export type MapPageUrl = (pageId: Blocks.ID, rootPageId?: Blocks.ID) => string;
-export type MapImageUrl = (url: string, block: Blocks.Any) => URL;
-
-export interface NotionContext {
-  recordMap: RecordMap;
-  components: Components.Any;
-  rootPageId: string | undefined;
-  fullPage: boolean;
-  previewImages: boolean;
-  showCollectionViewDropdown: boolean;
-  defaultPageIcon: string | null;
-  defaultPageCover: string | null;
-  defaultPageCoverPosition: number;
-  zoom: unknown;
-}

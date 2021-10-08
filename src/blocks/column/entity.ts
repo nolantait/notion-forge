@@ -1,14 +1,18 @@
 import { Option, Some, None } from "excoptional";
-import { Blocks } from "@types";
-import { Block } from "@entities";
+import { Domain, Api } from "@types";
 
 export class ColumnBlock
-  extends Block<Blocks.Column>
-  implements Blocks.Template<Blocks.Column>
+  extends Domain.Block<Api.Blocks.Column>
+  implements Domain.Blocks.Template<Api.Blocks.Column>
 {
-  get columnRatio(): Option<number> {
-    const value = this._format?.column_ratio;
-    if (!value) return None();
-    return Some(value);
+  columnRatio: Option<number>;
+
+  constructor(block: Api.Blocks.Column) {
+    super(block);
+    this.columnRatio = this.format.then((format) => {
+      const value = format?.column_ratio;
+      if (!value) return None();
+      return Some(value);
+    });
   }
 }

@@ -1,18 +1,18 @@
 import React from "react";
 
-import { Components, Entities } from "@types";
+import { Domain, View } from "@types";
 import { LinkIcon } from "@icons";
 import { useNotionContext } from "@context";
 import { Decorated } from "@entities";
 
 export type Props = {
   block:
-    | Entities.HeaderBlock
-    | Entities.SubHeaderBlock
-    | Entities.SubSubHeaderBlock;
+    | Domain.Blocks.Header.Entity
+    | Domain.Blocks.SubHeader.Entity
+    | Domain.Blocks.SubSubHeader.Entity;
 };
 
-export const Heading: Components.Presenter<Props> = ({ block }) => {
+export const Heading: View.Component<Props> = ({ block }) => {
   const { components } = useNotionContext();
   const id = block.uuid;
   const defaultTitle = Decorated.fromString(`Notion header ${id}`);
@@ -22,7 +22,7 @@ export const Heading: Components.Presenter<Props> = ({ block }) => {
     <span>
       <div id={id} className="notion-header-anchor" />
 
-      <a className="notion-hash-link" href={`#${id}`} title={title}>
+      <a className="notion-hash-link" href={`#${id}`} title={title.asString}>
         <LinkIcon />
       </a>
 

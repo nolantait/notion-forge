@@ -15,8 +15,9 @@ export type {
   ConditionalKeys,
   ConditionalExcept,
 } from "type-fest";
-import type { Formats, Blocks } from "@types";
-import type { Decorated } from "../entities";
+
+import type { Formats, Blocks } from "./";
+import type { Decorated } from "@entities";
 
 export type Intersection<T, U> = T extends U ? T : never;
 

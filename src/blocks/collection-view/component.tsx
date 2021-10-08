@@ -12,18 +12,20 @@ import Menu, { Item as MenuItem } from "rc-menu";
 import { CollectionViewIcon, ChevronDownIcon } from "@icons";
 import { useNotionContext } from "@context";
 import { cs } from "@utils";
-import { Collections, Core, Components } from "@types";
-import { ViewComponent } from "./view-component";
-import * as Blocks from "@blocks";
+import { Domain, View } from "@types";
+import { Decorated } from "@entities";
+import { ViewComponent } from "./view";
 
 export type Props = {
-  block: Blocks.CollectionView.Entity | Blocks.CollectionViewPage.Entity;
+  block:
+    | Domain.Blocks.CollectionView.Entity
+    | Domain.Blocks.CollectionViewPage.Entity;
   className?: string;
 };
 
 export const CollectionActionContext = createContext<CollectionActions>({});
 
-export const CollectionViewComponent: Components.Presenter<Props> = ({
+export const CollectionViewComponent: View.Component<Props> = ({
   block,
   className,
 }) => {
@@ -45,8 +47,8 @@ export const CollectionViewComponent: Components.Presenter<Props> = ({
     .findCollection(collectionId)
     .getOrElse(undefined);
 
-  if (!collection?.hasData) {
-    throw new Error(`Invalid collection ${collection}`);
+  if (!collection) {
+    throw new Error(`Missing collection ${recordMap}`);
   }
 
   const containerStyle = cs("notion-collection", className);
@@ -63,7 +65,7 @@ export const CollectionViewComponent: Components.Presenter<Props> = ({
       <div className={containerStyle}>
         <CollectionHeader {...collectionHeaderProps} />
 
-        <ViewComponent collection={collection} />
+        <ViewComponent block={block} viewId={currentViewId} />
       </div>
     </CollectionActionContext.Provider>
   );
@@ -78,21 +80,21 @@ interface CollectionActions {
 }
 
 type CollectionHeaderProps = Pick<Props, "block"> & {
-  viewIds: Core.ID[];
-  currentViewId: Core.ID;
+  viewIds: Domain.ID[];
+  currentViewId: Domain.ID;
 };
 
-const CollectionHeader: Components.Presenter<CollectionHeaderProps> = ({
+const CollectionHeader: View.Component<CollectionHeaderProps> = ({
   viewIds,
   currentViewId,
   block,
 }) => {
   const { components, showCollectionViewDropdown } = useNotionContext();
-  const { title } = block;
+  const title = block.title.getOrElse(Decorated.empty());
 
   return (
     <div className="notion-collection-header">
-      {!title.isEmpty && (
+      {!title.length && (
         <div className="notion-collection-header-title">
           <>
             <components.pageIcon

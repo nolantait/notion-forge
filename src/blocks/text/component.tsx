@@ -1,6 +1,6 @@
 import React from "react";
 
-import * as Blocks from "@blocks";
+import { View, Domain } from "@types";
 import { TextDecorator } from "./decorators";
 import { Decorated } from "@entities";
 
@@ -15,12 +15,12 @@ import { Decorated } from "@entities";
 
 export type Props = {
   value: Decorated;
-  block?: Blocks.Any;
+  block?: Domain.Blocks.Any;
   linkProps?: React.HTMLProps<HTMLAnchorElement>;
   linkProtocol?: "https" | "http" | "mailto" | "tel";
 };
 
-export const TextComponent: Blocks.Presenter<Props> = ({
+export const TextComponent: View.Component<Props> = ({
   value,
   block,
   linkProps = {},

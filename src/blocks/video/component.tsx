@@ -1,11 +1,12 @@
-import * as Blocks from "@blocks";
-import { Core } from "@types";
+import React from "react";
+
+import { View, Domain } from "@types";
 import { Entity as VideoBlock } from "./";
 
 export type Props = {
   block: VideoBlock;
   style?: React.CSSProperties;
-  signedUrl?: Core.URL;
+  signedUrl?: Domain.Url;
 };
 
 const isThirdPartyVideo = (signedUrl: string): boolean => {
@@ -24,7 +25,7 @@ const isThirdPartyVideo = (signedUrl: string): boolean => {
   });
 };
 
-export const VideoComponent: Blocks.Presenter<Props> = ({
+export const VideoComponent: View.Component<Props> = ({
   block,
   signedUrl,
   style,

@@ -1,50 +1,44 @@
 import { Some, None, Option } from "excoptional";
-import { Core, Blocks, Collections } from "@types";
-import {
-  CollectionSchemaMap,
-  CollectionProperty,
-  CollectionPageProperty,
-} from "@entities";
+import { Api, Domain } from "@types";
+import { Schema, SchemaDefinition, CollectionViewProperty } from "@entities";
 
 export class Collection {
-  readonly dto: Collections.Collection;
+  readonly dto: Api.Collections.Collection;
+  readonly icon: Option<string>;
+  readonly id: Domain.ID;
+  readonly parentId: Domain.ID;
+  readonly parentType: Domain.ParentType;
   readonly type = "collection";
-  private readonly _schema: CollectionSchemaMap;
+  readonly format: Option<Api.Collections.Format>;
+  readonly pageProperties: Option<CollectionViewProperty[]>;
+  readonly content: Domain.Blocks.ID[];
+  private readonly _schema: Schema;
 
-  constructor(dto: Collections.Collection) {
+  constructor(dto: Api.Collections.Collection) {
     this.dto = dto;
-    this._schema = new CollectionSchemaMap(this.dto.schema);
+    this.icon = dto.icon ? Some(dto.icon) : None();
+    this.id = dto.id;
+    this.parentId = dto.parent_id;
+    this.parentType = dto.parent_table;
+    this.format = dto.format ? Some(dto.format) : None();
+    this.content = (dto as any).content ?? [];
+    this.pageProperties = this.format.then((format) => {
+      return (
+        format?.collection_page_properties?.map(
+          (item: Api.Collections.PageProperty) =>
+            new CollectionViewProperty(item)
+        ) ?? []
+      );
+    });
+    this._schema = new Schema(this.dto.schema);
   }
 
-  get pageProperties(): Option<CollectionPageProperty[]> {
-    const value = this.dto.format?.collection_page_properties;
-    if (!value) return None();
-    const props = value.map((val) => new CollectionPageProperty(val));
-    return Some(props);
-  }
-
-  get properties(): CollectionProperty[] {
+  get properties(): SchemaDefinition[] {
     const hiddenPropIds = Object.keys(
       this.dto.format?.property_visibility ?? {}
     );
     return this._schema.all.filter((property) =>
       hiddenPropIds.includes(property.id)
     );
-  }
-
-  get icon(): string {
-    return this.dto.icon;
-  }
-
-  get id(): Blocks.ID {
-    return this.dto.id;
-  }
-
-  get parentId(): Blocks.ID {
-    return this.dto.parent_id;
-  }
-
-  get parentTable(): Core.ParentType {
-    return this.dto.parent_table;
   }
 }

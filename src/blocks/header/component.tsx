@@ -1,6 +1,6 @@
 import React from "react";
 
-import { Components } from "@types";
+import { View } from "@types";
 import { cs } from "@utils";
 import { Entity as HeaderBlock } from "./";
 import { Heading } from "../";
@@ -10,7 +10,7 @@ export type Props = {
   className?: string;
 };
 
-export const HeaderComponent: Components.Presenter<Props> = ({
+export const HeaderComponent: View.Component<Props> = ({
   block,
   className,
 }) => {

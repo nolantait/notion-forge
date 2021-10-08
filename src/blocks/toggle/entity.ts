@@ -1,6 +1,6 @@
 import { Ability } from "@mixins";
-import { Blocks } from "@types";
+import { Domain, Api } from "@types";
 
 export class ToggleBlock
-  extends Ability.Typographic<Blocks.Toggle>
-  implements Blocks.Template<Blocks.Toggle> {}
+  extends Ability.Iconable<Api.Blocks.Toggle>(Domain.Block)
+  implements Domain.Blocks.Template<Api.Blocks.Toggle> {}

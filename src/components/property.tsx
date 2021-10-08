@@ -2,7 +2,7 @@ import React from "react";
 
 import { useNotionContext } from "@context";
 import { cs } from "@utils";
-import { Core, Collections, Blocks, Components } from "@types";
+import { Domain, View } from "@types";
 import {
   DateProperty,
   NumberProperty,
@@ -11,10 +11,8 @@ import {
   SelectTagProperty,
   UrlProperty,
 } from "./properties";
-import { Block, Decorated, Collection, PageBlock } from "@entities";
-import { Component as PageLink } from "@components/page-link";
-import { Component as PageTitle } from "@components/page-title";
-import { Component as Checkbox } from "@components/checkbox";
+import { Block, Decorated, Property } from "@entities";
+import { PageLink, PageLinkTitle, Checkbox } from "@components";
 
 /**
  * Renders a single value of structured Notion data according to its schema.
@@ -24,69 +22,48 @@ import { Component as Checkbox } from "@components/checkbox";
  */
 
 export type Props = {
-  collection: Collection;
-  data: Decorated;
-  schema: Collections.PropertySchema;
-  inline?: boolean;
-  block?: Block<Blocks.Every>;
+  property: Property;
+  block?: Domain.Blocks.Any;
 };
 
-export const Component: Components.Presenter<Props> = ({
-  data,
-  schema,
-  block,
-  collection,
-  inline = false,
-}) => {
-  const { type } = schema;
+export const Component: View.Component<Props> = ({ property, block }) => {
+  const { type } = property;
   const style = cs("notion-property", `notion-property-${type}`);
 
   return (
     <span className={style}>
-      <PropertyContent {...{ block, schema, data, inline, collection }} />
+      <PropertyContent {...{ block, property }} />
     </span>
   );
 };
 
-type PropertyContentProps = Pick<
-  Props,
-  "block" | "data" | "collection" | "schema"
-> & {
-  inline: boolean;
-};
+type PropertyContentProps = Props;
 
-const PropertyContent: Components.Presenter<PropertyContentProps> = ({
+const PropertyContent: View.Component<PropertyContentProps> = ({
   block,
-  inline,
-  schema,
-  collection,
-  data = new Decorated(),
+  property,
 }) => {
   const { components, recordMap } = useNotionContext();
 
-  if (!block || !schema) {
-    return <components.text value={data} />;
+  if (!block) {
+    return <components.text value={property.data} />;
   }
 
-  const properties: Core.PropertyMap | undefined =
-    block.properties.getOrElse(undefined);
-
-  switch (schema.type) {
+  switch (property.type) {
     case "relation":
-      return <components.text value={data} block={block} />;
+      return <components.text value={property.data} block={block} />;
 
     case "formula":
-      return (
-        <FormulaProperty.Property {...{ schema, collection, properties }} />
-      );
+      return <FormulaProperty.Property {...{ property, block }} />;
 
     case "title": {
       return (
         <PageLink
+          blockId={block.id}
           className={cs("notion-page-link")}
           href={recordMap.mapPageUrl(block.id)}
         >
-          <PageTitle block={block as PageBlock} />
+          <PageLinkTitle block={block} />
         </PageLink>
       );
     }
@@ -94,7 +71,7 @@ const PropertyContent: Components.Presenter<PropertyContentProps> = ({
     case "select":
     // intentional fallthrough
     case "multi_select":
-      return <SelectTagProperty.Property data={data} schema={schema} />;
+      return <SelectTagProperty.Property data={property.data} />;
 
     case "person":
       return <components.text value={data} block={block} />;

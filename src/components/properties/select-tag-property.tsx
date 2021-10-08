@@ -1,14 +1,15 @@
 import React from "react";
 
-import { Components } from "@types";
+import { Domain, View } from "@types";
 import { cs } from "@utils";
-import { Props as PropertyProps } from "../property";
+import { Property } from "@entities";
 
-export type Props = Pick<PropertyProps, "data" | "schema">;
+export type Props = {
+  property: Property<Domain.Definitions.Select>;
+};
 
-export const Property: Components.Presenter<Props> = ({ data, schema }) => {
-  const values = data.asString.split(",");
-  const options = schema?.options ?? [];
+export const PropertyComponent: View.Component<Props> = ({ property }) => {
+  const { value, options } = property.value;
 
   const tags = values.map((value, index) => {
     const option = options.find((option) => value === option.value);

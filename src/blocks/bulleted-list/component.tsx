@@ -1,8 +1,8 @@
 import React from "react";
 
-import { Components } from "@types";
-import { Entity as BulletedListBlock } from "./";
+import { View } from "@types";
 import { List } from "@blocks";
+import { Entity as BulletedListBlock } from "./";
 
 export type Props = {
   block: BulletedListBlock;
@@ -10,7 +10,7 @@ export type Props = {
   children?: React.ReactNode;
 };
 
-export const BulletedListComponent: Components.Presenter<Props> = ({
+export const BulletedListComponent: View.Component<Props> = ({
   block,
   className,
   children,

@@ -1,20 +1,18 @@
 import { Option, Some, None } from "excoptional";
-import { Blocks } from "@types";
-import { Block } from "@entities";
+import { Domain, Api } from "@types";
 
 export class TransclusionReferenceBlock
-  extends Block<Blocks.TransclusionReference>
-  implements Blocks.Template<Blocks.TransclusionReference>
+  extends Domain.Block<Api.Blocks.TransclusionReference>
+  implements Domain.Blocks.Template<Api.Blocks.TransclusionReference>
 {
-  get copiedFromPointer(): Option<Blocks.Format.Pointer> {
-    const value = this._format?.copied_from_pointer;
-    if (!value) return None();
-    return Some(value);
-  }
+  readonly transclusionReferencePointer: Option<Api.Blocks.Format.Pointer>;
 
-  get transclusionReferencePointer(): Option<Blocks.Format.Pointer> {
-    const value = this._format?.transclusion_reference_pointer;
-    if (!value) return None();
-    return Some(value);
+  constructor(block: Api.Blocks.TransclusionReference) {
+    super(block);
+    this.transclusionReferencePointer = this.format.then((format) => {
+      const value = format?.transclusion_reference_pointer;
+      if (!value) return None();
+      return Some(value);
+    });
   }
 }

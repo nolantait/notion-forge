@@ -1,18 +1,19 @@
-import { Core } from "@types";
-import { Decorated, CollectionProperty } from "@entities";
+import { AnyDefinition, Decorated } from "@entities";
 
 export class Property {
-  readonly type: Core.PropertyType;
-  private readonly _schema: CollectionProperty;
-  private readonly _data: Decorated;
+  readonly schema: AnyDefinition;
+  readonly data: Decorated;
 
-  constructor(schema: CollectionProperty, data: Decorated) {
-    this.type = schema.type;
-    this._schema = schema;
-    this._data = data;
+  constructor(schema: AnyDefinition, data: Decorated) {
+    this.schema = schema;
+    this.data = data;
   }
 
-  get data(): string {
-    return this._data.asString;
+  get value(): ReturnType<AnyDefinition["decorate"]> {
+    return this.schema.decorate(this);
+  }
+
+  get rawValue(): string {
+    return this.data.asString;
   }
 }

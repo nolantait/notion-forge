@@ -1,29 +1,66 @@
 import { Some, None, Option } from "excoptional";
-import { BlocksWithTrait } from "./";
-import { Constructor } from "@mixins";
+import { Domain, Api, Mixins } from "@types";
 
-type Whitelist = BlocksWithTrait<"pageable">;
+export type HasPage = Mixins.Constructor<
+  Domain.Block<Mixins.WithTrait<IsPageable>>
+>;
 
-export function Pageable<TBase extends Constructor<Whitelist>>(Base: TBase) {
-  return class extends Base {
-    get pageFullWidth(): Option<boolean> {
-      if (!this._format?.page_full_width) return None();
-      return Some(this._format.page_full_width);
-    }
+export type IsPageable = {
+  format?: Api.Blocks.Format.Page;
+};
 
-    get pageSmallText(): Option<boolean> {
-      if (!this._format?.page_small_text) return None();
-      return Some(this._format.page_small_text);
-    }
+export type IPageable = {
+  pageFullWidth: Option<boolean>;
+  pageSmallText: Option<boolean>;
+  pageCoverPosition: Option<number>;
+  pageCover: Option<string>;
+  pageFont: Option<Domain.Font>;
+  pageSectionVisibility: Option<Api.Blocks.Format.PageSectionVisibility>;
+};
 
-    get pageCoverPosition(): Option<number> {
-      if (!this._format?.page_cover_position) return None();
-      return Some(this._format.page_cover_position);
-    }
+export function Pageable<TBase extends HasPage>(
+  Base: TBase
+): Mixins.Constructor<IPageable> & TBase {
+  return class Pageable extends Base implements IPageable {
+    readonly pageFullWidth: Option<boolean>;
+    readonly pageSmallText: Option<boolean>;
+    readonly pageCoverPosition: Option<number>;
+    readonly pageCover: Option<string>;
+    readonly pageFont: Option<Domain.Font>;
+    readonly pageSectionVisibility: Option<Api.Blocks.Format.PageSectionVisibility>;
 
-    get pageCover(): Option<string> {
-      if (!this._format?.page_cover) return None();
-      return Some(this._format.page_cover);
+    constructor(...args: any[]) {
+      super(...args);
+      this.pageFullWidth = this.format.then((format) => {
+        const value = format?.page_full_width;
+        if (!value) return None();
+        return Some(value);
+      });
+      this.pageSmallText = this.format.then((format) => {
+        const value = format?.page_small_text;
+        if (!value) return None();
+        return Some(value);
+      });
+      this.pageCoverPosition = this.format.then((format) => {
+        const value = format?.page_cover_position;
+        if (!value) return None();
+        return Some(value);
+      });
+      this.pageCover = this.format.then((format) => {
+        const value = format?.page_cover;
+        if (!value) return None();
+        return Some(value);
+      });
+      this.pageFont = this.format.then((format) => {
+        const value = format?.page_font;
+        if (!value) return None();
+        return Some(value);
+      });
+      this.pageSectionVisibility = this.format.then((format) => {
+        const value = format?.page_section_visibility;
+        if (!value) return None();
+        return Some(value);
+      });
     }
   };
 }

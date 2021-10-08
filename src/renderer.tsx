@@ -1,14 +1,14 @@
 import React from "react";
 import mediumZoom from "medium-zoom";
 
-import { Blocks, Components, Core } from "@types";
+import { Domain, View } from "@types";
 import {
   useNotionContext,
   ContextProvider as NotionContextProvider,
 } from "@context";
 import { Component as Block } from "./block";
 
-export type Props = Core.NotionContext & {
+export type Props = Domain.NotionContext & {
   rootPageId?: string;
   hideBlockId?: boolean;
   className?: string;
@@ -19,7 +19,7 @@ export type Props = Core.NotionContext & {
   pageCover?: React.ReactNode;
 };
 
-export const Renderer: Components.Presenter<Props> = ({
+export const Renderer: View.Component<Props> = ({
   components,
   recordMap,
   fullPage,
@@ -59,12 +59,12 @@ export const Renderer: Components.Presenter<Props> = ({
 
 export type BlockRendererProps = {
   level: number;
-  blockId?: Blocks.ID;
+  blockId?: Domain.Blocks.ID;
   hideBlockId?: boolean;
   rest?: any[];
 };
 
-export const BlockRenderer: Components.Presenter<BlockRendererProps> = ({
+export const BlockRenderer: View.Component<BlockRendererProps> = ({
   level = 0,
   blockId,
   hideBlockId = false,
@@ -86,7 +86,7 @@ export const BlockRenderer: Components.Presenter<BlockRendererProps> = ({
       block={block}
       {...rest}
     >
-      {block.content.map((childBlockId: Blocks.ID) => (
+      {block.content.map((childBlockId: Domain.Blocks.ID) => (
         <BlockRenderer
           key={childBlockId}
           blockId={childBlockId}

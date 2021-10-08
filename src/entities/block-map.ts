@@ -1,44 +1,79 @@
 import { Option, Some, None } from "excoptional";
-import { API, Blocks } from "@types";
-import { Block } from "@entities";
+import { Domain } from "@types";
+import { BlockFactory } from "@factories";
+import { RecordMap } from "./";
 
-export interface Leaf extends Tree {
-  item: Block<Blocks.Every>;
-  children: Children;
-  parent: Option<Parent>;
-  find: (id: Blocks.ID) => Option<Leaf>;
-  where: (condition: WhereClause) => Option<Leaf> | Option<Leaf[]>;
+interface LeafParams {
+  block: Domain.Blocks.Any;
+  parent?: Option<Parent>;
+  children?: Children;
 }
 
-export interface Tree {}
-
+type Leaf = Node | Composite;
 type Children = Leaf[];
 type Parent = Composite;
-type WhereClause = (block: Block<Blocks.Every>) => boolean;
+type WhereClause = (block: Domain.Blocks.Any) => boolean;
 
-export class BlockMap implements Tree {
+// Build tree by adding children functionally to root nodes.
+// This takes the flat structure Notion gives and converts it into a tree
+// interface
+const buildTree = (recordMap: RecordMap): Composite => {
+  const blockMap = recordMap.dto.block;
+
+  const blocks = Object.keys(blockMap).map((key): Domain.Blocks.Any => {
+    const dto = blockMap[key].value;
+    return BlockFactory(dto);
+  });
+
+  const rootBlock = blocks.find((block) => block.isRoot);
+  if (!rootBlock) {
+    throw new Error(`Could not find root block for ${blocks}`);
+  }
+
+  const root = new Composite({ block: rootBlock });
+
+  const addChildren = (
+    leaf: Leaf,
+    parent: Parent | undefined = undefined
+  ): Leaf => {
+    if (parent) {
+      leaf = leaf.setParent(parent);
+    }
+
+    return leaf.addChildren(
+      blocks
+        .filter((otherBlock) => otherBlock.parentId === leaf.id)
+        .map((block) => new Node({ block }))
+        .map((node) => addChildren(node, leaf))
+    );
+  };
+
+  return addChildren(root);
+};
+
+export class BlockMap {
   public root: Composite;
 
-  constructor(recordMap: API.ExtendedRecordMap) {
-    this.root = BuildTree(recordMap);
+  constructor(recordMap: RecordMap) {
+    this.root = buildTree(recordMap);
   }
 
-  where(condition: WhereClause): Block<Blocks.Every>[] {
+  where(condition: WhereClause): Domain.Blocks.Any[] {
     const found = this.root.where(condition).getOrElse([]);
 
-    return found.map((leaf) => leaf.item);
+    return found.map((leaf) => leaf.block);
   }
 
-  find(id: Blocks.ID): Option<Block<Blocks.Every>> {
+  find(id: Domain.Blocks.ID): Option<Domain.Blocks.Any> {
     const found = this._find(id).getOrElse(undefined);
     if (!found) return None();
-    return Some(found.item);
+    return Some(found.block);
   }
 
-  ancestors(id: Blocks.ID): Option<Block<Blocks.Every>[]> {
+  ancestors(id: Domain.Blocks.ID): Option<Domain.Blocks.Any[]> {
     return this._find(id)
       .then((composite) => this._ancestors([], composite))
-      .then((composites) => composites.map((composite) => composite.item));
+      .then((composites) => composites.map((composite) => composite.block));
   }
 
   private _ancestors(
@@ -57,32 +92,34 @@ export class BlockMap implements Tree {
       .getOrElse([]);
   }
 
-  private _find(id: Blocks.ID): Option<Leaf> {
+  private _find(id: Domain.Blocks.ID): Option<Leaf> {
     return this.root.find(id);
   }
 }
 
-class Composite implements Leaf {
-  public item: Block<Blocks.Every>;
-  public children: Children;
-  public parent: Option<Parent>;
+class Composite {
+  readonly id: Domain.ID;
+  readonly block: Domain.Blocks.Any;
+  readonly children: Children;
+  readonly parent: Option<Parent>;
 
-  constructor(block: Block<Blocks.Every>, parent: Composite | undefined) {
-    this.item = block;
-    this.children = [];
-    this.parent = parent ? Some(parent) : None();
+  constructor({ block, parent, children }: LeafParams) {
+    this.id = block.id;
+    this.block = block;
+    this.children = children ?? [];
+    this.parent = parent ?? None();
   }
 
   where(condition: WhereClause): Option<Leaf[]> {
-    const predicate = (child: Leaf) => child.where(condition).getOrElse(null);
-    const removeNull = (child: Leaf[] | Leaf | null): child is Leaf => !!child;
-    const found = this.children.map(predicate).filter(removeNull);
+    const found = this.children
+      .map((child) => child.where(condition).getOrElse([] as Leaf[]))
+      .flat();
 
     if (!found.length) return None();
     return Some(found);
   }
 
-  find(id: Blocks.ID): Option<Leaf> {
+  find(id: Domain.Blocks.ID): Option<Leaf> {
     const found =
       this.children
         .map((child) => child.find(id))
@@ -91,77 +128,63 @@ class Composite implements Leaf {
     return found;
   }
 
-  addChild(block: Block<Blocks.Every>): Leaf {
-    if (block.content.length) {
-      const composite = new Composite(block, this);
-      this.children.push(composite);
-      return composite;
-    } else {
-      const node = new Node(block, this);
-      this.children.push(node);
-      return node;
-    }
+  addChildren(leafs: Leaf[]): Composite {
+    return new Composite({
+      block: this.block,
+      parent: this.parent,
+      children: [...this.children, ...leafs],
+    });
+  }
+
+  setParent(parent: Parent): Composite {
+    return new Composite({
+      block: this.block,
+      parent: Some(parent),
+      children: this.children,
+    });
   }
 }
 
-class Node implements Leaf {
-  public item: Block<Blocks.Every>;
-  public parent: Option<Parent>;
+class Node {
+  readonly id: Domain.ID;
+  readonly block: Domain.Blocks.Any;
+  readonly children = [];
+  readonly parent: Option<Parent>;
 
-  constructor(block: Block<Blocks.Every>, parent: Composite) {
-    this.item = block;
-    this.parent = Option.of(parent);
+  constructor({ block, parent }: LeafParams) {
+    this.id = block.id;
+    this.block = block;
+    this.parent = parent ?? None();
   }
 
-  where(condition: WhereClause): Option<Node> {
-    if (condition(this.item)) {
+  where(condition: WhereClause): Option<Node[]> {
+    if (condition(this.block)) {
+      return Some([this]);
+    }
+
+    return None();
+  }
+
+  find(id: Domain.Blocks.ID): Option<Leaf> {
+    if (this.block.id === id) {
       return Some(this);
     }
 
     return None();
   }
 
-  find(id: Blocks.ID): Option<Leaf> {
-    if (this.item.id === id) {
-      return Some(this);
-    }
-
-    return None();
+  addChildren(leafs: Leaf[]): Composite {
+    return new Composite({
+      block: this.block,
+      parent: this.parent,
+      children: leafs,
+    });
   }
 
-  get children(): Children {
-    return [];
+  setParent(parent: Parent): Node {
+    return new Node({
+      block: this.block,
+      parent: Some(parent),
+    });
   }
 }
-
-const BuildNode = (
-  id: Blocks.ID,
-  recordMap: API.ExtendedRecordMap,
-  parent: Composite
-): Composite | Node => {
-  const value = recordMap.block[id].value;
-  const block = new Block(value);
-  if (block.content.length) {
-    const composite = BuildComposite(new Composite(block, parent), recordMap);
-    return composite;
-  } else {
-    const node = new Node(block, parent);
-    return node;
-  }
-};
-
-const BuildComposite = (
-  composite: Composite,
-  recordMap: API.ExtendedRecordMap
-): Composite => {
-  composite.children = composite.item.content.map((id) =>
-    BuildNode(id, recordMap, composite)
-  );
-  return composite;
-};
-
-const BuildTree = (recordMap: API.ExtendedRecordMap) => {
-  const root = new Composite(new Block(recordMap.block[0].value), undefined);
-  const tree = BuildComposite(root, recordMap);
-  return tree;
-};

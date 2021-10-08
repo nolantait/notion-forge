@@ -1,7 +1,6 @@
-//import {Ability} from "@mixins";
-import { Blocks } from "@types";
-import { Block } from "@entities";
+import { Domain, Api } from "@types";
+import { Ability } from "@mixins";
 
 export class AudioBlock
-  extends Block<Blocks.Audio>
-  implements Blocks.Template<Blocks.Audio> {}
+  extends Ability.Embeddable<Api.Blocks.Audio>(Domain.Block)
+  implements Domain.Blocks.Template<Api.Blocks.Audio> {}

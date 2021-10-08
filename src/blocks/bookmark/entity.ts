@@ -1,16 +1,25 @@
-import { Some, None, Option } from "excoptional";
+import { Option, None, Some } from "excoptional";
 import { Ability } from "@mixins";
-import { Blocks } from "@types";
+import { Api, Domain } from "@types";
 
 export class BookmarkBlock
-  extends Ability.Linkable<Blocks.Bookmark>
-  implements Blocks.Template<Blocks.Bookmark>
+  extends Ability.Linkable<Api.Blocks.Bookmark>(Domain.Block)
+  implements Domain.Blocks.Template<Api.Blocks.Bookmark>
 {
-  get bookmarkIcon(): string {
-    return this._format.bookmark_icon ?? "";
-  }
+  readonly bookmarkIcon: Option<string>;
+  readonly bookmarkCover: Option<string>;
 
-  get bookmarkCover(): string {
-    return this._format.bookmark_cover ?? "";
+  constructor(...args: any[]) {
+    super(...args);
+    this.bookmarkIcon = this.format.then((format) => {
+      const value = format?.bookmark_icon;
+      if (!value) return None();
+      return Some(value);
+    });
+    this.bookmarkCover = this.format.then((format) => {
+      const value = format?.bookmark_cover;
+      if (!value) return None();
+      return Some(value);
+    });
   }
 }

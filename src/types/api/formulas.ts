@@ -105,7 +105,7 @@ type FunctionType =
   | "year";
 
 interface BaseFormula {
-  type: FormulaType;
+  type: AnyType;
   result_type: ResultType;
 }
 
@@ -129,12 +129,12 @@ interface SymbolFormula extends BaseFormula {
 interface FunctionFormula extends BaseFormula {
   type: "function";
   name: FunctionType;
-  args: Formula[];
+  args: Any[];
 }
 
 interface OperatorFormula extends BaseFormula {
   type: "operator";
   operator: OperatorType;
   name: FunctionType;
-  args: Formula[];
+  args: Any[];
 }

@@ -1,6 +1,6 @@
 import { Ability } from "@mixins";
-import { Blocks } from "@types";
+import { Domain, Api } from "@types";
 
 export class VideoBlock
-  extends Ability.Embeddable<Blocks.Video>
-  implements Blocks.Template<Blocks.Video> {}
+  extends Ability.Embeddable<Api.Blocks.Video>(Domain.Block)
+  implements Domain.Blocks.Template<Api.Blocks.Video> {}

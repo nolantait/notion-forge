@@ -1,1 +1,1 @@
-export { Decorator as TextDecorator } from "./text";
+export { TextDecorator } from "./text";

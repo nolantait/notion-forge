@@ -1,6 +1,6 @@
 import { Ability } from "@mixins";
-import { Blocks } from "@types";
+import { Domain, Api } from "@types";
 
 export class BulletedListBlock
-  extends Ability.Typographic<Blocks.BulletedList>
-  implements Blocks.Template<Blocks.BulletedList> {}
+  extends Ability.Iconable<Api.Blocks.BulletedList>(Domain.Block)
+  implements Domain.Blocks.Template<Api.Blocks.BulletedList> {}

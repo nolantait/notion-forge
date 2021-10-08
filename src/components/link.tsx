@@ -1,9 +1,9 @@
 import React from "react";
 
-import { Components } from "@types";
+import { View } from "@types";
 
 export type Props = React.HTMLProps<HTMLAnchorElement>;
 
-export const Component: Components.Presenter<Props> = (props) => (
+export const Component: View.Component<Props> = (props) => (
   <a target="_blank" rel="noopener noreferrer" {...props} />
 );

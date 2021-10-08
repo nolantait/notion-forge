@@ -1,22 +1,33 @@
-import { Formats } from "@types";
+import { Api } from "@types";
 
 export class Decorated {
-  _value: Formats.Decoration[];
+  _value: Api.Formats.Decoration[];
+
+  static empty() {
+    return new Decorated();
+  }
 
   static fromString(
     value: string,
-    format?: Formats.SubDecoration[]
+    format?: Api.Formats.SubDecoration[]
   ): Decorated {
     if (format) {
-      const decoration: Formats.Decoration[] = [[value, format]];
+      const decoration: Api.Formats.Decoration[] = [[value, format]];
       return new Decorated(decoration);
     }
 
     return new Decorated([[value]]);
   }
 
-  constructor(value?: Formats.Decoration[]) {
+  constructor(value?: Api.Formats.Decoration[]) {
     this._value = value ?? [[""]];
+  }
+
+  unwrap<T>(
+    func: (decoration: Api.Formats.Decoration[], ...args: any[]) => T,
+    ...args: any[]
+  ): T {
+    return func(this.asDecoration, args);
   }
 
   get isEmpty(): boolean {
@@ -27,7 +38,11 @@ export class Decorated {
     return this._value[0][0];
   }
 
-  get asDecoration(): Formats.Decoration[] {
+  get asNumber(): number {
+    return parseFloat(this.asString);
+  }
+
+  get asDecoration(): Api.Formats.Decoration[] {
     return this._value;
   }
 }

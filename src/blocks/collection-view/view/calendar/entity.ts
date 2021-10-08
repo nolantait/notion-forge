@@ -1,11 +1,4 @@
-import {Collections} from "@types";
+import { Api } from "@types";
+import { View } from "../entity";
 
-export class CalendarView extends View {
-  readonly type: Collections.ViewType = "calendar";
-  public dto: Collections.CalendarView;
-
-  constructor(dto: Collections.CalendarView) {
-    super(dto);
-    this.dto = dto;
-  }
-}
+export class CalendarView extends View<Api.CollectionViews.CalendarView> {}

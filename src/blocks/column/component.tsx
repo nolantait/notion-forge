@@ -2,8 +2,8 @@ import React from "react";
 
 import { cs } from "@utils";
 import { useNotionContext } from "@context";
-import { Components } from "@types";
-import { ColumnBlock } from "@entities";
+import { View } from "@types";
+import { Entity as ColumnBlock } from "./";
 
 export type Props = {
   block: ColumnBlock;
@@ -11,7 +11,7 @@ export type Props = {
   children?: string;
 };
 
-export const ColumnComponent: Components.Presenter<Props> = ({
+export const ColumnComponent: View.Component<Props> = ({
   block,
   className,
   children,
@@ -20,9 +20,9 @@ export const ColumnComponent: Components.Presenter<Props> = ({
   // note: notion uses 46px
   const spacerWidth = `min(32px, 4vw)`;
   const ratio = block.columnRatio;
-  const parent = recordMap.block[block.parentId]?.value;
+  const parent = recordMap.getParentBlock(block).getOrElse(undefined);
   const columns =
-    parent?.content?.length || Math.max(2, Math.ceil(1.0 / ratio));
+    parent?.content?.length || Math.max(2, Math.ceil(1.0 / ratio.getOrElse(1)));
 
   const width = `calc((100% - (${columns - 1} * ${spacerWidth})) * ${ratio})`;
   const inlineStyle = { width };

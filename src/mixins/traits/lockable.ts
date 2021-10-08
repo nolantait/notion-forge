@@ -1,25 +1,36 @@
 import { Some, None, Option } from "excoptional";
-import { BlocksWithTrait } from "./";
+import { Domain, Api, Mixins } from "@types";
 
-import { Constructor } from "@mixins";
+export type HasLock = Mixins.Constructor<
+  Domain.Block<Mixins.WithTrait<IsLockable>>
+>;
 
-type Whitelist = BlocksWithTrait<"lockable">;
+export type IsLockable = { format?: Api.Blocks.Format.Access };
 
-export function Lockable<TBase extends Constructor<Whitelist>>(Base: TBase) {
-  return class extends Base {
-    get blockLocked(): Option<boolean> {
-      if (!this._format?.block_locked) return None();
-      return Some(this._format.block_locked);
-    }
+export type ILockable = {
+  blockLocked: Option<boolean>;
+  blockLockedBy: Option<string>;
+};
 
-    get blockLockedBy(): Option<string> {
-      if (!this._format?.block_locked_by) return None();
-      return Some(this._format.block_locked_by);
-    }
+export function Lockable<TBase extends HasLock>(
+  Base: TBase
+): Mixins.Constructor<ILockable> & TBase {
+  return class Lockable extends Base implements ILockable {
+    readonly blockLocked: Option<boolean>;
+    readonly blockLockedBy: Option<string>;
 
-    get _access() {
-      const defaults = { block_locked: false, block_locked_by: "" };
-      return Object.assign({}, defaults, this.format.getOrElse(defaults));
+    constructor(...args: any[]) {
+      super(...args);
+      this.blockLocked = this.format.then((format) => {
+        const value = format?.block_locked;
+        if (!value) return None();
+        return Some(value);
+      });
+      this.blockLockedBy = this.format.then((format) => {
+        const value = format?.block_locked_by;
+        if (!value) return None();
+        return Some(value);
+      });
     }
   };
 }

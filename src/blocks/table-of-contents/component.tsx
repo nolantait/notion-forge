@@ -1,8 +1,8 @@
 import React from "react";
 
 import { useNotionContext } from "@context";
-import { Components } from "@types";
-import { cs, uuidToId } from "@utils";
+import { View } from "@types";
+import { cs } from "@utils";
 import { Entity as TableOfContentsBlock } from "./";
 import { TableOfContentsEntry } from "@entities";
 
@@ -11,7 +11,7 @@ export type Props = {
   className?: string;
 };
 
-export const TableOfContentsComponent: Components.Presenter<Props> = ({
+export const TableOfContentsComponent: View.Component<Props> = ({
   block,
   className,
 }) => {
@@ -39,9 +39,9 @@ type ItemProps = {
   item: TableOfContentsEntry;
 };
 
-const Item: Components.Presenter<ItemProps> = ({ item }) => {
-  const { id, level, text } = item;
-  const href = `#${uuidToId(id)}`;
+const Item: View.Component<ItemProps> = ({ item }) => {
+  const { uuid, id, level, text } = item;
+  const href = `#${uuid}`;
   const itemStyle = {
     display: "inline-block",
     marginLeft: level * 24,

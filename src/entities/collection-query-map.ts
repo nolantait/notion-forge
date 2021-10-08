@@ -1,17 +1,17 @@
 import { Some, None, Option } from "excoptional";
-import { API, Collections } from "@types";
+import { Api } from "@types";
 import { CollectionQueryResult } from "@entities";
 
 export class CollectionQueryMap {
-  readonly dto: API.CollectionQuery;
+  readonly dto: Api.Responses.CollectionQuery;
 
-  constructor(dto: API.CollectionQuery) {
+  constructor(dto: Api.Responses.CollectionQuery) {
     this.dto = dto;
   }
 
   find(
-    collectionId: Collections.ID,
-    viewId: Collections.ViewID
+    collectionId: Api.Collections.ID,
+    viewId: Api.Collections.ViewID
   ): Option<CollectionQueryResult> {
     const value = this.dto[collectionId]?.[viewId];
     if (!value) return None();

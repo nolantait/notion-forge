@@ -1,6 +1,6 @@
 import { Ability } from "@mixins";
-import { Blocks } from "@types";
+import { Domain, Api } from "@types";
 
 export class HeaderBlock
-  extends Ability.Typographic<Blocks.Header>
-  implements Blocks.Template<Blocks.Header> {}
+  extends Ability.Iconable<Api.Blocks.Header>(Domain.Block)
+  implements Domain.Blocks.Template<Api.Blocks.Header> {}

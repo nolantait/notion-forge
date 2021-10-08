@@ -1,10 +1,9 @@
 import * as Blocks from "@blocks";
 import { Option, Some, None } from "excoptional";
-import { Entities, Core, API, Collections } from "@types";
+import { Domain, Api } from "@types";
 import {
-  AnyView,
+  AnyHeader,
   Collection,
-  Block,
   BlockMap,
   CollectionQueryResult,
   CollectionViewMap,
@@ -17,10 +16,10 @@ import {
   TableOfContentsEntry,
 } from "@entities";
 
-export const MapPageUrl: Core.MapPageUrl = (
+export const MapPageUrl: Domain.MapPageUrl = (
   pageId: Blocks.ID,
   rootPageId?: Blocks.ID
-): Core.URL => {
+): Domain.Url => {
   const mappedUrl = pageId.replace(/-/g, "");
   if (rootPageId === pageId) {
     return "/";
@@ -29,10 +28,10 @@ export const MapPageUrl: Core.MapPageUrl = (
   }
 };
 
-export const MapImageUrl: Core.MapImageUrl = (
+export const MapImageUrl: Domain.MapImageUrl = (
   url: string,
   block: Blocks.Any
-): Core.URL => {
+): Domain.Url => {
   const prefixNotionUrl = (url: string) => `https://notion.so${url}`;
 
   if (url.startsWith("data")) return url;
@@ -44,7 +43,7 @@ export const MapImageUrl: Core.MapImageUrl = (
   if (!url.startsWith("https://images.unsplash.com")) {
     const shouldOverride =
       block.parentIs("space") || block.parentIs("collection");
-    const parentType = shouldOverride ? "block" : block.parentTable;
+    const parentType = shouldOverride ? "block" : block.parentType;
     const imageUrl = url.startsWith("/image")
       ? url
       : `/image/${encodeURIComponent(url)}`;
@@ -63,7 +62,7 @@ export const MapImageUrl: Core.MapImageUrl = (
 type BlockOrCollection = {
   id: Blocks.ID;
   parentId: Blocks.ID;
-  parentTable: Core.ParentType;
+  parentType: Domain.ParentType;
   type: Blocks.BlockType | "collection";
 };
 
@@ -77,9 +76,9 @@ const defaultRecordMap = {
 };
 
 export class RecordMap {
-  readonly dto: API.ExtendedRecordMap;
-  mapImageUrl: Core.MapImageUrl;
-  mapPageUrl: Core.MapPageUrl;
+  readonly dto: Api.Responses.ExtendedRecordMap;
+  mapImageUrl: Domain.MapImageUrl;
+  mapPageUrl: Domain.MapPageUrl;
 
   private readonly _collections: CollectionMap;
   private readonly _views: CollectionViewMap;
@@ -89,15 +88,15 @@ export class RecordMap {
   private readonly _urls: SignedUrlMap;
 
   constructor(
-    dto: API.ExtendedRecordMap = defaultRecordMap,
-    mapImageUrl: Core.MapImageUrl = MapImageUrl,
-    mapPageUrl: Core.MapPageUrl = MapPageUrl
+    dto: Api.Responses.ExtendedRecordMap = defaultRecordMap,
+    mapImageUrl: Domain.MapImageUrl = MapImageUrl,
+    mapPageUrl: Domain.MapPageUrl = MapPageUrl
   ) {
     this.dto = dto;
     this.mapImageUrl = mapImageUrl;
     this.mapPageUrl = mapPageUrl;
 
-    this._blocks = new BlockMap(dto);
+    this._blocks = new BlockMap(this);
     this._collections = new CollectionMap(dto.collection);
     this._views = new CollectionViewMap(dto.collection_view);
     this._queries = new CollectionQueryMap(dto.collection_query);
@@ -106,29 +105,50 @@ export class RecordMap {
   }
 
   get rootBlock(): Blocks.Any {
-    return this._blocks.root.item;
+    return this._blocks.root.block;
   }
 
-  findBlock(id: Blocks.ID): Option<Blocks.Any> {
+  findBlock(id: Domain.ID): Option<Domain.Blocks.Any> {
     return this._blocks.find(id);
   }
 
-  findCollection(id: Collections.ID): Option<Collection> {
+  findCollection(id: Domain.ID): Option<Collection> {
     return this._collections.find(id);
   }
 
-  findUser(id: API.UserID): Option<User> {
+  findUser(id: Domain.ID): Option<User> {
     return this._users.find(id);
   }
 
-  findView(id: Collections.ViewID): Option<AnyView> {
+  findView(
+    id: Api.Collections.ViewID
+  ): Option<Domain.Blocks.CollectionView.AnyView> {
     return this._views.find(id);
   }
 
   findQuery(
-    view: Blocks.CollectionView.AnyView
+    viewId: Domain.ID,
+    collectionId: Domain.ID
   ): Option<CollectionQueryResult> {
-    return this._queries.find(view.id);
+    return this._queries.find(collectionId, viewId);
+  }
+
+  getFirstImage(block: Domain.Blocks.Any): Option<Domain.Blocks.Image.Entity> {
+    const blocks = this.getBlocks(block.content);
+    const firstFoundImage = blocks.filter(
+      (block): block is Domain.Blocks.Image.Entity => block.type === "image"
+    )[0];
+
+    return firstFoundImage ? Some(firstFoundImage) : None();
+  }
+
+  getViewBlocks(
+    viewId: Domain.ID,
+    collectionId: Domain.ID
+  ): Option<Domain.Blocks.Any[]> {
+    return this.findQuery(viewId, collectionId).then((query) => {
+      return this.getBlocks(query.blockIds);
+    });
   }
 
   getBlocks(blockIds: Blocks.ID[]): Blocks.Any[] {
@@ -147,7 +167,7 @@ export class RecordMap {
   }
 
   getParentBlock(block: Blocks.Any): Option<Blocks.Any | Collection> {
-    if (block.parentTable === "collection") {
+    if (block.parentType === "collection") {
       return this.findCollection(block.id);
     }
 
@@ -168,10 +188,8 @@ export class RecordMap {
   getTableOfContentsEntries(): TableOfContentsEntry[] {
     const headerBlocks = this._blocks.where((block) =>
       ["header", "sub_header", "sub_sub_header"].includes(block.type)
-    );
+    ) as AnyHeader[];
 
-    return headerBlocks.map(
-      (block) => new TableOfContentsEntry(block as Entities.AnyHeader)
-    );
+    return headerBlocks.map((block) => new TableOfContentsEntry(block));
   }
 }

@@ -1,6 +1,6 @@
 import React from "react";
 
-import { Components } from "@types";
+import { View } from "@types";
 import { Entity as NumberedListBlock } from "./";
 import { List } from "@blocks";
 
@@ -10,7 +10,7 @@ export type Props = {
   children?: React.ReactNode;
 };
 
-export const NumberedListComponent: Components.Presenter<Props> = ({
+export const NumberedListComponent: View.Component<Props> = ({
   block,
   className,
   children,

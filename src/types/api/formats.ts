@@ -1,39 +1,4 @@
-import { Core } from "@types";
-/** Block colors supported by Notion */
-
-export type Color =
-  | "transparent"
-  | "gray"
-  | "brown"
-  | "orange"
-  | "yellow"
-  | "teal"
-  | "blue"
-  | "purple"
-  | "pink"
-  | "red"
-  | "gray_background"
-  | "brown_background"
-  | "orange_background"
-  | "yellow_background"
-  | "teal_background"
-  | "blue_background"
-  | "purple_background"
-  | "pink_background"
-  | "red_background";
-
-/** Types of number formatting supported by Notion */
-
-export type NumberFormat =
-  | "number_with_commas"
-  | "percent"
-  | "dollar"
-  | "euro"
-  | "pound"
-  | "yen"
-  | "rupee"
-  | "won"
-  | "yuan";
+import { Core } from "./";
 
 export type BoldSymbol = "b";
 export type BoldFormat = [BoldSymbol];
@@ -54,7 +19,7 @@ export type LinkSymbol = "a";
 export type LinkFormat = [LinkSymbol, Core.URL];
 
 export type ColorSymbol = "h";
-export type ColorFormat = [ColorSymbol, Color];
+export type ColorFormat = [ColorSymbol, Core.Color];
 
 export type UserSymbol = "u";
 export type UserFormat = [UserSymbol, string];

@@ -1,11 +1,11 @@
 import React, { useContext } from "react";
 
-import { Components, Core } from "@types";
+import { Domain, View } from "@types";
 import { MapPageUrl, RecordMap } from "@entities";
 
 import * as Blocks from "@blocks";
 
-const DefaultComponents: Components.Any = {
+const DefaultComponents: View.Any = {
   alias: Blocks.Alias.Component,
   audio: Blocks.Audio.Component,
   bookmark: Blocks.Bookmark.Component,
@@ -45,7 +45,7 @@ const DefaultComponents: Components.Any = {
   video: Blocks.Video.Component,
 };
 
-const DefaultNotionContext: Core.NotionContext = {
+const defaultNotionContext: Domain.NotionContext = {
   rootPageId: undefined,
   components: DefaultComponents,
   fullPage: false,
@@ -58,22 +58,22 @@ const DefaultNotionContext: Core.NotionContext = {
   recordMap: new RecordMap(),
 };
 
-const ctx = React.createContext<Core.NotionContext>(DefaultNotionContext);
+const ctx = React.createContext<Domain.NotionContext>(defaultNotionContext);
 
-type ProviderProps = Core.NotionContext & {
+type ProviderProps = Domain.NotionContext & {
   children: React.ReactElement;
 };
-export const ContextProvider: Components.Presenter<ProviderProps> = ({
+export const ContextProvider: View.Component<ProviderProps> = ({
   components: themeComponents = {},
   children,
   rootPageId,
   ...rest
 }) => {
-  const RemapPageUrl: Core.MapPageUrl = (page, rootId) =>
+  const RemapPageUrl: Domain.MapPageUrl = (page, rootId) =>
     MapPageUrl(page, rootId);
   const pageMapper = rootPageId ? RemapPageUrl : MapPageUrl;
 
-  DefaultNotionContext.recordMap.mapPageUrl = pageMapper;
+  defaultNotionContext.recordMap.mapPageUrl = pageMapper;
 
   return (
     <ctx.Provider
@@ -91,6 +91,6 @@ export const ContextProvider: Components.Presenter<ProviderProps> = ({
 
 export const NotionContextConsumer = ctx.Consumer;
 
-export const useNotionContext = (): Core.NotionContext => {
+export const useNotionContext = (): Domain.NotionContext => {
   return useContext(ctx);
 };

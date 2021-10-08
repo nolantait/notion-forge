@@ -1,4 +1,4 @@
-import { Formats, Core } from "../";
+import { Core } from "../";
 
 export type Any =
   | Page
@@ -9,19 +9,27 @@ export type Any =
   | Bookmark
   | Icon
   | Drive
-  | DriveStatus
-  | DriveProperties
   | Pointer
   | AliasPointer
-  | TransclusionReference
-  | Column
-  | Alias;
+  | TransclusionReferencePointer
+  | CopiedFromPointer
+  | CollectionPointer
+  | ColumnRatio
+  | AliasPointer;
+
+type SectionVisibility = "section_hide" | "section_show";
+export type PageSectionVisibility = {
+  comments: SectionVisibility;
+  backlinks: SectionVisibility;
+};
 
 export type Page = {
   page_full_width?: boolean;
   page_small_text?: boolean;
   page_cover_position?: number;
   page_cover?: string;
+  page_font?: "serif" | "sans-serif" | "mono";
+  page_section_visibility?: PageSectionVisibility;
 };
 
 export type Access = {
@@ -30,7 +38,7 @@ export type Access = {
 };
 
 export type Color = {
-  block_color?: Formats.Color;
+  block_color?: Core.Color;
 };
 
 export type Block = {
@@ -47,8 +55,8 @@ export type Source = {
 };
 
 export type Bookmark = {
-  bookmark_icon?: string;
-  bookmark_cover?: string;
+  bookmark_icon: string;
+  bookmark_cover: string;
 };
 
 export type Icon = {
@@ -58,7 +66,6 @@ export type Icon = {
 export type Drive = {
   drive_status: DriveStatus;
   drive_properties: DriveProperties;
-  display_source: string;
 };
 
 export type DriveStatus = {
@@ -81,21 +88,25 @@ export type DriveProperties = {
 export type Pointer = {
   id: Core.PropertyID;
   spaceid: Core.PropertyID;
+  table: Core.ParentType;
 };
 
-export type AliasPointer = Pointer & {
-  table: string;
+export type CopiedFromPointer = {
+  copied_from_pointer?: Pointer;
 };
 
-export type TransclusionReference = {
-  copied_from_pointer: Pointer;
+export type CollectionPointer = {
+  collection_pointer?: Pointer;
+};
+
+export type TransclusionReferencePointer = {
   transclusion_reference_pointer: Pointer;
 };
 
-export type Column = {
+export type ColumnRatio = {
   column_ratio: number;
 };
 
-export type Alias = {
-  alias_pointer: AliasPointer;
+export type AliasPointer = {
+  alias_pointer: Pointer;
 };

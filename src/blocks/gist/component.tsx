@@ -1,14 +1,13 @@
 import React from "react";
 
-import { Components } from "@types";
+import { Domain, View } from "@types";
 import { IFrame, AssetWrapper } from "@components";
-import * as Blocks from "@blocks";
 
 export type Props = {
-  block: Blocks.Any;
+  block: Domain.Blocks.Gist.Entity;
 };
 
-export const GistComponent: Components.Presenter<Props> = ({ block }) => {
+export const GistComponent: View.Component<Props> = ({ block }) => {
   let src = block.displaySource.getOrElse("");
   if (!src.length) throw new Error(`Could not parse github gist src ${src}`);
   if (!src.endsWith(".pibb")) {

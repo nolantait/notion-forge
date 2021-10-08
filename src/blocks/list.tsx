@@ -1,17 +1,20 @@
 import React from "react";
 
 import { useNotionContext } from "@context";
-import { Components } from "@types";
+import { Domain, View } from "@types";
 import { cs } from "@utils";
-import * as Blocks from "@blocks";
+
+type ValidBlocks =
+  | Domain.Blocks.BulletedList.Entity
+  | Domain.Blocks.NumberedList.Entity;
 
 export type Props = {
-  block: Blocks.BulletedList.Entity | Blocks.NumberedList.Entity;
+  block: ValidBlocks;
   className?: string;
   children?: React.ReactNode;
 };
 
-export const List: Components.Presenter<Props> = ({ block, ...rest }) => {
+export const List: View.Component<Props> = ({ block, ...rest }) => {
   const { recordMap } = useNotionContext();
 
   const isTopLevel =
@@ -33,11 +36,11 @@ export const List: Components.Presenter<Props> = ({ block, ...rest }) => {
 };
 
 type ListWrapProps = {
-  block: Blocks.NumberedList.Entity | Blocks.BulletedList.Entity;
+  block: ValidBlocks;
   className?: string;
   children: React.ReactNode;
 };
-const ListWrap: Components.Presenter<ListWrapProps> = ({
+const ListWrap: View.Component<ListWrapProps> = ({
   block,
   children,
   className,
@@ -57,7 +60,7 @@ const ListWrap: Components.Presenter<ListWrapProps> = ({
 };
 
 type ItemWrapProps = Props;
-const ItemWrap: Components.Presenter<ItemWrapProps> = ({
+const ItemWrap: View.Component<ItemWrapProps> = ({
   block,
   className,
   children,
@@ -77,7 +80,7 @@ const ItemWrap: Components.Presenter<ItemWrapProps> = ({
 };
 
 type ItemProps = Pick<Props, "block">;
-const Item: Components.Presenter<ItemProps> = ({ block }) => {
+const Item: View.Component<ItemProps> = ({ block }) => {
   const { components } = useNotionContext();
   const title = block.title.getOrElse(undefined);
 
