@@ -17,5 +17,5 @@ export * from "./signed-url-map";
 export * from "./table-of-contents-entry";
 
 export * from "./property";
-export * from "./property-definition";
+export * from "./definition";
 export * from "./icon";

@@ -1,5 +1,5 @@
 import { Option, Some, None } from "excoptional";
-import { Definition, Property } from "@entities";
+import { Definition, Decorated } from "@entities";
 import { Api, Domain } from "@types";
 
 export class MultiSelectDefinition extends Definition<Api.Collections.Schema.MultiSelect> {
@@ -11,7 +11,7 @@ export class MultiSelectDefinition extends Definition<Api.Collections.Schema.Mul
     this.options = dto.options ? Some(dto.options) : None();
   }
 
-  decorate(property: Property<Domain.Definitions.MultiSelect>): string[] {
-    return property.rawValue.split(",");
+  _format(decorated: Decorated): string[] {
+    return decorated.asString.split(",");
   }
 }

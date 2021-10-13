@@ -1,5 +1,5 @@
 import { Domain, Api } from "@types";
-import { Property } from "@entities";
+import { Decorated } from "@entities";
 import * as Definitions from "./definitions";
 
 export type AnyDefinition =
@@ -36,7 +36,9 @@ export abstract class Definition<
     this.name = dto.name;
   }
 
-  decorate(property: Property): any {
-    return property.rawValue;
+  format(decorated: Decorated): ReturnType<AnyDefinition["_format"]> {
+    return this._format(decorated);
   }
+
+  abstract _format(decorated: Decorated): ReturnType<AnyDefinition["_format"]>;
 }

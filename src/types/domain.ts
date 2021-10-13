@@ -14,8 +14,7 @@ export type Color = Api.Core.Color;
 export type Font = "serif" | "sans-serif" | "mono";
 export type Pointer = Api.Blocks.Format.Pointer;
 export type Url = string;
-
-export type BlockWith<T> = Api.Blocks.DTO & T;
+export type BlockWith<T> = Extract<Api.Blocks.DTO, T>;
 
 export { Block } from "@entities";
 export { Blocks };

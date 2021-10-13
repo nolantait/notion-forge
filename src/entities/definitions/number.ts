@@ -1,5 +1,5 @@
 import { Option, Some, None } from "excoptional";
-import { Property, Definition } from "@entities";
+import { Decorated, Definition } from "@entities";
 import { Api, Domain } from "@types";
 import formatNumber from "format-number";
 
@@ -12,9 +12,9 @@ export class NumberDefinition extends Definition<Api.Collections.Schema.Number> 
     this.numberFormat = dto.number_format ? Some(dto.number_format) : None();
   }
 
-  decorate(property: Property<Domain.Definitions.Number>): string {
-    return format(property.data.asNumber, this.numberFormat).getOrElse(
-      property.rawValue
+  _format(decorated: Decorated): string {
+    return format(decorated.asNumber, this.numberFormat).getOrElse(
+      decorated.asString
     );
   }
 }

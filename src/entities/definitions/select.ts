@@ -1,5 +1,5 @@
 import { Option, Some, None } from "excoptional";
-import { Definition, Property } from "@entities";
+import { Definition, Decorated } from "@entities";
 import { Api, Domain } from "@types";
 
 export class SelectDefinition extends Definition<Api.Collections.Schema.Select> {
@@ -11,12 +11,12 @@ export class SelectDefinition extends Definition<Api.Collections.Schema.Select> 
     this.options = dto.options ? Some(dto.options) : None();
   }
 
-  decorate(property: Property<Domain.Definitions.Select>): {
+  _format(decorated: Decorated): {
     options: Domain.SelectOption[];
     value: string[];
   } {
     return {
-      value: property.rawValue.split(","),
+      value: decorated.asString.split(","),
       options: this.options.getOrElse([]),
     };
   }
