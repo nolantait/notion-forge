@@ -38,3 +38,23 @@ export type MapImageUrl = (url: string, block: Blocks.Any) => Url;
 import * as Definitions from "../entities/definitions";
 
 export { Definitions };
+
+export type AnyDefinition =
+  | Definitions.Checkbox
+  | Definitions.CreatedTime
+  | Definitions.CreatedBy
+  | Definitions.Date
+  | Definitions.Email
+  | Definitions.File
+  | Definitions.Formula
+  | Definitions.LastEditedTime
+  | Definitions.LastEditedBy
+  | Definitions.MultiSelect
+  | Definitions.Select
+  | Definitions.Number
+  | Definitions.PhoneNumber
+  | Definitions.Person
+  | Definitions.Relation
+  | Definitions.Title
+  | Definitions.Text
+  | Definitions.Url;

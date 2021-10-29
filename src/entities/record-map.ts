@@ -151,6 +151,19 @@ export class RecordMap {
     });
   }
 
+  getPropertyDefinition(
+    collectionId: Domain.ID,
+    propertyId: Domain.PropertyID
+  ): Option<Domain.AnyDefinition> {
+    return this.findCollection(collectionId).then((collection) => {
+      const found = collection.properties.find(
+        (property) => property.id === propertyId
+      );
+      if (!found) return None();
+      return Some(found);
+    });
+  }
+
   getBlocks(blockIds: Blocks.ID[]): Blocks.Any[] {
     const blocks = blockIds
       .map((id) => this.findBlock(id))

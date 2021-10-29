@@ -1,24 +1,23 @@
 import React from "react";
 
-import { Components } from "@types";
+import { View, Domain } from "@types";
 import { PropertyIcon } from "@icons";
 
 export type Props = {
-  schema: {
-    type: string;
-    name: string;
-  };
+  definition: Domain.AnyDefinition;
 };
 
-export const Component: Components.Presenter<Props> = ({ schema }) => {
+export const ColumnTitle: View.Component<Props> = ({ definition }) => {
   return (
     <div className="notion-collection-column-title">
       <PropertyIcon
         className="notion-collection-column-title-icon"
-        type={schema.type}
+        type={definition.type}
       />
 
-      <div className="notion-collection-column-title-body">{schema.name}</div>
+      <div className="notion-collection-column-title-body">
+        {definition.name}
+      </div>
     </div>
   );
 };

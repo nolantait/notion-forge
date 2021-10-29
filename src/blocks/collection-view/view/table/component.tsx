@@ -3,8 +3,9 @@ import React from "react";
 import { cs } from "@utils";
 import { useNotionContext } from "@context";
 import { View, Domain } from "@types";
-import { Component as Property } from "@components/property";
-import { Decorated, CollectionViewProperty, Collection } from "@entities";
+import { Component as PropertyComponent } from "@components/property";
+import { Decorated, CollectionViewProperty, Property } from "@entities";
+import { ColumnTitle } from "../../column-title";
 
 export type Props = {
   view: Domain.Blocks.CollectionView.Table.Entity;
@@ -13,18 +14,18 @@ export type Props = {
 
 export const TableComponent: View.Component<Props> = ({ view, block }) => {
   const { recordMap } = useNotionContext();
-  const tableProperties = view.properties.getOrElse([]);
+  const properties = view.properties.getOrElse([]);
   const blocks = recordMap.getViewBlocks(view.id, block.collectionId);
 
   return (
     <div className="notion-table">
       <div className="notion-table-view">
-        {tableProperties.length && (
+        {properties.length && (
           <>
             <div className="notion-table-header">
               <div className="notion-table-header-inner">
-                {tableProperties.map((property, index) => (
-                  <TableHead key={index} {...{ collection, property }} />
+                {properties.map((property, index) => (
+                  <TableHead key={index} {...{ block, property }} />
                 ))}
               </div>
             </div>
@@ -50,19 +51,19 @@ export const TableComponent: View.Component<Props> = ({ view, block }) => {
   );
 };
 
-const TableCell: View.Component<TableCellProps> = ({
-  property,
-  collection,
-  blockId,
-}) => {
+const TableCell: View.Component<TableCellProps> = ({ property, block }) => {
   const { recordMap } = useNotionContext();
-  const propertyId = property.propertyId;
-  const schema = collection.schema[propertyId];
-  const block = recordMap.findBlock(blockId).getOrElse(undefined);
-  if (!block) throw new Error(`Could not find block for blockID ${blockId}`);
-  const page = block as Domain.Blocks.Page.Entity;
+  const definition = recordMap
+    .getPropertyDefinition(block.collectionId, property.id)
+    .getOrElse(undefined);
 
-  const data = page.getPageProperty(property).getOrElse(new Decorated());
+  if (!definition)
+    throw new Error(`Could not find definition for property ${property}`);
+
+  const blockProperty = block
+    .getPageProperty(property)
+    .getOrElse(Decorated.empty());
+  const definedProperty = new Property(definition, blockProperty);
 
   const style: React.CSSProperties = {
     width: getPropertyWidth(property),
@@ -70,55 +71,55 @@ const TableCell: View.Component<TableCellProps> = ({
 
   const containerStyle = cs(
     "notion-table-cell",
-    `notion-table-cell-${schema.type}`
+    `notion-table-cell-${definedProperty.type}`
   );
 
   return (
-    <div key={propertyId} className={containerStyle} style={style}>
-      <Property
-        schema={schema}
-        data={data}
-        block={page}
-        collection={collection}
-      />
+    <div key={property.id} className={containerStyle} style={style}>
+      <PropertyComponent property={property} block={block} />
     </div>
   );
 };
 
-type TableCellProps = Props & {
-  collection: Collection;
-  property: CollectionViewProperty;
-  blockId: Domain.Blocks.ID;
-};
-
-type TableHeadProps = Props & {
-  collection: Collection;
+type TableCellProps = {
+  block: Domain.Blocks.Page.Entity;
   property: CollectionViewProperty;
 };
 
-const TableHead = ({ collection, property }: TableHeadProps): JSX.Element => {
-  const propertyId = property.id;
-  const schema = collection.schema[propertyId];
+type TableHeadProps = Props & { property: CollectionViewProperty };
+
+const TableHead = ({ block, property }: TableHeadProps): JSX.Element => {
+  const { recordMap } = useNotionContext();
+  const definition = recordMap
+    .getPropertyDefinition(block.collectionId, property.id)
+    .getOrElse(undefined);
+
   const style: React.CSSProperties = {
     width: getPropertyWidth(property),
   };
 
+  if (!definition)
+    throw new Error(
+      `Missing property definition for ${block} with property ${property.id}`
+    );
+
   return (
-    <div className="notion-table-th" key={propertyId}>
+    <div className="notion-table-th" key={property.id}>
       <div className="notion-table-view-header-cell" style={style}>
         <div className="notion-table-view-header-cell-inner">
-          <ColumnTitle schema={schema} />
+          <ColumnTitle definition={definition} />
         </div>
       </div>
     </div>
   );
 };
 
-const getPropertyWidth = (property: TableProperty): number => {
-  const isTitle = property.propertyId === "title";
+const getPropertyWidth = (property: CollectionViewProperty): number => {
+  const isTitle = property.id === "title";
+  const width = property.width.getOrElse(undefined);
 
-  if (property.width) {
-    return property.width;
+  if (width) {
+    return width;
   } else if (isTitle) {
     return 280;
   } else {

@@ -1,6 +1,6 @@
 import { Some, None, Option } from "excoptional";
 import { Api, Domain } from "@types";
-import { Schema, SchemaDefinition, CollectionViewProperty } from "@entities";
+import { Schema, CollectionViewProperty } from "@entities";
 
 export class Collection {
   readonly dto: Api.Collections.Collection;
@@ -33,7 +33,7 @@ export class Collection {
     this._schema = new Schema(this.dto.schema);
   }
 
-  get properties(): SchemaDefinition[] {
+  get properties(): Domain.AnyDefinition[] {
     const hiddenPropIds = Object.keys(
       this.dto.format?.property_visibility ?? {}
     );

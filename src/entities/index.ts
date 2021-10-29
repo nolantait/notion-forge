@@ -9,7 +9,6 @@ export * from "./collection-view-property";
 export * from "./collection-query-map";
 export * from "./collection-query-result";
 export * from "./schema";
-export * from "./schema-definition";
 export * from "./user-map";
 export * from "./user";
 export * from "./signed-url";

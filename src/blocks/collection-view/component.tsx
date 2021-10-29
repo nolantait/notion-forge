@@ -64,8 +64,7 @@ export const CollectionViewComponent: View.Component<Props> = ({
     >
       <div className={containerStyle}>
         <CollectionHeader {...collectionHeaderProps} />
-
-        <ViewComponent block={block} viewId={currentViewId} />
+        <ViewComponent block={block} currentViewId={currentViewId} />
       </div>
     </CollectionActionContext.Provider>
   );
